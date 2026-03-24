@@ -83,9 +83,16 @@ Initial release. RAG-powered OSPF knowledge base assistant for multi-vendor netw
 - **1 live test suite** (LT-001, 35 tests): platform coverage — 5 vendors x 7 queries against live lab devices, generates `testing/live/platform_coverage_results.md` with per-test raw output
 - **Test runner** (`testing/run_tests.sh`) — suite IDs, pass/fail/skip tracking, `--live` flag for lab tests
 
+### CI/CD Pipeline (`.github/workflows/ci.yml`)
+
+- **Lint** — ruff static analysis on every push to main and PRs
+- **Test** — installs CPU-only PyTorch (saves ~1.5GB vs full CUDA build), installs all dependencies from `requirements.txt` (including sentence-transformers, chromadb, langchain), runs `ingest.py` with NetBox disabled (falls back to legacy JSON files) to populate ChromaDB, then runs all 77 automated tests. Live lab tests excluded.
+- **Release** — triggered on version tags (`v*`) only, after lint + test pass. Extracts the matching version section from CHANGELOG.md and creates a GitHub Release with those notes.
+- Triggers: push to main, PRs to main, version tags
+
 ### Documentation
 
 - `README.md` — architecture, tech stack, setup, usage, project structure
 - `CLAUDE.md` — OSPF investigation skill with troubleshooting decision trees
-- `metadata/guardrails.md` — all safeguards documented by enforcement type
-- `metadata/RAG_WORKFLOW_EXAMPLE.md` — end-to-end RAG pipeline walkthrough with real data (actual chunks, vectors, similarity scores from the live ChromaDB)
+- `metadata/guardrails/guardrails.md` — all safeguards documented by enforcement type
+- `metadata/workflow/RAG_WORKFLOW_EXAMPLE.md` — end-to-end RAG pipeline walkthrough with real data (actual chunks, vectors, similarity scores from the live ChromaDB)
