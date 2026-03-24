@@ -1,7 +1,7 @@
 # ✨ netKB • Network Knowledge Base
 
 [![Version](https://img.shields.io/badge/version-1.0-1a1a2e)](https://github.com/pdudotdev/netKB/releases/tag/1.0.0)
-![License](https://img.shields.io/badge/license-MIT-1a1a2e)
+![License](https://img.shields.io/badge/license-GPLv3-1a1a2e)
 [![Last Commit](https://img.shields.io/github/last-commit/pdudotdev/netKB?color=1a1a2e)](https://github.com/pdudotdev/netKB/commits/main/)
 
 | | |
@@ -28,7 +28,7 @@
 
 ## 🔭 Overview
 
-RAG-powered OSPF troubleshooting assistant for multi-vendor networks. 
+RAG-powered troubleshooting assistant for multi-vendor networks. 
 
 Combines documentation retrieval (RFCs + vendor guides + network intent) with live device queries across 5+ vendors.
 
@@ -236,7 +236,7 @@ You are responsible for defining your own network intent via NetBox, building yo
 
 ## 📜 License
 
-Licensed under the [**MIT License**](LICENSE).
+Licensed under the [**GNU General Public License v3.0**](LICENSE).
 
 ## 📧 Collaborations
 
