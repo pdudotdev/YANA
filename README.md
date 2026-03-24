@@ -212,7 +212,7 @@ netKB/
 
 ## ⬆️ Planned Upgrades
 
-- [ ] New protocols supported
+- [ ] EIGRP and BGP support
 
 ## ♻️ Repository Lifecycle
 

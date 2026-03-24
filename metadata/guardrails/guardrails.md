@@ -34,7 +34,7 @@ No other user-controlled input reaches a command string. There is no `run_show` 
 
 ### No run_show Tool
 
-Unlike dblCheck, netKB deliberately omits the `run_show` fallback tool. In a multi-vendor environment, raw command execution is error-prone (vendor syntax differences) and expands the attack surface. All device queries are routed through the platform_map, which resolves the correct vendor-specific command automatically.
+netKB deliberately omits a `run_show` fallback tool. In a multi-vendor environment, raw command execution is error-prone (vendor syntax differences) and expands the attack surface. All device queries are routed through the platform_map, which resolves the correct vendor-specific command automatically.
 
 ### SSH Transport (`transport/ssh.py`)
 

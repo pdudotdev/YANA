@@ -13,11 +13,12 @@ from langchain_community.vectorstores import Chroma
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 from core.netbox import load_devices, load_intent
+from tools.rag import _CHROMA_DIR, _COLLECTION, _EMBEDDING_MODEL
 
 DOCS_DIR = Path(__file__).parent / "docs"
 LEGACY_DIR = Path(__file__).parent / "core" / "legacy"
-CHROMA_DIR = Path(__file__).parent / "data" / "chroma"
-COLLECTION_NAME = "ospf_kb"
+CHROMA_DIR = Path(_CHROMA_DIR)
+COLLECTION_NAME = _COLLECTION
 CHUNK_SIZE = 800
 CHUNK_OVERLAP = 100
 
@@ -159,7 +160,7 @@ def ingest():
     print(f"Split into {len(chunks)} chunk(s)")
 
     # Embed and store
-    embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+    embeddings = HuggingFaceEmbeddings(model_name=_EMBEDDING_MODEL)
     Chroma.from_documents(
         documents=chunks,
         embedding=embeddings,

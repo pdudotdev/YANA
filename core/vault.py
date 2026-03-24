@@ -25,6 +25,7 @@ def get_secret(path: str, key: str, fallback_env: str = "", quiet: bool = False)
     try:
         import hvac
         client = hvac.Client(url=vault_addr, token=vault_token)
+        client.session.timeout = (5, 10)
         response = client.secrets.kv.v2.read_secret_version(
             path=path, mount_point="secret", raise_on_deleted_version=True
         )
