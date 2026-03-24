@@ -46,17 +46,20 @@ class TestSearchReturnsResults:
 class TestFiltering:
     async def test_vendor_filter(self, run):
         result = await run("OSPF configuration", vendor="cisco_ios")
+        assert len(result["results"]) > 0
         for r in result["results"]:
             assert r["metadata"]["vendor"] == "cisco_ios"
 
     async def test_topic_filter(self, run):
         result = await run("OSPF neighbor state machine", topic="rfc")
+        assert len(result["results"]) > 0
         for r in result["results"]:
             assert r["metadata"]["topic"] == "rfc"
 
     async def test_compound_filter(self, run):
         """Both vendor + topic should work without ChromaDB $and error."""
         result = await run("OSPF configuration", vendor="cisco_ios", topic="vendor_guide")
+        assert len(result["results"]) > 0
         for r in result["results"]:
             assert r["metadata"]["vendor"] == "cisco_ios"
             assert r["metadata"]["topic"] == "vendor_guide"
@@ -66,6 +69,18 @@ class TestFiltering:
         assert len(result["results"]) > 0
         for r in result["results"]:
             assert r["metadata"]["topic"] == "intent"
+
+
+class TestSearchErrorPath:
+    async def test_vectorstore_failure_returns_error_dict(self, search):
+        """ChromaDB/embedding failure returns structured error dict, not an exception."""
+        from unittest.mock import patch
+        with patch("tools.rag._get_vectorstore", side_effect=RuntimeError("DB corrupt")):
+            from input_models.models import KBQuery
+            result = await search(KBQuery(query="OSPF neighbors"))
+        assert "error" in result
+        assert "results" not in result
+        assert "Knowledge base unavailable" in result["error"]
 
 
 class TestTopK:

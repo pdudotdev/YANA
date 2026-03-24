@@ -2,7 +2,6 @@
 
 Generates platform_coverage_results.md with detailed output per test.
 """
-import asyncio
 from datetime import datetime, timezone
 
 import pytest
@@ -117,22 +116,18 @@ def write_results_file(request):
 # ── Test cases ───────────────────────────────────────────────────────────────
 @pytest.mark.parametrize("device", TEST_DEVICES.keys())
 @pytest.mark.parametrize("query", OSPF_QUERIES)
-def test_ospf_query(device, query):
+async def test_ospf_query(device, query):
     """Test OSPF query against a live device."""
-    result = asyncio.get_event_loop().run_until_complete(
-        get_ospf(OspfQuery(device=device, query=query))
-    )
+    result = await get_ospf(OspfQuery(device=device, query=query))
     status = classify(result)
     record(device, "ospf", query, result, status)
     assert status != "FAIL", f"{device} ospf/{query}: {result.get('error', result.get('raw', '')[:200])}"
 
 
 @pytest.mark.parametrize("device", TEST_DEVICES.keys())
-def test_interfaces(device):
+async def test_interfaces(device):
     """Test interface status query against a live device."""
-    result = asyncio.get_event_loop().run_until_complete(
-        get_interfaces(InterfacesQuery(device=device))
-    )
+    result = await get_interfaces(InterfacesQuery(device=device))
     status = classify(result)
     record(device, "interfaces", "interface_status", result, status)
     assert status != "FAIL", f"{device} interfaces: {result.get('error', result.get('raw', '')[:200])}"

@@ -66,6 +66,11 @@ class TestGetAction:
         with pytest.raises(KeyError):
             get_action(device, "ospf", "neighbors")
 
+    def test_unknown_category_raises(self):
+        device = {"cli_style": "ios"}
+        with pytest.raises(KeyError):
+            get_action(device, "bgp", "neighbors")
+
     def test_vrf_from_device_fallback(self):
         device = {"cli_style": "eos", "vrf": "VRF1"}
         result = get_action(device, "ospf", "neighbors")

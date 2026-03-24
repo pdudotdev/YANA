@@ -39,6 +39,10 @@ class TestOspfQuery:
         with pytest.raises(ValidationError):
             OspfQuery.model_validate("not json at all")
 
+    def test_json_without_vrf_defaults_to_none(self):
+        q = OspfQuery.model_validate('{"device": "R1", "query": "neighbors"}')
+        assert q.vrf is None
+
 
 class TestInterfacesQuery:
     def test_valid(self):

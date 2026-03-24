@@ -1,6 +1,6 @@
-"""UT-006: Ingest helpers — metadata extraction and markdown conversion."""
+"""UT-006: Ingest helpers — metadata extraction, markdown conversion, and context loading."""
 from pathlib import Path
-
+from unittest.mock import patch
 
 from ingest import _router_to_markdown, extract_metadata
 
@@ -32,6 +32,44 @@ class TestExtractMetadata:
         for v in vendors:
             meta = extract_metadata(Path(f"docs/vendor_{v}.md"))
             assert meta["vendor"] == v
+
+
+class TestLoadNetworkContext:
+    def test_netbox_intent_used_when_available(self):
+        from ingest import load_network_context
+        fake_intent = {"routers": {"R1": {"roles": ["ABR"], "platform": "cisco_iosxe"}}}
+        with patch("ingest.load_intent", return_value=fake_intent), \
+             patch("ingest.load_devices", return_value=None):
+            docs = load_network_context()
+        intent_docs = [d for d in docs if d.metadata.get("topic") == "intent"]
+        assert len(intent_docs) == 1
+        assert "R1" in intent_docs[0].page_content
+
+    def test_falls_back_to_intent_json(self, tmp_path, monkeypatch):
+        from ingest import load_network_context
+        import json
+        # Point LEGACY_DIR at tmp_path and write a minimal INTENT.json
+        intent_data = {"routers": {"R2": {"roles": ["LEAF"], "platform": "arista_eos"}}}
+        (tmp_path / "INTENT.json").write_text(json.dumps(intent_data))
+        monkeypatch.setattr("ingest.LEGACY_DIR", tmp_path)
+        with patch("ingest.load_intent", return_value=None), \
+             patch("ingest.load_devices", return_value=None):
+            docs = load_network_context()
+        intent_docs = [d for d in docs if d.metadata.get("topic") == "intent"]
+        assert len(intent_docs) == 1
+        assert "R2" in intent_docs[0].page_content
+
+    def test_inventory_document_has_correct_metadata(self):
+        from ingest import load_network_context
+        fake_inventory = {"R1": {"host": "10.0.0.1", "platform": "cisco_iosxe", "cli_style": "ios"}}
+        with patch("ingest.load_intent", return_value=None), \
+             patch("ingest.load_devices", return_value=fake_inventory), \
+             patch("ingest.LEGACY_DIR", Path("/nonexistent")):
+            docs = load_network_context()
+        inv_docs = [d for d in docs if d.metadata.get("topic") == "inventory"]
+        assert len(inv_docs) == 1
+        assert inv_docs[0].metadata["vendor"] == "all"
+        assert "R1" in inv_docs[0].page_content
 
 
 class TestRouterToMarkdown:

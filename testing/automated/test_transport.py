@@ -19,6 +19,22 @@ class TestExecuteCommand:
         assert result["_command"] == "show ip ospf neighbor"
         assert "FULL" in result["raw"]
 
+    async def test_unknown_device_error_shape(self):
+        """Unknown device error has only 'error' key — no device/cli_style."""
+        from transport import execute_command
+        result = await execute_command("NONEXISTENT", "show version")
+        assert set(result.keys()) == {"error"}
+
+    async def test_ssh_failure_error_shape(self):
+        """SSH failure error includes device and cli_style alongside error."""
+        with patch("transport.execute_ssh", new_callable=AsyncMock) as mock_ssh:
+            mock_ssh.side_effect = TimeoutError("SSH timeout")
+            from transport import execute_command
+            result = await execute_command("R1", "show version")
+        assert "error" in result
+        assert "device" in result
+        assert "cli_style" in result
+
     async def test_ssh_error_returns_error_dict(self):
         with patch("transport.execute_ssh", new_callable=AsyncMock) as mock_ssh:
             mock_ssh.side_effect = ConnectionError("SSH timeout")

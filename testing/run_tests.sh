@@ -51,6 +51,9 @@ run_suite "UT-003" "Tool Layer"               "testing/automated/test_tools.py"
 run_suite "UT-004" "Transport Dispatcher"     "testing/automated/test_transport.py"
 run_suite "UT-005" "Vault Client"             "testing/automated/test_vault.py"
 run_suite "UT-006" "Ingest Helpers"           "testing/automated/test_ingest.py"
+run_suite "UT-007" "NetBox Loader"            "testing/automated/test_netbox.py"
+run_suite "UT-008" "SSH Layer"               "testing/automated/test_ssh.py"
+run_suite "UT-009" "MCP Server Registration" "testing/automated/test_mcp_server.py"
 run_suite "IT-001" "RAG Pipeline"             "testing/automated/test_rag_pipeline.py"
 
 # ── Live Tests ───────────────────────────────────────────────────────────
