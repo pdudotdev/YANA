@@ -9,7 +9,6 @@ import pytest
 
 from core.inventory import devices
 from input_models.models import InterfacesQuery, OspfQuery
-from platforms.platform_map import PLATFORM_MAP
 from tools.operational import get_interfaces
 from tools.ospf import get_ospf
 
@@ -71,7 +70,7 @@ def write_results_file(request):
 
     lines = []
     timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
-    lines.append(f"# Platform Coverage Results")
+    lines.append("# Platform Coverage Results")
     lines.append(f"*Generated: {timestamp}*\n")
 
     # Summary table

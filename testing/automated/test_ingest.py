@@ -1,7 +1,6 @@
 """UT-006: Ingest helpers — metadata extraction and markdown conversion."""
 from pathlib import Path
 
-import pytest
 
 from ingest import _router_to_markdown, extract_metadata
 

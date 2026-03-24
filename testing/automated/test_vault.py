@@ -1,8 +1,6 @@
 """UT-005: Vault client — cache, fallback, sentinel behavior."""
-import os
 from unittest.mock import MagicMock, patch
 
-import pytest
 
 
 class TestVault:

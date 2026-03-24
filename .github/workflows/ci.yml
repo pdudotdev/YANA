@@ -38,7 +38,7 @@ jobs:
         env:
           NETBOX_URL: ""
       - name: Run automated tests
-        run: pytest testing/automated/ -v --tb=short --timeout=30
+        run: python -m pytest testing/automated/ -v --tb=short --timeout=30
 
   # ── Release ──────────────────────────────────────────────────────────────
   # Triggered only on version tags (e.g. v1.1.0).

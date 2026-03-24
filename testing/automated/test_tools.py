@@ -1,8 +1,7 @@
 """UT-003: Tool layer — tests get_ospf and get_interfaces with mocked transport."""
 import asyncio
-from unittest.mock import AsyncMock, patch
+from unittest.mock import patch
 
-import pytest
 
 from input_models.models import InterfacesQuery, OspfQuery
 from tools.ospf import get_ospf

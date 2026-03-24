@@ -1,0 +1,5 @@
+[lint.per-file-ignores]
+# Entry-point files that must configure sys.path / load_dotenv() before imports
+"server/MCPServer.py" = ["E402"]
+"ingest.py" = ["E402"]
+"testing/live/conftest.py" = ["E402"]
