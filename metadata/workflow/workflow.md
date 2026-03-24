@@ -65,14 +65,14 @@ This happens for all 75 chunks across all documents. The database is now ready.
 
 ## Step 2: Query (Every Time You Ask)
 
-Now you ask: `"Why is my OSPF neighbor stuck in INIT?"`
+Now you ask: `"Why is D1C's OSPF neighbor stuck in INIT?"`
 
 ### 2a. Question → Vector
 
 The same embedding model converts your question into a 384-dim vector:
 
 ```
-Question: "Why is my OSPF neighbor stuck in INIT"
+Question: "Why is D1C's OSPF neighbor stuck in INIT"
 Vector:   [0.0193, -0.0532, 0.0135, -0.0071, 0.1528, 0.0054, -0.0898, -0.0029, -0.0993, 0.0045, ...]
 ```
 
@@ -100,11 +100,12 @@ Claude reads the CLAUDE.md skill, which tells it to:
 
 1. Use the KB results to understand the theory (INIT = one-way communication, common causes)
 2. Optionally query live devices if a specific device was mentioned
-3. Combine both into a grounded answer citing sources
+3. Identify the protocol and read the relevant skill for troubleshooting guidance
+4. Combine all of the above into a grounded, realistic, and accurate answer citing sources
 
 ## Why This Works
 
-The key insight is that the embedding model maps both *"INIT state means Hello one-way"* and *"Why is my neighbor stuck in INIT"* to nearby points in 384-dimensional space — because they're about the same concept. A keyword search would miss this (the word "stuck" doesn't appear in the RFC text), but vector similarity catches the semantic relationship.
+The key insight is that the embedding model maps both *"INIT state means Hello one-way"* and *"Why is D1C's neighbor stuck in INIT"* to nearby points in 384-dimensional space — because they're about the same concept. A keyword search would miss this (the word "stuck" doesn't appear in the RFC text), but vector similarity catches the semantic relationship.
 
 ## Summary
 
