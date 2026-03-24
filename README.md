@@ -1,6 +1,6 @@
-# ✨ netKB — Network Knowledge Base
+# ✨ netKB • Network Knowledge Base
 
-[![Version](https://img.shields.io/badge/ver.-1.1.0-1a1a2e)](https://github.com/pdudotdev/netKB/releases/tag/1.1.0)
+[![Version](https://img.shields.io/badge/version-1.0-1a1a2e)](https://github.com/pdudotdev/netKB/releases/tag/1.0.0)
 ![License](https://img.shields.io/badge/license-MIT-1a1a2e)
 [![Last Commit](https://img.shields.io/github/last-commit/pdudotdev/netKB?color=1a1a2e)](https://github.com/pdudotdev/netKB/commits/main/)
 
@@ -28,7 +28,9 @@
 
 ## 🔭 Overview
 
-RAG-powered OSPF troubleshooting assistant for multi-vendor networks. Combines documentation retrieval (RFCs + vendor guides + network intent) with live device queries across 5+ vendors.
+RAG-powered OSPF troubleshooting assistant for multi-vendor networks. 
+
+Combines documentation retrieval (RFCs + vendor guides + network intent) with live device queries across 5+ vendors.
 
 ## ⭐ What's New in v1.0
 
@@ -40,9 +42,9 @@ RAG-powered OSPF troubleshooting assistant for multi-vendor networks. Combines d
 |-----------|------|
 | Python | Core language |
 | FastMCP | MCP server exposing 3 tools |
-| Claude Code + CLAUDE.md | OSPF investigation skill |
+| Claude | Reasoning, context, troubleshooting |
 | LangChain | RAG pipeline (chunking, embedding, retrieval) |
-| ChromaDB | Vector database for OSPF knowledge base |
+| ChromaDB | Vector database for knowledge base |
 | HuggingFace Embeddings | Local embedding model (all-MiniLM-L6-v2) |
 | NetBox | Device inventory (hostnames, IPs, platforms) |
 | HashiCorp Vault | Credential management |
@@ -52,7 +54,7 @@ RAG-powered OSPF troubleshooting assistant for multi-vendor networks. Combines d
 
 | Protocol | What's Checked |
 |----------|---------------|
-| **OSPF** | Neighbor state (FULL), area config, process config |
+| **OSPF** | Neighbor states, area config, process config, LSDB |
 | **Interfaces** | Up/down state, expected operational status |
 
 ## 🛠️ Installation & Usage
@@ -114,7 +116,7 @@ Option B - API key via Vault.
 claude mcp add netkb -s user -- /path/to/netkb/bin/python /path/to/netKB/server/MCPServer.py
 ```
 
-▫️ **Step 6 - Ingest OSPF docs into ChromaDB:**
+▫️ **Step 6 - Ingest docs into ChromaDB:**
 ```
 netkb/bin/python ingest.py
 ```
@@ -128,19 +130,12 @@ claude
 > What causes OSPF neighbors to get stuck in EXSTART state?
 > D1C's OSPF neighbor with A2A is in INIT — what's wrong?
 > How does MikroTik handle OSPF configuration differently from Cisco?
-> Which devices are ABRs in this network?
+> Which devices are ABRs in this network? What about ASBRs?
 ```
 
 ## 📚 Knowledge Base
 
-**OSPF Documentation** (`docs/`):
-- `rfc2328_summary.md` — OSPF protocol reference (state machine, LSAs, area types, timers)
-- `rfc3101_nssa.md` — NSSA reference (Type 7, P-bit, translator election)
-- `vendor_cisco_ios.md` — Cisco IOS/IOS-XE OSPF specifics
-- `vendor_arista_eos.md` — Arista EOS OSPF specifics
-- `vendor_juniper_junos.md` — Juniper JunOS OSPF specifics
-- `vendor_aruba_aoscx.md` — Aruba AOS-CX OSPF specifics
-- `vendor_mikrotik_ros.md` — MikroTik RouterOS 7 OSPF specifics
+- See [**docs/**](docs/):
 
 ⚠️ To update the knowledge base after editing docs:
 ```bash
