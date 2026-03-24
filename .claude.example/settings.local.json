@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__netkb__*",
+      "Bash(netkb/bin/python:*)",
+      "Bash(netkb/bin/pip:*)",
+      "Bash(ls:*)"
+    ],
+    "deny": [
+      "Read(.env)",
+      "Read(**/.env)",
+      "Read(**/.env.*)",
+      "Bash(cat .env*)",
+      "Bash(less .env*)",
+      "Bash(head .env*)",
+      "Bash(tail .env*)",
+      "Bash(more .env*)",
+      "Bash(env)",
+      "Bash(printenv *)",
+      "Bash(ssh *)",
+      "Bash(sshpass *)",
+      "Bash(rm -rf *)",
+      "Bash(git push --force*)",
+      "Bash(git reset --hard*)"
+    ]
+  }
+}

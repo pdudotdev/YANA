@@ -1,0 +1,6 @@
+data/chroma/
+.env
+__pycache__/
+*.pyc
+netkb/
+.claude/
