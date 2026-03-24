@@ -32,6 +32,17 @@ RAG-powered OSPF troubleshooting assistant for multi-vendor networks.
 
 Combines documentation retrieval (RFCs + vendor guides + network intent) with live device queries across 5+ vendors.
 
+▫️ **Supported models:**
+- [x] Haiku 4.5
+- [x] Sonnet 4.6
+- [x] Opus 4.6 (default, best reasoning)
+
+▫️ **Operational Flow:**
+- [x] See [**workflow.md**](metadata/workflow/workflow.md)
+
+▫️ **Operational Guardrails:**
+- [x] See [**guardrails.md**](metadata/guardrails/guardrails.md)
+
 ## ⭐ What's New in v1.0
 
 - [x] See [**CHANGELOG.md**](CHANGELOG.md)
@@ -105,11 +116,11 @@ cp .env.example .env
 
 ▫️ **Step 4 - Claude auth**:
 
-Option A - Anthropic account:
+**Option A** - Anthropic account:
 ```
 claude auth login
 ```
-Option B - API key via Vault.
+**Option B** - API key via Vault.
 
 ▫️ **Step 5 - Register the MCP server:**
 ```
@@ -172,8 +183,11 @@ netKB/
 ├── lab_configs/                  # Device running configs + NetBox populator
 ├── metadata/
 │   ├── guardrails/               # Security controls documentation
-│   ├── topology/                 # Network diagram
+│   ├── scalability/              # Planned RAG optimizations
+│   ├── topology/                 # Test network diagram
 │   └── workflow/                 # RAG pipeline walkthrough
+├── skills/
+│   └── ospf/                     # OSPF skill file for specific troubleshooting
 ├── testing/
 │   ├── automated/                # Unit + integration tests (77 tests)
 │   ├── live/                     # Live lab tests (35 tests) + results report
