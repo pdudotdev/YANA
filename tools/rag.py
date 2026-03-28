@@ -36,7 +36,7 @@ async def search_knowledge_base(params: KBQuery) -> dict:
     Returns ranked document chunks matching the query. Use the optional
     vendor and topic filters to narrow results:
     - vendor: cisco_ios, arista_eos, juniper_junos, aruba_aoscx, mikrotik_ros
-    - topic: rfc, vendor_guide, intent, inventory
+    - topic: rfc, vendor_guide
     """
     where = {}
     if params.vendor:

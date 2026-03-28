@@ -5,6 +5,7 @@ from platforms.platform_map import PLATFORM_MAP, _apply_vrf, get_action
 
 EXPECTED_CLI_STYLES = {"ios", "eos", "junos", "aos", "routeros", "vyos"}
 OSPF_QUERIES = {"neighbors", "database", "borders", "config", "interfaces", "details"}
+ROUTING_QUERIES = {"ip_route", "route_maps", "prefix_lists", "policy_based_routing", "access_lists"}
 
 
 class TestPlatformMapStructure:
@@ -15,6 +16,11 @@ class TestPlatformMapStructure:
     def test_ospf_queries_complete(self, cli_style):
         ospf = PLATFORM_MAP[cli_style]["ospf"]
         assert set(ospf.keys()) == OSPF_QUERIES, f"{cli_style} missing OSPF queries"
+
+    @pytest.mark.parametrize("cli_style", EXPECTED_CLI_STYLES)
+    def test_routing_queries_complete(self, cli_style):
+        routing = PLATFORM_MAP[cli_style]["routing_table"]
+        assert set(routing.keys()) == ROUTING_QUERIES, f"{cli_style} missing routing queries"
 
     @pytest.mark.parametrize("cli_style", EXPECTED_CLI_STYLES)
     def test_interfaces_present(self, cli_style):
@@ -43,6 +49,33 @@ class TestApplyVrf:
     def test_plain_string_none_vrf(self):
         result = _apply_vrf("show ip ospf neighbor", None)
         assert result == "show ip ospf neighbor"
+
+
+class TestRoutingTableVrf:
+    def test_eos_ip_route_with_vrf(self):
+        device = {"cli_style": "eos"}
+        result = get_action(device, "routing_table", "ip_route", vrf="VRF1")
+        assert result == "show ip route vrf VRF1"
+
+    def test_eos_ip_route_no_vrf(self):
+        device = {"cli_style": "eos"}
+        result = get_action(device, "routing_table", "ip_route")
+        assert result == "show ip route"
+
+    def test_junos_ip_route_with_vrf(self):
+        device = {"cli_style": "junos"}
+        result = get_action(device, "routing_table", "ip_route", vrf="VRF1")
+        assert result == "show route instance VRF1"
+
+    def test_ios_ip_route_no_vrf_variant(self):
+        device = {"cli_style": "ios"}
+        result = get_action(device, "routing_table", "ip_route")
+        assert result == "show ip route"
+
+    def test_routeros_ip_route(self):
+        device = {"cli_style": "routeros"}
+        result = get_action(device, "routing_table", "ip_route")
+        assert result == "/ip route print without-paging"
 
 
 class TestGetAction:

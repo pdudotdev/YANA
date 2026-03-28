@@ -44,12 +44,30 @@ class InterfacesQuery(BaseParamsModel):
     device: str = Field(..., description="Device name from inventory")
 
 
+class RoutingQuery(BaseParamsModel):
+    device: str = Field(..., description="Device name from inventory")
+    query: Literal["ip_route", "route_maps", "prefix_lists", "policy_based_routing", "access_lists"] = Field(
+        ..., description="ip_route | route_maps | prefix_lists | policy_based_routing | access_lists"
+    )
+    vrf: str | None = Field(None, description="Optional VRF name (default: device VRF or global)")
+
+
+class DeviceListQuery(BaseParamsModel):
+    cli_style: str | None = Field(
+        None, description="Filter by CLI style: ios | eos | junos | aos | routeros | vyos"
+    )
+
+
+class IntentQuery(BaseParamsModel):
+    device: str | None = Field(None, description="Device name to filter intent (omit for all devices)")
+
+
 class KBQuery(BaseParamsModel):
     query: str = Field(..., description="Search question for the OSPF knowledge base", max_length=500)
     vendor: Literal["cisco_ios", "arista_eos", "juniper_junos", "aruba_aoscx", "mikrotik_ros"] | None = Field(
         None, description="Filter by vendor: cisco_ios | arista_eos | juniper_junos | aruba_aoscx | mikrotik_ros"
     )
-    topic: Literal["rfc", "vendor_guide", "intent", "inventory"] | None = Field(
-        None, description="Filter by topic: rfc | vendor_guide | intent | inventory"
+    topic: Literal["rfc", "vendor_guide"] | None = Field(
+        None, description="Filter by topic: rfc | vendor_guide"
     )
     top_k: int = Field(5, description="Number of results to return (1-10)", ge=1, le=10)

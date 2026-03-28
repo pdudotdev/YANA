@@ -2,7 +2,7 @@
 import asyncio
 import logging
 
-from core.inventory import devices
+from core.inventory import get_device
 from core.settings import SSH_MAX_CONCURRENT
 from transport.ssh import execute_ssh
 
@@ -14,9 +14,10 @@ _cmd_sem = asyncio.Semaphore(SSH_MAX_CONCURRENT)
 async def execute_command(device_name: str, command: str,
                           timeout_ops: int | None = None) -> dict:
     """Execute a read command on a device and return a structured result dict."""
-    device = devices.get(device_name)
-    if not device:
-        return {"error": f"Unknown device: {device_name}"}
+    try:
+        device = get_device(device_name)
+    except KeyError as exc:
+        return {"error": str(exc)}
 
     async with _cmd_sem:
         try:

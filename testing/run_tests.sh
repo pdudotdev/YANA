@@ -54,6 +54,12 @@ run_suite "UT-006" "Ingest Helpers"           "testing/automated/test_ingest.py"
 run_suite "UT-007" "NetBox Loader"            "testing/automated/test_netbox.py"
 run_suite "UT-008" "SSH Layer"               "testing/automated/test_ssh.py"
 run_suite "UT-009" "MCP Server Registration" "testing/automated/test_mcp_server.py"
+run_suite "UT-010" "Inventory Loader"         "testing/automated/test_inventory.py"
+run_suite "UT-011" "List Devices Tool"        "testing/automated/test_list_devices.py"
+run_suite "UT-012" "Status Tool"              "testing/automated/test_status.py"
+run_suite "UT-013" "Routing Tool"             "testing/automated/test_routing.py"
+run_suite "UT-014" "Intent Tool"              "testing/automated/test_intent_tool.py"
+run_suite "UT-015" "Security Controls"        "testing/automated/test_security.py"
 run_suite "IT-001" "RAG Pipeline"             "testing/automated/test_rag_pipeline.py"
 
 # ── Live Tests ───────────────────────────────────────────────────────────

@@ -5,9 +5,10 @@ from unittest.mock import MagicMock, patch
 
 class TestVault:
     def setup_method(self):
-        """Reset vault cache before each test."""
+        """Reset vault cache and sources before each test."""
         import core.vault
         core.vault._cache.clear()
+        core.vault._sources.clear()
 
     def test_no_vault_env_falls_back(self, monkeypatch):
         """Without VAULT_ADDR, returns the fallback env var."""
@@ -66,3 +67,51 @@ class TestVault:
             result = core.vault.get_secret("fail/path", "key", fallback_env="FALLBACK")
             assert result == "env_value"
             assert core.vault._cache["fail/path"] is core.vault._VAULT_FAILED
+
+
+class TestVaultSourceTracking:
+    def setup_method(self):
+        import core.vault
+        core.vault._cache.clear()
+        core.vault._sources.clear()
+
+    def test_no_vault_env_sets_source_env(self, monkeypatch):
+        """Without Vault config, source is recorded as 'env'."""
+        monkeypatch.delenv("VAULT_ADDR", raising=False)
+        monkeypatch.delenv("VAULT_TOKEN", raising=False)
+
+        import core.vault
+        core.vault.get_secret("some/path", "key", fallback_env="MISSING_VAR")
+        assert core.vault.get_source("some/path") == "env"
+
+    def test_vault_success_sets_source_vault(self, monkeypatch):
+        """Successful Vault read records source as 'vault'."""
+        monkeypatch.setenv("VAULT_ADDR", "http://fake:8200")
+        monkeypatch.setenv("VAULT_TOKEN", "fake-token")
+
+        import core.vault
+        mock_response = {"data": {"data": {"username": "admin"}}}
+        with patch.dict("sys.modules", {"hvac": MagicMock()}):
+            import hvac
+            hvac.Client.return_value.secrets.kv.v2.read_secret_version.return_value = mock_response
+
+            core.vault.get_secret("netkb/router", "username")
+            assert core.vault.get_source("netkb/router") == "vault"
+
+    def test_vault_failure_sets_source_env(self, monkeypatch):
+        """Failed Vault read falls back and records source as 'env'."""
+        monkeypatch.setenv("VAULT_ADDR", "http://fake:8200")
+        monkeypatch.setenv("VAULT_TOKEN", "fake-token")
+
+        import core.vault
+        with patch.dict("sys.modules", {"hvac": MagicMock()}):
+            import hvac
+            hvac.Client.return_value.secrets.kv.v2.read_secret_version.side_effect = Exception("unreachable")
+
+            core.vault.get_secret("netkb/router", "username")
+            assert core.vault.get_source("netkb/router") == "env"
+
+    def test_get_source_unknown_path(self):
+        """Unqueried path returns 'unknown'."""
+        import core.vault
+        assert core.vault.get_source("never/queried") == "unknown"

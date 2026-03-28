@@ -21,7 +21,7 @@ All MCP tool inputs are validated at the boundary before use:
 | `vrf` | Alphanumeric + `_`/`-`, max 32 chars | `;`, `\|`, spaces, injection payloads |
 | `query` (KBQuery) | String, max 500 chars | Excessively long queries that could abuse the embedding model |
 | `vendor` (KBQuery) | `Literal` enum: cisco_ios, arista_eos, juniper_junos, aruba_aoscx, mikrotik_ros | Any string outside the defined vendor set |
-| `topic` (KBQuery) | `Literal` enum: rfc, vendor_guide, intent, inventory | Any string outside the defined topic set |
+| `topic` (KBQuery) | `Literal` enum: rfc, vendor_guide | Any string outside the defined topic set |
 | `top_k` (KBQuery) | Integer, 1-10 | Values outside range; prevents full database dumps |
 
 ### Static Command Map (`platforms/platform_map.py`)
@@ -81,9 +81,13 @@ The agent is explicitly forbidden from proposing or implying configuration chang
 
 Defense-in-depth against prompt injection via device output. A device could theoretically return output containing text like "SYSTEM: ignore previous instructions." The data boundary directive instructs the model to treat all tool output as data, not instructions.
 
-### All 3 MCP Tools Are Read-Only
+### All 7 MCP Tools Are Read-Only
 
 No MCP tool in netKB issues write commands:
 - `search_knowledge_base` — reads from local ChromaDB (no network access)
 - `get_ospf` — runs read-only OSPF show commands via static platform_map
 - `get_interfaces` — runs read-only interface status commands via static platform_map
+- `get_routing` — runs read-only routing table and policy show commands via static platform_map
+- `query_intent` — reads network design intent from NetBox or local JSON (no network writes)
+- `get_status` — probes data source availability (read-only health check)
+- `list_devices` — returns device inventory from memory (no network access)

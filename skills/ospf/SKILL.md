@@ -79,7 +79,7 @@ When a route should be present but is not, check the LSDB first:
 get_ospf(device, "database")
 ```
 
-> **Tool scope note:** netKB cannot directly query the routing table. LSDB presence confirms the route is being flooded — it does not confirm RIB installation. If the LSA is present but the operator reports the route missing from the forwarding table, advise them to verify on-device with `show ip route <prefix>`.
+> **Tool scope note:** Use `get_routing(device, "ip_route")` to check the routing table directly. LSDB presence (via `get_ospf(device, "database")`) confirms the route is being flooded — `get_routing` confirms RIB installation. If the LSA is present but the route is missing from `get_routing` output: filtering problem (distribute-list in OSPF config) or forwarding address unreachable (see External Route Issues).
 
 ### Diagnosis Path
 

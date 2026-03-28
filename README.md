@@ -17,11 +17,13 @@
 - [Tech Stack](#tech-stack)
 - [Scope](#-scope)
 - [Installation & Usage](#️-installation--usage)
+- [MCP Tools](#-mcp-tools)
 - [Usage](#-usage)
 - [Knowledge Base](#-knowledge-base)
 - [Project Structure](#️-project-structure)
 - [Test Network Topology](#-test-network-topology)
 - [Planned Upgrades](#️-planned-upgrades)
+- [Repository Lifecycle](#️-repository-lifecycle)
 - [Disclaimer](#-disclaimer)
 - [License](#-license)
 - [Collaborations](#-collaborations)
@@ -52,11 +54,10 @@ Combines documentation retrieval (RFCs + vendor guides + network intent) with li
 | Technology | Role |
 |-----------|------|
 | Python | Core language |
-| FastMCP | MCP server exposing 3 tools |
+| FastMCP | MCP server exposing 7 tools |
 | Claude | Reasoning, context, troubleshooting |
 | LangChain | RAG pipeline (chunking, embedding, retrieval) |
 | ChromaDB | Vector database for knowledge base |
-| HuggingFace Embeddings | Local embedding model (all-MiniLM-L6-v2) |
 | NetBox | Device inventory (hostnames, IPs, platforms) |
 | HashiCorp Vault | Credential management |
 | Scrapli | Multi-vendor SSH transport |
@@ -66,6 +67,7 @@ Combines documentation retrieval (RFCs + vendor guides + network intent) with li
 | Protocol | What's Checked |
 |----------|---------------|
 | **OSPF** | Neighbor states, area config, process config, LSDB |
+| **Routing** | Table, route maps, prefix lists, PBR, ACLs |
 | **Interfaces** | Up/down state, expected operational status |
 
 ## 🛠️ Installation & Usage
@@ -80,6 +82,7 @@ Combines documentation retrieval (RFCs + vendor guides + network intent) with li
 # Create virtualenv and install dependencies
 git clone https://github.com/pdudotdev/netKB
 python3 -m venv netkb
+netkb/bin/pip install torch --index-url https://download.pytorch.org/whl/cpu 
 netkb/bin/pip install -r requirements.txt
 ```
 
@@ -132,6 +135,18 @@ claude mcp add netkb -s user -- /path/to/netkb/bin/python /path/to/netKB/server/
 netkb/bin/python ingest.py
 ```
 
+## 🔧 MCP Tools
+
+| Tool | Description |
+|------|-------------|
+| `get_status` | Report active data sources (inventory, credentials, intent, KB) |
+| `list_devices` | List inventory devices, optionally filtered by CLI style |
+| `get_ospf` | Query OSPF state (neighbors, LSDB, process config) on a live device |
+| `get_interfaces` | Query interface up/down status on a live device |
+| `get_routing` | Query routing table, route maps, and prefix lists on a live device |
+| `query_intent` | Retrieve network design intent from NetBox or local JSON |
+| `search_knowledge_base` | Search network knowledge base (RFCs, vendor guides) with optional filters |
+
 ## 🦾 Usage
 
 ```
@@ -146,7 +161,7 @@ claude
 
 ## 📚 Knowledge Base
 
-- See [**docs/**](docs/):
+- See [**docs**](docs/)
 
 ⚠️ To update the knowledge base after editing docs:
 ```bash
@@ -158,10 +173,14 @@ netkb/bin/python ingest.py --clean
 ```
 netKB/
 ├── server/
-│   └── MCPServer.py              # FastMCP server (3 tools)
+│   └── MCPServer.py              # FastMCP server (7 tools)
 ├── tools/                        # MCP tool implementations
 │   ├── ospf.py                   # get_ospf
 │   ├── operational.py            # get_interfaces
+│   ├── routing.py                # get_routing
+│   ├── intent.py                 # query_intent
+│   ├── status.py                 # get_status
+│   ├── inventory_tool.py         # list_devices
 │   └── rag.py                    # search_knowledge_base
 ├── core/                         # Infrastructure
 │   ├── vault.py                  # Vault + env var fallback
@@ -189,11 +208,11 @@ netKB/
 ├── skills/
 │   └── ospf/                     # OSPF skill file for specific troubleshooting
 ├── testing/
-│   ├── automated/                # Unit + integration tests (77 tests)
+│   ├── automated/                # Unit + integration tests (225 tests)
 │   ├── live/                     # Live lab tests (35 tests) + results report
 │   └── run_tests.sh              # Test runner (--live for lab tests)
 ├── ingest.py                     # RAG ingestion pipeline
-├── CLAUDE.md                     # OSPF investigation skill
+├── CLAUDE.md                     # Troubleshooting workflow + tool reference
 ├── TOPOLOGY.yml                  # Containerlab topology definition
 ├── CHANGELOG.md                  # Version history
 ├── LICENSE

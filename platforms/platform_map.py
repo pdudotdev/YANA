@@ -12,6 +12,13 @@ PLATFORM_MAP = {
             "interfaces": "show ip ospf interface",
             "details":    "show ip ospf",
         },
+        "routing_table": {
+            "ip_route":             "show ip route",
+            "route_maps":           "show route-map",
+            "prefix_lists":         "show ip prefix-list",
+            "policy_based_routing": "show route-map",
+            "access_lists":         "show access-lists",
+        },
         "interfaces": {
             "interface_status": "show ip interface brief",
         },
@@ -26,6 +33,13 @@ PLATFORM_MAP = {
             "config":     "show running-config section ospf",
             "interfaces": {"default": "show ip ospf interface",      "vrf": "show ip ospf interface vrf {vrf}"},
             "details":    {"default": "show ip ospf",                "vrf": "show ip ospf vrf {vrf}"},
+        },
+        "routing_table": {
+            "ip_route":             {"default": "show ip route",       "vrf": "show ip route vrf {vrf}"},
+            "route_maps":           "show route-map",
+            "prefix_lists":         "show ip prefix-list",
+            "policy_based_routing": "show policy-map type pbr",
+            "access_lists":         "show ip access-lists",
         },
         "interfaces": {
             "interface_status": "show ip interface brief",
@@ -42,6 +56,13 @@ PLATFORM_MAP = {
             "interfaces": {"default": "show ospf interface", "vrf": "show ospf interface instance {vrf}"},
             "details":    {"default": "show ospf overview",  "vrf": "show ospf overview instance {vrf}"},
         },
+        "routing_table": {
+            "ip_route":             {"default": "show route",            "vrf": "show route instance {vrf}"},
+            "route_maps":           "show policy-options policy-statement",
+            "prefix_lists":         "show policy-options prefix-list",
+            "policy_based_routing": "show firewall filter",
+            "access_lists":         "show firewall filter",
+        },
         "interfaces": {
             "interface_status": "show interfaces terse",
         },
@@ -56,6 +77,13 @@ PLATFORM_MAP = {
             "config":     {"default": "show ip ospf",                "vrf": "show ip ospf vrf {vrf}"},
             "interfaces": {"default": "show ip ospf interface",      "vrf": "show ip ospf interface vrf {vrf}"},
             "details":    {"default": "show ip ospf",                "vrf": "show ip ospf vrf {vrf}"},
+        },
+        "routing_table": {
+            "ip_route":             {"default": "show ip route",         "vrf": "show ip route vrf {vrf}"},
+            "route_maps":           "show route-map",
+            "prefix_lists":         "show ip prefix-list",
+            "policy_based_routing": "show policy",
+            "access_lists":         "show access-list",
         },
         "interfaces": {
             "interface_status": "show interface brief",
@@ -72,6 +100,13 @@ PLATFORM_MAP = {
             "interfaces": "/routing ospf interface print terse without-paging",
             "details":    "/routing ospf instance print detail without-paging",
         },
+        "routing_table": {
+            "ip_route":             "/ip route print without-paging",
+            "route_maps":           "/routing filter print without-paging",
+            "prefix_lists":         "/routing filter print without-paging",
+            "policy_based_routing": "/ip firewall mangle print without-paging",
+            "access_lists":         "/ip firewall filter print without-paging",
+        },
         "interfaces": {
             "interface_status": "/interface print brief without-paging",
         },
@@ -86,6 +121,13 @@ PLATFORM_MAP = {
             "config":     "show configuration commands | match ospf",
             "interfaces": {"default": "show ip ospf interface",      "vrf": "show ip ospf vrf {vrf} interface"},
             "details":    {"default": "show ip ospf",                "vrf": "show ip ospf vrf {vrf}"},
+        },
+        "routing_table": {
+            "ip_route":             {"default": "show ip route",         "vrf": "show ip route vrf {vrf}"},
+            "route_maps":           "show route-map",
+            "prefix_lists":         "show ip prefix-list",
+            "policy_based_routing": "show policy route",
+            "access_lists":         "show access-list",
         },
         "interfaces": {
             "interface_status": "show interfaces",

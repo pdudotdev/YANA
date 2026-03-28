@@ -1,8 +1,7 @@
-"""UT-006: Ingest helpers — metadata extraction, markdown conversion, and context loading."""
+"""UT-006: Ingest helpers — metadata extraction."""
 from pathlib import Path
-from unittest.mock import patch
 
-from ingest import _router_to_markdown, extract_metadata
+from ingest import extract_metadata
 
 
 class TestExtractMetadata:
@@ -34,86 +33,3 @@ class TestExtractMetadata:
             assert meta["vendor"] == v
 
 
-class TestLoadNetworkContext:
-    def test_netbox_intent_used_when_available(self):
-        from ingest import load_network_context
-        fake_intent = {"routers": {"R1": {"roles": ["ABR"], "platform": "cisco_iosxe"}}}
-        with patch("ingest.load_intent", return_value=fake_intent), \
-             patch("ingest.load_devices", return_value=None):
-            docs = load_network_context()
-        intent_docs = [d for d in docs if d.metadata.get("topic") == "intent"]
-        assert len(intent_docs) == 1
-        assert "R1" in intent_docs[0].page_content
-
-    def test_falls_back_to_intent_json(self, tmp_path, monkeypatch):
-        from ingest import load_network_context
-        import json
-        # Point LEGACY_DIR at tmp_path and write a minimal INTENT.json
-        intent_data = {"routers": {"R2": {"roles": ["LEAF"], "platform": "arista_eos"}}}
-        (tmp_path / "INTENT.json").write_text(json.dumps(intent_data))
-        monkeypatch.setattr("ingest.LEGACY_DIR", tmp_path)
-        with patch("ingest.load_intent", return_value=None), \
-             patch("ingest.load_devices", return_value=None):
-            docs = load_network_context()
-        intent_docs = [d for d in docs if d.metadata.get("topic") == "intent"]
-        assert len(intent_docs) == 1
-        assert "R2" in intent_docs[0].page_content
-
-    def test_inventory_document_has_correct_metadata(self):
-        from ingest import load_network_context
-        fake_inventory = {"R1": {"host": "10.0.0.1", "platform": "cisco_iosxe", "cli_style": "ios"}}
-        with patch("ingest.load_intent", return_value=None), \
-             patch("ingest.load_devices", return_value=fake_inventory), \
-             patch("ingest.LEGACY_DIR", Path("/nonexistent")):
-            docs = load_network_context()
-        inv_docs = [d for d in docs if d.metadata.get("topic") == "inventory"]
-        assert len(inv_docs) == 1
-        assert inv_docs[0].metadata["vendor"] == "all"
-        assert "R1" in inv_docs[0].page_content
-
-
-class TestRouterToMarkdown:
-    def test_basic_router(self):
-        router = {
-            "roles": ["ABR", "OSPF_AREA0_DISTRIBUTION"],
-            "platform": "cisco_iosxe",
-            "vrf": "VRF1",
-            "igp": {
-                "ospf": {
-                    "router_id": "11.11.11.11",
-                    "areas": {"0": ["10.0.0.0/30"], "1": ["10.1.1.0/30"]},
-                    "area_types": {"1": "stub"},
-                }
-            },
-            "direct_links": {
-                "A1M": {"local_interface": "Ethernet0/1", "local_ip": "10.1.1.2"},
-            },
-        }
-        md = _router_to_markdown("D1C", router)
-        assert "## D1C" in md
-        assert "ABR" in md
-        assert "11.11.11.11" in md
-        assert "Area 0 normal" in md
-        assert "Area 1 stub" in md
-        assert "A1M (Ethernet0/1, 10.1.1.2)" in md
-
-    def test_router_with_bgp(self):
-        router = {
-            "roles": ["ASBR"],
-            "platform": "cisco_iosxe",
-            "asn": 1010,
-            "bgp": {
-                "neighbors": {
-                    "ISP_A": {"as": 4040, "peer": "200.40.40.2"},
-                }
-            },
-        }
-        md = _router_to_markdown("E1C", router)
-        assert "BGP AS: 1010" in md
-        assert "ISP_A (AS 4040, 200.40.40.2)" in md
-
-    def test_router_minimal(self):
-        router = {"roles": ["LEAF"], "platform": "arista_eos"}
-        md = _router_to_markdown("A2A", router)
-        assert "## A2A" in md
-        assert "LEAF" in md

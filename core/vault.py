@@ -6,6 +6,7 @@ log = logging.getLogger("netkb.vault")
 
 _VAULT_FAILED = object()
 _cache: dict[str, object] = {}
+_sources: dict[str, str] = {}
 
 
 def get_secret(path: str, key: str, fallback_env: str = "", quiet: bool = False) -> str | None:
@@ -14,6 +15,7 @@ def get_secret(path: str, key: str, fallback_env: str = "", quiet: bool = False)
     vault_token = os.getenv("VAULT_TOKEN", "").strip()
 
     if not vault_addr or not vault_token:
+        _sources[path] = "env"
         return os.getenv(fallback_env) if fallback_env else None
 
     if path in _cache:
@@ -31,6 +33,7 @@ def get_secret(path: str, key: str, fallback_env: str = "", quiet: bool = False)
         )
         data: dict = response["data"]["data"]
         _cache[path] = data
+        _sources[path] = "vault"
         log_fn = log.debug if quiet else log.info
         log_fn("Vault: loaded secret path '%s'", path)
         return data.get(key) or (os.getenv(fallback_env) if fallback_env else None)
@@ -38,4 +41,10 @@ def get_secret(path: str, key: str, fallback_env: str = "", quiet: bool = False)
         log_fn = log.debug if quiet else log.warning
         log_fn("Vault unavailable (path=%s): %s — falling back to env var", path, exc)
         _cache[path] = _VAULT_FAILED
+        _sources[path] = "env"
         return os.getenv(fallback_env) if fallback_env else None
+
+
+def get_source(path: str) -> str:
+    """Return which backend provided the secret at the given path."""
+    return _sources.get(path, "unknown")

@@ -64,12 +64,6 @@ class TestFiltering:
             assert r["metadata"]["vendor"] == "cisco_ios"
             assert r["metadata"]["topic"] == "vendor_guide"
 
-    async def test_intent_topic(self, run):
-        result = await run("Which devices are ABRs", topic="intent")
-        assert len(result["results"]) > 0
-        for r in result["results"]:
-            assert r["metadata"]["topic"] == "intent"
-
 
 class TestSearchErrorPath:
     async def test_vectorstore_failure_returns_error_dict(self, search):

@@ -1,5 +1,5 @@
 """OSPF diagnostic tool."""
-from core.inventory import devices
+from core.inventory import get_device
 from input_models.models import OspfQuery
 from platforms.platform_map import get_action
 from tools import _error_response
@@ -17,9 +17,10 @@ async def get_ospf(params: OspfQuery) -> dict:
     - interfaces  — OSPF-enabled interfaces and parameters (timers, area, cost)
     - details     — Process-level details (router-id, SPF stats)
     """
-    device = devices.get(params.device)
-    if not device:
-        return _error_response(params.device, f"Unknown device: {params.device}")
+    try:
+        device = get_device(params.device)
+    except KeyError as exc:
+        return _error_response(params.device, str(exc))
 
     try:
         action = get_action(device, "ospf", params.query, vrf=params.vrf)

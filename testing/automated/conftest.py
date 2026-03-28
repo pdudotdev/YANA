@@ -19,15 +19,28 @@ MOCK_DEVICES = {
 }
 
 
+def _mock_get_device(name):
+    if name not in MOCK_DEVICES:
+        known = ", ".join(sorted(MOCK_DEVICES))
+        raise KeyError(f"Unknown device {name!r} — known: {known}")
+    return MOCK_DEVICES[name]
+
+
 @pytest.fixture(autouse=True)
 def mock_inventory(monkeypatch):
-    """Replace the devices dict everywhere it's imported."""
+    """Replace the devices dict and get_device everywhere they're imported."""
     import core.inventory
     import tools.ospf
     import tools.operational
+    import tools.routing
+    import tools.inventory_tool
     import transport
 
     monkeypatch.setattr(core.inventory, "devices", MOCK_DEVICES)
-    monkeypatch.setattr(tools.ospf, "devices", MOCK_DEVICES)
-    monkeypatch.setattr(tools.operational, "devices", MOCK_DEVICES)
-    monkeypatch.setattr(transport, "devices", MOCK_DEVICES)
+    monkeypatch.setattr(core.inventory, "source", "netbox")
+    monkeypatch.setattr(core.inventory, "get_device", _mock_get_device)
+    monkeypatch.setattr(tools.ospf, "get_device", _mock_get_device)
+    monkeypatch.setattr(tools.operational, "get_device", _mock_get_device)
+    monkeypatch.setattr(tools.routing, "get_device", _mock_get_device)
+    monkeypatch.setattr(tools.inventory_tool, "devices", MOCK_DEVICES)
+    monkeypatch.setattr(transport, "get_device", _mock_get_device)

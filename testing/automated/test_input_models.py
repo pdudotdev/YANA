@@ -2,7 +2,7 @@
 import pytest
 from pydantic import ValidationError
 
-from input_models.models import InterfacesQuery, KBQuery, OspfQuery
+from input_models.models import InterfacesQuery, IntentQuery, KBQuery, OspfQuery, RoutingQuery
 
 
 class TestOspfQuery:
@@ -42,6 +42,43 @@ class TestOspfQuery:
     def test_json_without_vrf_defaults_to_none(self):
         q = OspfQuery.model_validate('{"device": "R1", "query": "neighbors"}')
         assert q.vrf is None
+
+
+class TestRoutingQuery:
+    @pytest.mark.parametrize("query", ["ip_route", "route_maps", "prefix_lists", "policy_based_routing", "access_lists"])
+    def test_valid_query_types(self, query):
+        q = RoutingQuery(device="R1", query=query)
+        assert q.query == query
+
+    def test_invalid_query_rejected(self):
+        with pytest.raises(ValidationError):
+            RoutingQuery(device="R1", query="bgp_summary")
+
+    def test_vrf_valid(self):
+        q = RoutingQuery(device="R1", query="ip_route", vrf="VRF1")
+        assert q.vrf == "VRF1"
+
+    def test_vrf_injection_rejected(self):
+        with pytest.raises(ValidationError):
+            RoutingQuery(device="R1", query="ip_route", vrf="VRF1;reboot")
+
+    def test_vrf_optional(self):
+        q = RoutingQuery(device="R1", query="ip_route")
+        assert q.vrf is None
+
+
+class TestIntentQuery:
+    def test_no_device(self):
+        q = IntentQuery()
+        assert q.device is None
+
+    def test_with_device(self):
+        q = IntentQuery(device="R1")
+        assert q.device == "R1"
+
+    def test_json_string_no_device(self):
+        q = IntentQuery.model_validate("{}")
+        assert q.device is None
 
 
 class TestInterfacesQuery:
