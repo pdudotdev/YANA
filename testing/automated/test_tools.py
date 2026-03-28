@@ -1,11 +1,11 @@
-"""UT-003: Tool layer — get_ospf, get_interfaces, _error_response, and VRF integration."""
+"""UT-003: Tool layer — get_ospf, get_interfaces, traceroute, _error_response, and VRF integration."""
 from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from input_models.models import InterfacesQuery, OspfQuery
+from input_models.models import InterfacesQuery, OspfQuery, TracerouteInput
 from tools import _error_response
-from tools.operational import get_interfaces
+from tools.operational import get_interfaces, traceroute
 from tools.ospf import get_ospf
 
 
@@ -70,6 +70,48 @@ class TestGetInterfaces:
             mock_ssh.return_value = "ge-0/0/0  up  up"
             result = await get_interfaces(InterfacesQuery(device="R3"))
         assert result["cli_style"] == "junos"  # R3 is junos in MOCK_DEVICES
+
+
+class TestTraceroute:
+    async def test_unknown_device(self):
+        result = await traceroute(TracerouteInput(device="NONEXISTENT", destination="10.0.0.1"))
+        assert "error" in result
+        assert "Unknown device" in result["error"]
+
+    async def test_valid_device_ios_basic(self):
+        with patch("transport.execute_ssh", new_callable=AsyncMock) as mock_ssh:
+            mock_ssh.return_value = "1  10.0.0.254  1 ms"
+            result = await traceroute(TracerouteInput(device="R1", destination="10.0.0.1"))
+        assert result["device"] == "R1"
+        assert result["cli_style"] == "ios"
+        assert "traceroute" in result["_command"]
+        assert "10.0.0.1" in result["_command"]
+
+    async def test_ios_source_appended(self):
+        with patch("transport.execute_ssh", new_callable=AsyncMock) as mock_ssh:
+            mock_ssh.return_value = "1  10.0.0.254  1 ms"
+            result = await traceroute(TracerouteInput(device="R1", destination="10.0.0.1", source="192.168.1.1"))
+        assert "source 192.168.1.1" in result["_command"]
+
+    async def test_eos_vrf_in_command(self):
+        with patch("transport.execute_ssh", new_callable=AsyncMock) as mock_ssh:
+            mock_ssh.return_value = "mock output"
+            result = await traceroute(TracerouteInput(device="R2", destination="10.0.0.1", vrf="VRF1"))
+        assert "vrf VRF1" in result["_command"]
+        assert "10.0.0.1" in result["_command"]
+
+    async def test_routeros_address_syntax(self):
+        with patch("transport.execute_ssh", new_callable=AsyncMock) as mock_ssh:
+            mock_ssh.return_value = "mock output"
+            result = await traceroute(TracerouteInput(device="R5", destination="10.0.0.1"))
+        assert "address=10.0.0.1" in result["_command"]
+
+    async def test_routeros_source_syntax(self):
+        with patch("transport.execute_ssh", new_callable=AsyncMock) as mock_ssh:
+            mock_ssh.return_value = "mock output"
+            result = await traceroute(TracerouteInput(device="R5", destination="10.0.0.1", source="192.168.1.1"))
+        assert "address=10.0.0.1" in result["_command"]
+        assert "src-address=192.168.1.1" in result["_command"]
 
 
 class TestVrfEndToEnd:

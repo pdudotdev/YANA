@@ -2,7 +2,7 @@
 import pytest
 from pydantic import ValidationError
 
-from input_models.models import InterfacesQuery, IntentQuery, KBQuery, OspfQuery, RoutingQuery
+from input_models.models import InterfacesQuery, IntentQuery, KBQuery, OspfQuery, RoutingQuery, TracerouteInput
 
 
 class TestOspfQuery:
@@ -70,6 +70,33 @@ class TestInterfacesQuery:
     def test_valid(self):
         q = InterfacesQuery(device="R1")
         assert q.device == "R1"
+
+
+class TestTracerouteInput:
+    def test_valid_minimal(self):
+        q = TracerouteInput(device="R1", destination="10.0.0.1")
+        assert q.device == "R1"
+        assert q.destination == "10.0.0.1"
+        assert q.source is None
+        assert q.vrf is None
+
+    def test_valid_full(self):
+        q = TracerouteInput(device="R1", destination="10.0.0.1", source="192.168.1.1", vrf="VRF1")
+        assert q.source == "192.168.1.1"
+        assert q.vrf == "VRF1"
+
+    def test_vrf_injection_blocked(self):
+        with pytest.raises(ValidationError):
+            TracerouteInput(device="R1", destination="10.0.0.1", vrf="VRF1; reboot")
+
+    def test_json_string_parsing(self):
+        q = TracerouteInput.model_validate('{"device": "R1", "destination": "10.0.0.1"}')
+        assert q.device == "R1"
+        assert q.destination == "10.0.0.1"
+
+    def test_missing_destination_rejected(self):
+        with pytest.raises(ValidationError):
+            TracerouteInput(device="R1")
 
 
 class TestKBQuery:

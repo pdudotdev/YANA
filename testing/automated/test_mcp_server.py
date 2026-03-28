@@ -2,14 +2,14 @@
 
 
 class TestMcpToolRegistration:
-    async def test_seven_tools_registered(self):
-        """The MCP server must expose exactly 7 tools."""
+    async def test_eight_tools_registered(self):
+        """The MCP server must expose exactly 8 tools."""
         from server.MCPServer import mcp
         tools = await mcp.list_tools()
-        assert len(tools) == 7
+        assert len(tools) == 8
 
     async def test_tool_names(self):
-        """All seven expected tool names are registered."""
+        """All eight expected tool names are registered."""
         from server.MCPServer import mcp
         tools = await mcp.list_tools()
         names = {t.name for t in tools}
@@ -21,4 +21,5 @@ class TestMcpToolRegistration:
             "query_intent",
             "get_status",
             "list_devices",
+            "traceroute",
         }

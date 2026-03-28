@@ -26,6 +26,10 @@ class TestPlatformMapStructure:
     def test_interfaces_present(self, cli_style):
         assert "interface_status" in PLATFORM_MAP[cli_style]["interfaces"]
 
+    @pytest.mark.parametrize("cli_style", EXPECTED_CLI_STYLES)
+    def test_traceroute_present(self, cli_style):
+        assert "traceroute" in PLATFORM_MAP[cli_style]["tools"], f"{cli_style} missing traceroute"
+
 
 class TestApplyVrf:
     def test_dict_with_vrf(self):
@@ -76,6 +80,39 @@ class TestRoutingTableVrf:
         device = {"cli_style": "routeros"}
         result = get_action(device, "routing_table", "ip_route")
         assert result == "/ip route print without-paging"
+
+
+class TestTracerouteVrf:
+    def test_ios_traceroute_with_vrf(self):
+        device = {"cli_style": "ios"}
+        result = get_action(device, "tools", "traceroute", vrf="VRF1")
+        assert result == "traceroute vrf VRF1"
+
+    def test_ios_traceroute_no_vrf(self):
+        device = {"cli_style": "ios"}
+        result = get_action(device, "tools", "traceroute")
+        assert result == "traceroute"
+
+    def test_eos_traceroute_with_vrf(self):
+        device = {"cli_style": "eos"}
+        result = get_action(device, "tools", "traceroute", vrf="VRF1")
+        assert result == "traceroute vrf VRF1"
+
+    def test_junos_traceroute_with_vrf(self):
+        device = {"cli_style": "junos"}
+        result = get_action(device, "tools", "traceroute", vrf="VRF1")
+        assert result == "traceroute routing-instance VRF1"
+
+    def test_routeros_traceroute_no_vrf_variant(self):
+        device = {"cli_style": "routeros"}
+        result = get_action(device, "tools", "traceroute")
+        assert result == "/tool/traceroute"
+
+    def test_routeros_traceroute_ignores_vrf(self):
+        """RouterOS has no VRF variant — VRF is silently ignored."""
+        device = {"cli_style": "routeros"}
+        result = get_action(device, "tools", "traceroute", vrf="VRF1")
+        assert result == "/tool/traceroute"
 
 
 class TestGetAction:

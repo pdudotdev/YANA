@@ -1,6 +1,4 @@
 """UT-011: list_devices tool."""
-import pytest
-
 from input_models.models import DeviceListQuery
 from tools.inventory_tool import list_devices
 

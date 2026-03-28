@@ -1,8 +1,6 @@
 """UT-014: query_intent tool."""
 from unittest.mock import patch
 
-import pytest
-
 from input_models.models import IntentQuery
 from tools.intent import query_intent
 

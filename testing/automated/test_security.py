@@ -7,7 +7,7 @@ between user-supplied VRF names and CLI command strings.
 import pytest
 from pydantic import ValidationError
 
-from input_models.models import OspfQuery, RoutingQuery
+from input_models.models import OspfQuery, RoutingQuery, TracerouteInput
 
 
 # ── VRF injection: each pattern MUST be rejected by the Pydantic validator ────
@@ -48,6 +48,13 @@ def test_vrf_injection_blocked_routing(bad_vrf):
         RoutingQuery(device="R1", query="ip_route", vrf=bad_vrf)
 
 
+@pytest.mark.parametrize("bad_vrf", _INJECTION_PATTERNS)
+def test_vrf_injection_blocked_traceroute(bad_vrf):
+    """Every injection payload must raise ValidationError in TracerouteInput."""
+    with pytest.raises(ValidationError):
+        TracerouteInput(device="R1", destination="10.0.0.1", vrf=bad_vrf)
+
+
 # ── VRF positive cases: valid names MUST be accepted ─────────────────────────
 
 _VALID_VRFS = [
@@ -69,4 +76,10 @@ def test_vrf_valid_names_accepted_ospf(good_vrf):
 @pytest.mark.parametrize("good_vrf", _VALID_VRFS)
 def test_vrf_valid_names_accepted_routing(good_vrf):
     q = RoutingQuery(device="R1", query="ip_route", vrf=good_vrf)
+    assert q.vrf == good_vrf
+
+
+@pytest.mark.parametrize("good_vrf", _VALID_VRFS)
+def test_vrf_valid_names_accepted_traceroute(good_vrf):
+    q = TracerouteInput(device="R1", destination="10.0.0.1", vrf=good_vrf)
     assert q.vrf == good_vrf

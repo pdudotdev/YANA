@@ -1,4 +1,4 @@
-"""LT-001: Live platform coverage — all vendors × all OSPF queries + interfaces.
+"""LT-001: Live platform coverage — all vendors × all OSPF, routing_table, tools + interfaces.
 
 Generates platform_coverage_results.md with detailed output per test.
 """
@@ -7,9 +7,10 @@ from datetime import datetime, timezone
 import pytest
 
 from core.inventory import devices
-from input_models.models import InterfacesQuery, OspfQuery
-from tools.operational import get_interfaces
+from input_models.models import InterfacesQuery, OspfQuery, RoutingQuery, TracerouteInput
+from tools.operational import get_interfaces, traceroute
 from tools.ospf import get_ospf
+from tools.routing import get_routing
 
 # ── Test devices: one per vendor ─────────────────────────────────────────────
 TEST_DEVICES = {
@@ -21,6 +22,9 @@ TEST_DEVICES = {
 }
 
 OSPF_QUERIES = ["neighbors", "database", "borders", "config", "interfaces", "details"]
+ROUTING_QUERIES = ["ip_route", "route_maps", "prefix_lists", "policy_based_routing", "access_lists"]
+TRACEROUTE_DEST = "172.20.20.207"  # C1J management IP — core device reachable from all vendors
+
 RESULTS = []  # collected during test run
 
 
@@ -125,9 +129,28 @@ async def test_ospf_query(device, query):
 
 
 @pytest.mark.parametrize("device", TEST_DEVICES.keys())
+@pytest.mark.parametrize("query", ROUTING_QUERIES)
+async def test_routing_query(device, query):
+    """Test routing_table query against a live device."""
+    result = await get_routing(RoutingQuery(device=device, query=query))
+    status = classify(result)
+    record(device, "routing_table", query, result, status)
+    assert status != "FAIL", f"{device} routing_table/{query}: {result.get('error', result.get('raw', '')[:200])}"
+
+
+@pytest.mark.parametrize("device", TEST_DEVICES.keys())
 async def test_interfaces(device):
     """Test interface status query against a live device."""
     result = await get_interfaces(InterfacesQuery(device=device))
     status = classify(result)
     record(device, "interfaces", "interface_status", result, status)
     assert status != "FAIL", f"{device} interfaces: {result.get('error', result.get('raw', '')[:200])}"
+
+
+@pytest.mark.parametrize("device", TEST_DEVICES.keys())
+async def test_traceroute(device):
+    """Test traceroute against a live device, tracing to C1J management IP."""
+    result = await traceroute(TracerouteInput(device=device, destination=TRACEROUTE_DEST))
+    status = classify(result)
+    record(device, "tools", "traceroute", result, status)
+    assert status != "FAIL", f"{device} traceroute→{TRACEROUTE_DEST}: {result.get('error', result.get('raw', '')[:200])}"

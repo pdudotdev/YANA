@@ -67,7 +67,7 @@ echo ""
 printf "%sLive Tests%s\n" "$BOLD" "$NC"
 echo "-----------------------------------------"
 if [[ "${1:-}" == "--live" ]]; then
-    run_suite "LT-001" "Platform Coverage (5 vendors)" "testing/live/test_platform_coverage.py" "--live"
+    run_suite "LT-001" "Platform Coverage (5 vendors × OSPF+routing+traceroute+interfaces)" "testing/live/test_platform_coverage.py" "--live"
     echo ""
     echo "Report: testing/live/platform_coverage_results.md"
 else
