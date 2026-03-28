@@ -1,4 +1,4 @@
-# Codebase Audit Report — netKB v1.0.0
+# Codebase Audit Report — YANA v1.0.0
 
 **Date:** 2026-03-27
 **Scope:** Full codebase — code logic, quality, consistency, edge cases, silent failures, sync issues, agent hang risks
@@ -9,7 +9,7 @@
 
 ## Executive Summary
 
-The netKB codebase is well-structured, cleanly written, and defensively designed at the critical boundaries (input validation, SSH command mapping, error handling). No infinite loops or unbounded retry patterns exist. The security posture is solid — static command maps, VRF regex validation, and Pydantic enums prevent injection at every tool entry point.
+The YANA codebase is well-structured, cleanly written, and defensively designed at the critical boundaries (input validation, SSH command mapping, error handling). No infinite loops or unbounded retry patterns exist. The security posture is solid — static command maps, VRF regex validation, and Pydantic enums prevent injection at every tool entry point.
 
 Six confirmed issues were found, none critical to runtime safety. The most impactful are: (1) VyOS is platform-supported but has no knowledge base documentation or search filter, creating a misleading gap; (2) SSH connection establishment has no explicit timeout, relying on system SSH defaults that may be too slow for responsive MCP tool behavior; (3) if NetBox is unavailable at startup, the server accepts tool calls but silently fails all device queries.
 

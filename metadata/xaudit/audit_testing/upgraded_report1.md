@@ -1,4 +1,4 @@
-# netKB Test Quality Audit Report
+# YANA Test Quality Audit Report
 
 **Scope:** Full
 **Date:** 2026-03-27
@@ -9,7 +9,7 @@
 
 ## Executive Summary
 
-The netKB test suite is above average for a project of this size — most tests have specific assertions, and the conftest mock inventory design is sound. However, the audit identified **two S1 ghost passes** where tests pass regardless of whether the function under test works correctly, **three S2 mock infidelity issues** that could mask real integration failures, and **seven S3 coverage gaps** in critical code paths including `core/settings.py`, `core/inventory.py`, and the main `ingest()` function. The most critical theme is that the tool layer tests (`test_tools.py`) have a structural mock-leakage problem: `get_ospf()` and `get_interfaces()` are thin wrappers around `execute_command()`, and when `execute_ssh` is mocked, the mock's return value flows through both functions without transformation, making several assertions test the mock rather than the function logic.
+The YANA test suite is above average for a project of this size — most tests have specific assertions, and the conftest mock inventory design is sound. However, the audit identified **two S1 ghost passes** where tests pass regardless of whether the function under test works correctly, **three S2 mock infidelity issues** that could mask real integration failures, and **seven S3 coverage gaps** in critical code paths including `core/settings.py`, `core/inventory.py`, and the main `ingest()` function. The most critical theme is that the tool layer tests (`test_tools.py`) have a structural mock-leakage problem: `get_ospf()` and `get_interfaces()` are thin wrappers around `execute_command()`, and when `execute_ssh` is mocked, the mock's return value flows through both functions without transformation, making several assertions test the mock rather than the function logic.
 
 ---
 

@@ -7,7 +7,7 @@ from core.netbox import load_intent
 from input_models.models import IntentQuery
 from tools import INTENT_JSON as _INTENT_JSON, _error_response
 
-log = logging.getLogger("yanaa.intent")
+log = logging.getLogger("yana.intent")
 
 
 def _load_intent() -> dict | None:

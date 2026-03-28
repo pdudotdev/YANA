@@ -1,4 +1,4 @@
-# QA Audit Report — netKB Test Suite
+# QA Audit Report — YANA Test Suite
 
 **Audit type:** External QA review (automated test validity + coverage gap analysis)
 **Scope:** `testing/automated/`, `testing/live/`, `testing/manual/`, CI pipeline
@@ -9,7 +9,7 @@
 
 ## Executive Summary
 
-The netKB test suite contains **~110 automated tests** across 10 suites (9 unit, 1 integration) plus **35 conditionally-executed live tests** and **10 manual scenarios**. The overall architecture is sound — tests are well-organized, mocking is generally appropriate, and security-critical input validation is tested with adversarial payloads.
+The YANA test suite contains **~110 automated tests** across 10 suites (9 unit, 1 integration) plus **35 conditionally-executed live tests** and **10 manual scenarios**. The overall architecture is sound — tests are well-organized, mocking is generally appropriate, and security-critical input validation is tested with adversarial payloads.
 
 However, the audit identified **3 ghost/silent pass conditions**, **3 mock false-pass risks**, **14 coverage gaps**, and **3 security test gaps**. Several of these are severity-high issues that could allow regressions to ship undetected.
 

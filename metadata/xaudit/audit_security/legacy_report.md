@@ -1,8 +1,8 @@
-# netKB Security Audit Report
+# YANA Security Audit Report
 
 ## Context
 
-Professional security audit of the netKB codebase — a RAG-powered MCP server that provides an AI assistant with OSPF knowledge base search and live SSH device queries across a multi-vendor network (Cisco IOS, Arista EOS, Juniper JunOS, Aruba AOS-CX, MikroTik RouterOS, VyOS). The audit covers code-level vulnerabilities, architectural trust boundaries, prompt injection vectors, credential management, supply chain risks, and agent permission controls.
+Professional security audit of the YANA codebase — a RAG-powered MCP server that provides an AI assistant with OSPF knowledge base search and live SSH device queries across a multi-vendor network (Cisco IOS, Arista EOS, Juniper JunOS, Aruba AOS-CX, MikroTik RouterOS, VyOS). The audit covers code-level vulnerabilities, architectural trust boundaries, prompt injection vectors, credential management, supply chain risks, and agent permission controls.
 
 **Scope:** All production code (`server/`, `tools/`, `core/`, `transport/`, `input_models/`, `platforms/`), ingestion pipeline (`ingest.py`), Claude Code agent controls (`.claude/settings.local.json`, `CLAUDE.md`), CI/CD pipeline, and documentation accuracy.
 
@@ -12,7 +12,7 @@ Professional security audit of the netKB codebase — a RAG-powered MCP server t
 
 ## Executive Summary
 
-netKB demonstrates strong security architecture in its core design: static command maps eliminate arbitrary command execution, Pydantic Literal enums enforce hard allowlists, and the VRF regex blocks injection characters at the user-input boundary. No `subprocess`, `eval`, or `exec` exists in production code.
+YANA demonstrates strong security architecture in its core design: static command maps eliminate arbitrary command execution, Pydantic Literal enums enforce hard allowlists, and the VRF regex blocks injection characters at the user-input boundary. No `subprocess`, `eval`, or `exec` exists in production code.
 
 However, the audit uncovered **two HIGH-severity code-level vulnerabilities** where the defense-in-depth breaks down at the NetBox trust boundary — data from NetBox bypasses the very input validation that protects against user-supplied attacks. These are real, exploitable findings that could enable arbitrary command execution on network devices and credential theft.
 
@@ -82,7 +82,7 @@ With `SSH_STRICT_HOST_KEY` defaulting to `False` (`settings.py:13`), no host key
 **Impact:** Credential compromise. Since `settings.py:6-7` loads a single `USERNAME`/`PASSWORD` at import time (unless per-cli_style Vault paths are configured), compromising one device entry in NetBox yields credentials that likely work across the entire network.
 
 **Compounding factors:**
-- `cli_style` from NetBox is also unvalidated. `ssh.py:31` uses it to construct a Vault path: `f"netkb/router{cli_style}"`. A crafted `cli_style` (e.g., `/../admin`) could attempt Vault path traversal to read secrets from unintended paths, depending on Vault's path normalization.
+- `cli_style` from NetBox is also unvalidated. `ssh.py:31` uses it to construct a Vault path: `f"yana/router{cli_style}"`. A crafted `cli_style` (e.g., `/../admin`) could attempt Vault path traversal to read secrets from unintended paths, depending on Vault's path normalization.
 - `platform` from NetBox is unvalidated. `ssh.py:27` uses `_CUSTOM_DEFINITIONS.get(platform, platform)` — if not in the dict, it's passed as-is to Scrapli's `Cli()` as a `definition_file_or_name`.
 
 ---
@@ -114,7 +114,7 @@ The only defense is a behavioral directive in `CLAUDE.md:49`:
 
 Behavioral controls are probabilistic, not deterministic. They reduce attack success rate but cannot eliminate it.
 
-**Impact bounded by:** All 3 MCP tools are read-only. Even a successful prompt injection cannot cause the agent to modify devices through netKB tools. The risk is information disclosure (agent revealing secrets from its context) or operator manipulation (attacker-influenced analysis misleading the human).
+**Impact bounded by:** All 3 MCP tools are read-only. Even a successful prompt injection cannot cause the agent to modify devices through YANA tools. The risk is information disclosure (agent revealing secrets from its context) or operator manipulation (attacker-influenced analysis misleading the human).
 
 ---
 
@@ -149,7 +149,7 @@ No content integrity verification exists on the ingestion pipeline. Poisoned con
 
 The 15 deny rules protecting `.env` can be circumvented:
 - **Definitive bypass:** `cp .env readable.txt` — `Bash(cp:*)` is in the allow list; the copy is not covered by deny rules. Then `cat readable.txt` doesn't match `Bash(cat .env*)`.
-- **Likely bypass:** `netkb/bin/python -c "print(open('.env').read())"` — `Bash(netkb/bin/python:*)` is allowed; Python code executing file reads is not covered by Bash-level deny rules.
+- **Likely bypass:** `yana/bin/python -c "print(open('.env').read())"` — `Bash(yana/bin/python:*)` is allowed; Python code executing file reads is not covered by Bash-level deny rules.
 - **Potential bypass:** `grep`, `base64`, `xxd` — not in deny list; access depends on whether Claude Code's permission model is default-deny for unlisted Bash commands.
 
 **Scope note:** These are development environment controls on the Claude Code agent, not production MCP server defenses.
@@ -176,7 +176,7 @@ SSH exceptions typically contain target host IPs, ports, and error descriptions.
 
 ---
 
-## What netKB Gets Right
+## What YANA Gets Right
 
 These positive findings are worth noting because they represent deliberate security-by-design decisions:
 

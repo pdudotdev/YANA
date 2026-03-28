@@ -1,4 +1,4 @@
-"""YANAA MCP Server — OSPF knowledge base + live device tools."""
+"""YANA MCP Server — OSPF knowledge base + live device tools."""
 import logging
 import sys
 from pathlib import Path
@@ -21,7 +21,7 @@ from tools.intent import query_intent
 from tools.status import get_status
 from tools.inventory_tool import list_devices
 
-mcp = FastMCP("yanaa")
+mcp = FastMCP("yana")
 
 mcp.tool(name="search_knowledge_base")(search_knowledge_base)
 mcp.tool(name="get_ospf")(get_ospf)

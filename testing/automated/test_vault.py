@@ -96,8 +96,8 @@ class TestVaultSourceTracking:
             import hvac
             hvac.Client.return_value.secrets.kv.v2.read_secret_version.return_value = mock_response
 
-            core.vault.get_secret("yanaa/router", "username")
-            assert core.vault.get_source("yanaa/router") == "vault"
+            core.vault.get_secret("yana/router", "username")
+            assert core.vault.get_source("yana/router") == "vault"
 
     def test_vault_failure_sets_source_env(self, monkeypatch):
         """Failed Vault read falls back and records source as 'env'."""
@@ -109,8 +109,8 @@ class TestVaultSourceTracking:
             import hvac
             hvac.Client.return_value.secrets.kv.v2.read_secret_version.side_effect = Exception("unreachable")
 
-            core.vault.get_secret("yanaa/router", "username")
-            assert core.vault.get_source("yanaa/router") == "env"
+            core.vault.get_secret("yana/router", "username")
+            assert core.vault.get_source("yana/router") == "env"
 
     def test_get_source_unknown_path(self):
         """Unqueried path returns 'unknown'."""

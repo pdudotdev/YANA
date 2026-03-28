@@ -1,4 +1,4 @@
-# netKB Security Audit Report
+# YANA Security Audit Report
 
 **Audit date:** 2026-03-27
 **Auditor:** External Senior Application Security Engineer
@@ -8,7 +8,7 @@
 
 ## 1. Executive Summary
 
-netKB has a sound security architecture for an MCP-based read-only network tool: static command maps eliminate arbitrary command execution, Pydantic validation gates all LLM-generated inputs, and the absence of a `run_show` tool is a strong structural control. The most critical finding is that **NetBox-sourced data (VRF, cli_style, host, platform) flows into SSH commands, Vault secret paths, and SSH connection targets without any validation**, creating a privilege escalation and credential-path-traversal vector if NetBox is compromised. The primary architectural strength is the static PLATFORM_MAP design, which confines device interaction to a fixed set of pre-authored commands.
+YANA has a sound security architecture for an MCP-based read-only network tool: static command maps eliminate arbitrary command execution, Pydantic validation gates all LLM-generated inputs, and the absence of a `run_show` tool is a strong structural control. The most critical finding is that **NetBox-sourced data (VRF, cli_style, host, platform) flows into SSH commands, Vault secret paths, and SSH connection targets without any validation**, creating a privilege escalation and credential-path-traversal vector if NetBox is compromised. The primary architectural strength is the static PLATFORM_MAP design, which confines device interaction to a fixed set of pre-authored commands.
 
 ---
 
@@ -48,13 +48,13 @@ netKB has a sound security architecture for an MCP-based read-only network tool:
 **Attack chain:**
 1. Attacker compromises NetBox.
 2. Attacker sets a device's `cli_style` custom field to a path traversal value, e.g., `../../target/secret` or an empty string that resolves to a different Vault path.
-3. When netKB queries that device, `_build_cli()` constructs a Vault path: `f"netkb/router{cli_style}"` (line 31-32).
-4. With `cli_style` set to `../../other/path`, the Vault query becomes `netkb/router../../other/path`, which Vault's KV v2 engine may resolve to `other/path` depending on Vault's path normalization behavior.
-5. If successful, the attacker can cause netKB to fetch credentials from an arbitrary Vault path and use them for SSH authentication, potentially exposing secrets stored elsewhere in Vault.
+3. When YANA queries that device, `_build_cli()` constructs a Vault path: `f"yana/router{cli_style}"` (line 31-32).
+4. With `cli_style` set to `../../other/path`, the Vault query becomes `yana/router../../other/path`, which Vault's KV v2 engine may resolve to `other/path` depending on Vault's path normalization behavior.
+5. If successful, the attacker can cause YANA to fetch credentials from an arbitrary Vault path and use them for SSH authentication, potentially exposing secrets stored elsewhere in Vault.
 
 **Prerequisites:** Write access to NetBox API. Vault must be configured and reachable. Vault's path handling must not reject the traversal (Vault KV v2 typically normalizes paths, which may or may not prevent this -- it depends on the mount configuration).
 
-**Impact:** Credential leak -- netKB fetches and uses credentials from an unintended Vault path. If the Vault token has broad read access, this is effectively arbitrary secret read within Vault's permission scope.
+**Impact:** Credential leak -- YANA fetches and uses credentials from an unintended Vault path. If the Vault token has broad read access, this is effectively arbitrary secret read within Vault's permission scope.
 
 **Existing controls:** None. The `cli_style` field is read from NetBox and used directly in an f-string without any validation or allowlist check.
 
@@ -69,8 +69,8 @@ netKB has a sound security architecture for an MCP-based read-only network tool:
 **Attack chain:**
 1. Attacker compromises NetBox.
 2. Attacker modifies a device's `primary_ip` to point to an attacker-controlled host (e.g., `evil.attacker.com` or an internal host the attacker wants to probe).
-3. When netKB queries that device, `_build_cli()` uses `device["host"]` as the SSH target.
-4. netKB connects to the attacker's host with legitimate network credentials, exposing the username and password to the attacker.
+3. When YANA queries that device, `_build_cli()` uses `device["host"]` as the SSH target.
+4. YANA connects to the attacker's host with legitimate network credentials, exposing the username and password to the attacker.
 
 **Prerequisites:** Write access to NetBox API. SSH strict host key checking must be disabled (which is the default -- see S3-1).
 
@@ -92,7 +92,7 @@ netKB has a sound security architecture for an MCP-based read-only network tool:
 SSH_STRICT_HOST_KEY = os.getenv("SSH_STRICT_HOST_KEY", "").lower() in ("true", "1", "yes")
 ```
 
-The default value when the environment variable is unset is `False`. This means netKB will connect to any SSH host without verifying the host key, making it vulnerable to MITM attacks and the NetBox-sourced host redirection described in S2-3.
+The default value when the environment variable is unset is `False`. This means YANA will connect to any SSH host without verifying the host key, making it vulnerable to MITM attacks and the NetBox-sourced host redirection described in S2-3.
 
 **Existing controls:** The guardrails document lists `SSH_STRICT_HOST_KEY=true` as a "production recommendation" but it is not enforced. The default-off posture means any deployment that does not explicitly set this variable is unprotected.
 
@@ -111,7 +111,7 @@ _cache: dict[str, object] = {}
 
 When a Vault call fails, the path is cached as `_VAULT_FAILED` (line 40). All subsequent calls for that path return the environment variable fallback without ever retrying Vault. This creates a persistent degraded state: if Vault is temporarily unavailable at startup, the server permanently falls back to environment variable credentials for the lifetime of the process.
 
-**Impact:** If an attacker can cause a brief Vault outage during netKB startup (e.g., network disruption), the server permanently degrades to env var credentials, which may be weaker, shared across environments, or stale.
+**Impact:** If an attacker can cause a brief Vault outage during YANA startup (e.g., network disruption), the server permanently degrades to env var credentials, which may be weaker, shared across environments, or stale.
 
 **Existing controls:** None -- there is no cache TTL, no retry, and no health check.
 
@@ -255,7 +255,7 @@ The `--clean` flag calls `shutil.rmtree(CHROMA_DIR)` where `CHROMA_DIR` is a har
 
 ### Device-level `cli_style` (from NetBox)
 
-- **Validation:** Only checked for non-empty (`if not platform or not cli_style:` in `core/netbox.py` line 46). No allowlist against PLATFORM_MAP keys. Used in Vault path construction (`f"netkb/router{cli_style}"` in `transport/ssh.py` line 31).
+- **Validation:** Only checked for non-empty (`if not platform or not cli_style:` in `core/netbox.py` line 46). No allowlist against PLATFORM_MAP keys. Used in Vault path construction (`f"yana/router{cli_style}"` in `transport/ssh.py` line 31).
 - **Bypass potential:** A compromised NetBox can set any non-empty string.
 - **Worst-case impact:** Vault path traversal -- reading credentials from unintended Vault paths. **Verdict: INEFFECTIVE.** This is Finding S2-2.
 
@@ -325,7 +325,7 @@ The `--clean` flag calls `shutil.rmtree(CHROMA_DIR)` where `CHROMA_DIR` is a har
 
 ### Credential chain: Vault -> env var fallback -> SSH transport
 
-1. **Vault primary path:** `core/vault.py` attempts to read from Vault KV v2 at `secret/netkb/router` (and per-cli_style paths like `secret/netkb/routerios`).
+1. **Vault primary path:** `core/vault.py` attempts to read from Vault KV v2 at `secret/yana/router` (and per-cli_style paths like `secret/yana/routerios`).
 2. **Fallback:** If Vault is unavailable or the path doesn't exist, falls back to `ROUTER_USERNAME` / `ROUTER_PASSWORD` environment variables (via `core/settings.py` lines 6-7).
 3. **Per-device override:** `transport/ssh.py` lines 31-32 attempt per-cli_style Vault paths first, falling back to the global credentials from `core/settings.py`.
 
@@ -340,7 +340,7 @@ When Vault is unreachable:
 
 1. **Via deny rules:** The deny rules in `.claude/settings.local.json` block direct reads of `.env` files via common shell commands. However, the rules are bypassable (Findings S4-3, S4-4). The `Bash(cp:*)` allow rule is particularly concerning as it permits copying `.env` files.
 2. **Via NetBox compromise:** A compromised NetBox can redirect SSH connections to an attacker-controlled host (Finding S2-3), causing credentials to be sent to the attacker.
-3. **Via Vault path traversal:** A compromised NetBox can manipulate the Vault secret path (Finding S2-2), potentially causing netKB to use attacker-chosen credentials.
+3. **Via Vault path traversal:** A compromised NetBox can manipulate the Vault secret path (Finding S2-2), potentially causing YANA to use attacker-chosen credentials.
 4. **Via error messages:** Vault errors are logged with the path and exception details. If logging is accessible, this could leak Vault structure. Error messages returned to the LLM (Finding S3-4) could contain Vault path information.
 
 ### Secure degradation assessment

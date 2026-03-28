@@ -1,8 +1,8 @@
-# ✨ YANAA • Yet Another Network Automation Agent
+# ✨ YANA • Yet Another Network Agent
 
-[![Version](https://img.shields.io/badge/version-1.0-1a1a2e)](https://github.com/pdudotdev/YANAA/releases/tag/1.0.0)
+[![Version](https://img.shields.io/badge/version-1.0-1a1a2e)](https://github.com/pdudotdev/YANA/releases/tag/1.0.0)
 ![License](https://img.shields.io/badge/license-GPLv3-1a1a2e)
-[![Last Commit](https://img.shields.io/github/last-commit/pdudotdev/YANAA?color=1a1a2e)](https://github.com/pdudotdev/YANAA/commits/main/)
+[![Last Commit](https://img.shields.io/github/last-commit/pdudotdev/YANA?color=1a1a2e)](https://github.com/pdudotdev/YANA/commits/main/)
 
 | | |
 |---|---|
@@ -80,10 +80,10 @@ Combines documentation retrieval (RFCs + vendor guides + network intent) with li
 ▫️ **Step 1 - Install:**
 ```bash
 # Create virtualenv and install dependencies
-git clone https://github.com/pdudotdev/YANAA
-python3 -m venv netkb
-netkb/bin/pip install torch --index-url https://download.pytorch.org/whl/cpu 
-netkb/bin/pip install -r requirements.txt
+git clone https://github.com/pdudotdev/YANA
+python3 -m venv yana
+yana/bin/pip install torch --index-url https://download.pytorch.org/whl/cpu
+yana/bin/pip install -r requirements.txt
 ```
 
 ▫️ **Step 2 - Vault:**
@@ -103,12 +103,12 @@ vault operator unseal                                  # after every restart
 
 > 🔑 Save the unseal key output from `vault operator init` somewhere safe - you'll need it every time Vault restarts or seals. Without it, a sealed Vault cannot be recovered.
 
-> ⚠️ YANAA requires Vault to be **running and unsealed** before any run. If Vault is unavailable, credential lookups fall back to env vars (see `.env.example`).
+> ⚠️ YANA requires Vault to be **running and unsealed** before any run. If Vault is unavailable, credential lookups fall back to env vars (see `.env.example`).
 
 Store secrets:
 ```
-vault kv put secret/yanaa/router username=<user> password=<pass>
-vault kv put secret/yanaa/netbox token=<token>
+vault kv put secret/yana/router username=<user> password=<pass>
+vault kv put secret/yana/netbox token=<token>
 ```
 
 ▫️ **Step 3 - Configure `.env`:**
@@ -127,12 +127,12 @@ claude auth login
 
 ▫️ **Step 5 - Register the MCP server:**
 ```
-claude mcp add yanaa -s user -- /path/to/netkb/bin/python /path/to/YANAA/server/MCPServer.py
+claude mcp add yana -s user -- /path/to/yana/bin/python /path/to/YANA/server/MCPServer.py
 ```
 
 ▫️ **Step 6 - Ingest docs into ChromaDB:**
 ```
-netkb/bin/python ingest.py
+yana/bin/python ingest.py
 ```
 
 ## 🔧 MCP Tools
@@ -150,7 +150,7 @@ netkb/bin/python ingest.py
 ## 🦾 Usage
 
 ```
-cd /path/to/YANAA
+cd /path/to/YANA
 claude
 
 > What causes OSPF neighbors to get stuck in EXSTART state?
@@ -165,13 +165,13 @@ claude
 
 ⚠️ To update the knowledge base after editing docs:
 ```bash
-netkb/bin/python ingest.py --clean
+yana/bin/python ingest.py --clean
 ```
 
 ## 🏗️ Project Structure
 
 ```
-YANAA/
+YANA/
 ├── server/
 │   └── MCPServer.py              # FastMCP server (7 tools)
 ├── tools/                        # MCP tool implementations

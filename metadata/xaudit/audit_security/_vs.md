@@ -2,7 +2,7 @@
 ```
 (same model, effort, plan mode approach as the testing audit)
 You are a Senior Application Security Engineer and a seasoned pentester.
-Please do a thorough, careful, well-thought and well-planned analysis of the codebase as you would do a professional security audit to uncover any potential or real risks, threats, vulnerabilities, prompt injections etc. that netKB is exposed to. Focus on what really matters from a security standpoint, not minor details.
+Please do a thorough, careful, well-thought and well-planned analysis of the codebase as you would do a professional security audit to uncover any potential or real risks, threats, vulnerabilities, prompt injections etc. that YANA is exposed to. Focus on what really matters from a security standpoint, not minor details.
 
 After your analysis is fully done: read it, challenge it and your own judgement and assumptions regarding any important findings in order to double check if there's really an issue or not.
 
@@ -62,7 +62,7 @@ This is the most consequential difference between the two reports. Legacy F2 is 
 **Legacy's F2 attack chain:**
 1. Attacker compromises NetBox (or has write access to device records — the threat model's primary vector, rated MEDIUM likelihood)
 2. Attacker sets a device's `primary_ip` to an attacker-controlled IP
-3. netKB reads `dev.primary_ip.address.split("/")[0]` at `netbox.py:41` with no validation — no network prefix check, no allowlist, no IP format verification
+3. YANA reads `dev.primary_ip.address.split("/")[0]` at `netbox.py:41` with no validation — no network prefix check, no allowlist, no IP format verification
 4. The attacker IP is passed directly to Scrapli at `ssh.py:50`: `Cli(host=device["host"], ...)`
 5. With `SSH_STRICT_HOST_KEY` defaulting to `False`, no host key verification occurs
 6. The MCP server SSHes to the attacker's machine; the attacker's SSH server receives the plaintext password in the RFC 4252 password authentication handshake
@@ -71,7 +71,7 @@ This is the most consequential difference between the two reports. Legacy F2 is 
 
 **What v1 produces instead:**
 
-- **S2-02** describes "An attacker positioned on the network path between the netKB server and a managed device performs an SSH man-in-the-middle attack." This is a different attack with a different prerequisite (network positioning, not just NetBox write access). S2-02 addresses the insecure default; it does not address the host poisoning chain.
+- **S2-02** describes "An attacker positioned on the network path between the YANA server and a managed device performs an SSH man-in-the-middle attack." This is a different attack with a different prerequisite (network positioning, not just NetBox write access). S2-02 addresses the insecure default; it does not address the host poisoning chain.
 - **Input Boundary Analysis** for the `host` field: "A compromised NetBox could redirect SSH connections to an attacker-controlled host, capturing credentials." Verdict: PARTIAL. This is the legacy F2 attack in a sentence — but it has no finding number, no attack chain, and receives a PARTIAL verdict rather than triggering a standalone HIGH finding.
 - **P2-6**: "Validate NetBox `host` field as IP address" — priority P2. Legacy had the fix at P0.
 
@@ -85,7 +85,7 @@ A reader of v1 who trusts its prioritized recommendations would implement P0-1 (
 | `cli_style` → Vault path construction | Analyzed in Credential section; traversal dismissed with reasoning (Vault ACLs + hvac opaque paths). Analysis is deeper than legacy. |
 | `platform` → Scrapli `definition_file_or_name` | Not mentioned in Input Boundary Analysis at all. `ssh.py:27` passes an unknown platform string as-is to Scrapli. |
 
-The `cli_style` dismissal in v1 is arguably the one case where v1 provides *better* analysis than legacy: it traces the actual code path (`f"netkb/router{cli_style}"` at `ssh.py:31`) and concludes that Vault ACLs and hvac's opaque path handling prevent traversal. Whether that conclusion is operationally correct depends on the Vault ACL configuration, but the analysis is substantive.
+The `cli_style` dismissal in v1 is arguably the one case where v1 provides *better* analysis than legacy: it traces the actual code path (`f"yana/router{cli_style}"` at `ssh.py:31`) and concludes that Vault ACLs and hvac's opaque path handling prevent traversal. Whether that conclusion is operationally correct depends on the Vault ACL configuration, but the analysis is substantive.
 
 ---
 
@@ -114,7 +114,7 @@ definition = _CUSTOM_DEFINITIONS.get(platform, platform)
 ```
 If `platform` is not in `_CUSTOM_DEFINITIONS` (two known entries: `mikrotik_routeros`, `vyos_vyos`), the value is passed as-is to `Cli(definition_file_or_name=definition)`. Legacy flagged this as a compounding factor of F2. v1's Input Boundary Analysis does not mention `platform` at all.
 
-**Gap 2: `cli_style` dual code paths.** v1 analyzes `cli_style` only as a PLATFORM_MAP dict key (verdict: EFFECTIVE through fail-closed). But `ssh.py:30-32` shows a second code path: `cli_style` is also used to construct a Vault secret path (`f"netkb/router{cli_style}"`). The Input Boundary section gives an EFFECTIVE verdict based on one path while the other is analyzed only in the Credential section. These are different code paths with different security properties.
+**Gap 2: `cli_style` dual code paths.** v1 analyzes `cli_style` only as a PLATFORM_MAP dict key (verdict: EFFECTIVE through fail-closed). But `ssh.py:30-32` shows a second code path: `cli_style` is also used to construct a Vault secret path (`f"yana/router{cli_style}"`). The Input Boundary section gives an EFFECTIVE verdict based on one path while the other is analyzed only in the Credential section. These are different code paths with different security properties.
 
 Despite these gaps, the Input Boundary Analysis section itself is a material improvement in audit quality. Legacy identified the `host` and `cli_style` issues only incidentally through F2. v1 provides a systematic inventory.
 
@@ -260,7 +260,7 @@ Both gaps identified in the v1 evaluation are closed in v2:
 
 **`platform` field:** Now mentioned explicitly in the "Compounding factors" of S2-3: "platform from NetBox is unvalidated. `ssh.py:27` uses `_CUSTOM_DEFINITIONS.get(platform, platform)` — if not in the dict, it's passed as-is to Scrapli's `Cli()` as a `definition_file_or_name`." The P0-2 remediation also covers it: "Validate NetBox-sourced `cli_style` against PLATFORM_MAP keys."
 
-**`cli_style` dual path:** v2 correctly handles both paths separately. The Vault path construction (`f"netkb/router{cli_style}"`) is S2-2. The PLATFORM_MAP dict key lookup is S3-1 / Input Boundary "EFFECTIVE through fail-closed."
+**`cli_style` dual path:** v2 correctly handles both paths separately. The Vault path construction (`f"yana/router{cli_style}"`) is S2-2. The PLATFORM_MAP dict key lookup is S3-1 / Input Boundary "EFFECTIVE through fail-closed."
 
 ---
 

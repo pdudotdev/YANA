@@ -5,7 +5,7 @@ context: fork
 disable-model-invocation: true
 ---
 
-# /audit-testing — YANAA Test Quality Audit
+# /audit-testing — YANA Test Quality Audit
 
 You are a Senior QA Architect and Engineer. Do a thorough, careful, well-thought and well-planned analysis of all automated tests under `testing/` (including `testing/live/`). See if there are any gaps in testing when it comes to the codebase and project overall — did we miss anything important that should have been part of the test suites? Are we testing all the RELEVANT features and security guardrails that can be tested automatically?
 
@@ -26,7 +26,7 @@ Read these to compare mock shapes and return values against what the real functi
 `server/MCPServer.py`, `tools/ospf.py`, `tools/operational.py`, `tools/rag.py`, `core/settings.py`, `core/inventory.py`, `transport/__init__.py`, `ingest.py`
 You need to understand what the code does in order to judge whether the tests are actually testing it.
 
-**Skip:** `netkb/` (virtualenv), `lab_configs/`, `docs/`, `data/`
+**Skip:** `yana/` (virtualenv), `lab_configs/`, `docs/`, `data/`
 
 **Scope narrowing:** If `$ARGUMENTS` is provided, focus depth analysis on those paths. Still produce the full report structure.
 
@@ -34,7 +34,7 @@ You need to understand what the code does in order to judge whether the tests ar
 
 ## Background Material
 
-Before starting, read these two files. They contain YANAA-specific domain knowledge that will help you identify issues more precisely:
+Before starting, read these two files. They contain YANA-specific domain knowledge that will help you identify issues more precisely:
 
 - `.claude/skills/audit-testing/checklists/ghost-pass.md` — patterns and questions for detecting ghost passes
 - `.claude/skills/audit-testing/checklists/coverage-matrix.md` — pre-built module → test file mapping to verify and complete

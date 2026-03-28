@@ -7,7 +7,7 @@ import core.vault
 from core.netbox import load_intent
 from tools import CHROMA_DIR as _CHROMA_DIR, INTENT_JSON as _INTENT_JSON
 
-log = logging.getLogger("yanaa.status")
+log = logging.getLogger("yana.status")
 
 
 async def get_status() -> dict:
@@ -25,8 +25,8 @@ async def get_status() -> dict:
 
     # Vault / credentials
     # Trigger secret resolution so _sources is populated (no-op if already cached)
-    core.vault.get_secret("yanaa/router", "username", fallback_env="ROUTER_USERNAME", quiet=True)
-    vault_status = {"source": core.vault.get_source("yanaa/router")}
+    core.vault.get_secret("yana/router", "username", fallback_env="ROUTER_USERNAME", quiet=True)
+    vault_status = {"source": core.vault.get_source("yana/router")}
 
     # Intent
     intent = await asyncio.to_thread(load_intent)

@@ -2,7 +2,7 @@
 
 ## Problem Statement
 
-As the YANAA document corpus grows (adding BGP, EIGRP, STP, and other protocols), **retrieval precision degrades** — the proportion of truly relevant chunks in the top-k results decreases, even though recall (finding *some* relevant result) may remain acceptable.
+As the YANA document corpus grows (adding BGP, EIGRP, STP, and other protocols), **retrieval precision degrades** — the proportion of truly relevant chunks in the top-k results decreases, even though recall (finding *some* relevant result) may remain acceptable.
 
 This is not a latency problem. It is a **relevance quality** problem in the retrieval step that feeds the LLM context window.
 

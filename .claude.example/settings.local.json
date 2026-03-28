@@ -1,9 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "mcp__yanaa__*",
-      "Bash(netkb/bin/python:*)",
-      "Bash(netkb/bin/pip:*)",
+      "mcp__yana__*",
+      "Bash(yana/bin/python:*)",
+      "Bash(yana/bin/pip:*)",
       "Bash(ls:*)"
     ],
     "deny": [

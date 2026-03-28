@@ -9,7 +9,7 @@ _CHROMA_DIR = str(CHROMA_DIR)
 _COLLECTION = "ospf_kb"
 _EMBEDDING_MODEL = "all-MiniLM-L6-v2"
 
-log = logging.getLogger("yanaa.rag")
+log = logging.getLogger("yana.rag")
 
 # Lazy-initialized at first call so a ChromaDB failure does not prevent
 # the device tools (get_ospf, get_interfaces) from loading.

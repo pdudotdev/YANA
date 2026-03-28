@@ -1,4 +1,4 @@
-# netKB Test Quality Audit Report
+# YANA Test Quality Audit Report
 
 **Date:** 2026-03-27
 **Auditor:** External QA (automated analysis)
@@ -8,7 +8,7 @@
 
 ## 1. Executive Summary
 
-The netKB test suite is **structurally sound** — it covers the critical boundaries (input validation, platform map resolution, VRF injection, credential chain, NetBox parsing) with specific assertions that would genuinely fail under mutation. The most critical finding is in **IT-001 (RAG Pipeline)**, where `test_basic_query` uses `len(result["results"]) > 0`, a trivially-true assertion that cannot distinguish correct retrieval from garbage results. The dominant theme across the suite is **conditional coverage**: the RAG integration tests skip entirely without ChromaDB, and there is no CI-level guarantee they have ever been exercised in the pipeline (they have, due to the `ingest.py` step in CI), while several source modules (`core/settings.py`, `core/inventory.py`, the main `ingest()` function) have zero direct test coverage.
+The YANA test suite is **structurally sound** — it covers the critical boundaries (input validation, platform map resolution, VRF injection, credential chain, NetBox parsing) with specific assertions that would genuinely fail under mutation. The most critical finding is in **IT-001 (RAG Pipeline)**, where `test_basic_query` uses `len(result["results"]) > 0`, a trivially-true assertion that cannot distinguish correct retrieval from garbage results. The dominant theme across the suite is **conditional coverage**: the RAG integration tests skip entirely without ChromaDB, and there is no CI-level guarantee they have ever been exercised in the pipeline (they have, due to the `ingest.py` step in CI), while several source modules (`core/settings.py`, `core/inventory.py`, the main `ingest()` function) have zero direct test coverage.
 
 ---
 
@@ -271,7 +271,7 @@ The netKB test suite is **structurally sound** — it covers the critical bounda
 
 ### UT-007: NetBox Loader — EXCELLENT
 
-**What it covers:** `load_devices()` for: no URL, no token, pynetbox exception, empty device list, valid device parsing, VRF inclusion, missing primary_ip skip, missing cli_style skip, per-device exception resilience. `load_intent()` for: no URL, no contexts, netkb prefix parsing, dblcheck fallback, global context with autonomous_systems, pynetbox exception.
+**What it covers:** `load_devices()` for: no URL, no token, pynetbox exception, empty device list, valid device parsing, VRF inclusion, missing primary_ip skip, missing cli_style skip, per-device exception resilience. `load_intent()` for: no URL, no contexts, yana prefix parsing, dblcheck fallback, global context with autonomous_systems, pynetbox exception.
 **Strengths:** 12 tests covering virtually every code path. The `_make_nb_device` helper produces realistic mock shapes. The per-device exception test verifies that one broken device does not abort loading of valid devices.
 **Weaknesses:** No test for `load_devices()` when `custom_fields` is `None` (the code handles this with `(dev.custom_fields or {})`, but no test exercises this path).
 

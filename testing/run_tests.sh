@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# YANAA test runner — automated + optional live tests
+# YANA test runner — automated + optional live tests
 
 cd "$(dirname "$0")/.."
-PYTHON="netkb/bin/python"
+PYTHON="yana/bin/python"
 PASSED=0
 FAILED=0
 SKIPPED=0
@@ -38,7 +38,7 @@ run_suite() {
 
 echo ""
 echo "========================================="
-echo "  YANAA Test Runner"
+echo "  YANA Test Runner"
 echo "========================================="
 echo ""
 

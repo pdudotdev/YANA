@@ -1,6 +1,6 @@
-# Attack Surfaces — YANAA
+# Attack Surfaces — YANA
 
-Use this during Phase 3. This defines every entry point into YANAA and the data flow for each user-controlled input.
+Use this during Phase 3. This defines every entry point into YANA and the data flow for each user-controlled input.
 
 ---
 
@@ -12,7 +12,7 @@ Use this during Phase 3. This defines every entry point into YANAA and the data 
         | Tool calls (JSON arguments, LLM-generated, untrusted)
         | No authentication layer
         v
-[YANAA MCP Server — FastMCP]
+[YANA MCP Server — FastMCP]
         |
         |-- search_knowledge_base ──> [ChromaDB / HuggingFace Embeddings] (local)
         |
@@ -82,7 +82,7 @@ MCP tool call
   → command_template.replace("{vrf}", vrf_name)
   → SSH command string sent to device
 ```
-**Risk zone:** String interpolation into CLI command. This is the highest-risk data flow in YANAA.
+**Risk zone:** String interpolation into CLI command. This is the highest-risk data flow in YANA.
 Key question: Does `_VRF_RE` reject all values that could alter command semantics?
 
 ### `query` (KBQuery)

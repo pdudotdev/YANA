@@ -2,5 +2,7 @@ data/chroma/
 .env
 __pycache__/
 *.pyc
-netkb/
+yana/
 .claude/
+.pytest_cache/
+.ruff_cache/

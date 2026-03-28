@@ -1,4 +1,4 @@
-# Threat Model — YANAA
+# Threat Model — YANA
 
 Use this during Phase 3 and Phase 8 (self-challenge). Defines the realistic threat actors, assets to protect, and STRIDE-lite analysis per component.
 

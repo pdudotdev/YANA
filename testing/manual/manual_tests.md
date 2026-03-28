@@ -1,6 +1,6 @@
 # Manual Tests
 
-Type each prompt into the MCP client (Claude Desktop or claude-code connected to the YANAA server).
+Type each prompt into the MCP client (Claude Desktop or claude-code connected to the YANA server).
 Mark each test **PASS** / **FAIL** and note any unexpected behavior.
 
 ---

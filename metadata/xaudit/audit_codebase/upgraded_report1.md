@@ -1,4 +1,4 @@
-# netKB Codebase Audit Report
+# YANA Codebase Audit Report
 
 **Date:** 2026-03-27
 **Scope:** `server/`, `tools/`, `core/`, `transport/`, `platforms/`, `input_models/`, `ingest.py`, `testing/`
@@ -8,7 +8,7 @@
 
 ## 1. Executive Summary
 
-The netKB codebase is well-structured with clean separation of concerns, solid Pydantic input validation, and comprehensive test coverage for its core modules. The most critical finding is the absence of a timeout on semaphore acquisition in `transport/__init__.py`, which means that if all 5 SSH slots are occupied by stalled connections, every subsequent MCP tool call blocks indefinitely -- an availability risk for a production MCP server. Across the codebase, the primary theme is **missing defensive timeouts and graceful degradation boundaries** at the transport and RAG layers.
+The YANA codebase is well-structured with clean separation of concerns, solid Pydantic input validation, and comprehensive test coverage for its core modules. The most critical finding is the absence of a timeout on semaphore acquisition in `transport/__init__.py`, which means that if all 5 SSH slots are occupied by stalled connections, every subsequent MCP tool call blocks indefinitely -- an availability risk for a production MCP server. Across the codebase, the primary theme is **missing defensive timeouts and graceful degradation boundaries** at the transport and RAG layers.
 
 ---
 
@@ -241,7 +241,7 @@ The `asyncio.Semaphore(5)` at `transport/__init__.py:11` is the server's only co
 | `core/vault.py` | `test_vault.py` | Good coverage. Cache, fallback, sentinel. Missing: test for falsy-but-valid secret values (S2-001). |
 | `core/netbox.py` | `test_netbox.py` | Excellent coverage. All edge cases: missing URL/token, missing fields, per-device exceptions, intent prefix fallback, global context. |
 | `core/inventory.py` | Covered indirectly via `conftest.py` mock | No dedicated test. Module-level execution tested implicitly. |
-| `core/settings.py` | None | **No test file.** Settings are simple assignments. Bug class: a typo in the Vault path (e.g., `"netkb/roter"`) would silently fall back to env vars. Not currently tested. |
+| `core/settings.py` | None | **No test file.** Settings are simple assignments. Bug class: a typo in the Vault path (e.g., `"yana/roter"`) would silently fall back to env vars. Not currently tested. |
 | `server/MCPServer.py` | `test_mcp_server.py` | Covers tool registration count and names. Missing: verifying the tool functions are the actual implementations (not just name matches). |
 | `ingest.py` | `test_ingest.py` | Good coverage. `extract_metadata`, `_router_to_markdown`, `load_network_context` with NetBox/fallback paths. Missing: `ingest()` main function (chunking, embedding, storage). |
 | `platforms/definitions/*.yaml` | None | **No test file.** Scrapli definition files are validated by Scrapli at runtime only. A regex error in `vyos_vyos.yaml` would surface as `OpenException` on first VyOS connection. |

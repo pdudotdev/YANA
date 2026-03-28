@@ -1,4 +1,4 @@
-# netKB Test Quality Audit Report
+# YANA Test Quality Audit Report
 
 **Date:** 2026-03-27
 **Auditor:** External Senior QA Architect
@@ -8,7 +8,7 @@
 
 ## 1. Executive Summary
 
-The netKB test suite is **structurally sound** — it covers the major functional paths, has good input validation tests, and demonstrates awareness of security guardrails. However, the suite contains **no ghost passes (S1)** upon rigorous analysis, but does contain **two mock fidelity issues (S2)** that reduce confidence in specific tests, **several meaningful coverage gaps (S3)** in critical modules (`core/settings.py`, `core/inventory.py`, main `ingest()` pipeline, concurrency behavior), and **a few test infrastructure concerns (S4)** in `run_tests.sh` that could mask failures. The most critical theme is that **import-time side effects in `core/settings.py` and `core/inventory.py` are completely untested**, meaning a misconfiguration that breaks the server at startup would go undetected by CI.
+The YANA test suite is **structurally sound** — it covers the major functional paths, has good input validation tests, and demonstrates awareness of security guardrails. However, the suite contains **no ghost passes (S1)** upon rigorous analysis, but does contain **two mock fidelity issues (S2)** that reduce confidence in specific tests, **several meaningful coverage gaps (S3)** in critical modules (`core/settings.py`, `core/inventory.py`, main `ingest()` pipeline, concurrency behavior), and **a few test infrastructure concerns (S4)** in `run_tests.sh` that could mask failures. The most critical theme is that **import-time side effects in `core/settings.py` and `core/inventory.py` are completely untested**, meaning a misconfiguration that breaks the server at startup would go undetected by CI.
 
 ---
 
@@ -99,7 +99,7 @@ This module runs Vault calls at import time to resolve `USERNAME` and `PASSWORD`
 - The `SSH_STRICT_HOST_KEY` env var parsing (`"true"`, `"1"`, `"yes"` accepted; others rejected)
 - The default values are as documented
 
-**Bug class:** A typo in the Vault path (`"netkb/roter"` instead of `"netkb/router"`) would cause all SSH connections to use env-var fallback credentials. A change to `SSH_STRICT_HOST_KEY` parsing logic (e.g., inverting the condition) would disable host key verification silently. Neither would be caught by any test.
+**Bug class:** A typo in the Vault path (`"yana/roter"` instead of `"yana/router"`) would cause all SSH connections to use env-var fallback credentials. A change to `SSH_STRICT_HOST_KEY` parsing logic (e.g., inverting the condition) would disable host key verification silently. Neither would be caught by any test.
 
 #### S3-002: `core/inventory.py` — Import-time behavior untested
 
@@ -203,7 +203,7 @@ No test verifies that error messages returned by tool functions do not leak inte
 
 #### S3-SEC-003: Guardrail for no `run_show` tool — NOT automatically tested
 
-The guardrails document states netKB deliberately omits a `run_show` tool. No automated test verifies that the MCP server exposes exactly the allowed set of tools (only `test_mcp_server.py::test_tool_names` does this, which is a positive — it verifies the exact set `{"search_knowledge_base", "get_ospf", "get_interfaces"}`). This IS covered.
+The guardrails document states YANA deliberately omits a `run_show` tool. No automated test verifies that the MCP server exposes exactly the allowed set of tools (only `test_mcp_server.py::test_tool_names` does this, which is a positive — it verifies the exact set `{"search_knowledge_base", "get_ospf", "get_interfaces"}`). This IS covered.
 
 #### S3-SEC-004: VRF value reaches command string safely — tested but incomplete
 
@@ -303,7 +303,7 @@ The autouse fixture patches `devices` dicts in four modules but does not patch `
 ### UT-007: NetBox Loader — EXCELLENT
 
 **Covers:** `core/netbox.py::load_devices()`, `load_intent()`
-**Strengths:** Thorough error path coverage: no URL, no token, pynetbox exception, empty device list, missing primary_ip, missing cli_style, per-device exception resilience. Valid device parsing with exact field verification. `load_intent()` tests both netkb- and dblcheck- prefix fallback, global context for autonomous_systems, exception handling.
+**Strengths:** Thorough error path coverage: no URL, no token, pynetbox exception, empty device list, missing primary_ip, missing cli_style, per-device exception resilience. Valid device parsing with exact field verification. `load_intent()` tests both yana- and dblcheck- prefix fallback, global context for autonomous_systems, exception handling.
 **Weaknesses:** None significant. The mock shape (`_make_nb_device`) matches the real pynetbox device record structure accurately.
 
 ### UT-008: SSH Layer — SOLID
@@ -402,9 +402,9 @@ def test_successful_vault_lookup(self, monkeypatch):
         "data": {"data": {"username": "admin", "password": "secret"}}
     }
     with patch.dict("sys.modules", {"hvac": mock_hvac}):
-        result = core.vault.get_secret("netkb/router", "password")
+        result = core.vault.get_secret("yana/router", "password")
     assert result == "secret"
-    assert core.vault._cache["netkb/router"] == {"username": "admin", "password": "secret"}
+    assert core.vault._cache["yana/router"] == {"username": "admin", "password": "secret"}
 ```
 
 #### P0-2: Add `core/settings.py` test (S3-001)

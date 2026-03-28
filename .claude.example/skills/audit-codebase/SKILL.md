@@ -5,11 +5,11 @@ context: fork
 disable-model-invocation: true
 ---
 
-# /audit-codebase — YANAA Codebase Audit
+# /audit-codebase — YANA Codebase Audit
 
-You are a Senior Software Engineer performing a full, professional, and deep analysis of the entire codebase — code logic, code quality, and cleanliness. Check for any mistakes, bugs, inconsistencies, edge case failures, gaps, stale code or references, silent failures, and unhandled exceptions. Make sure everything is in sync with the current implementation of YANAA.
+You are a Senior Software Engineer performing a full, professional, and deep analysis of the entire codebase — code logic, code quality, and cleanliness. Check for any mistakes, bugs, inconsistencies, edge case failures, gaps, stale code or references, silent failures, and unhandled exceptions. Make sure everything is in sync with the current implementation of YANA.
 
-Pay particular attention to any ways the agent can hang or enter infinite loops that might consume tokens and time — YANAA is an MCP server used by client companies, and reliability matters.
+Pay particular attention to any ways the agent can hang or enter infinite loops that might consume tokens and time — YANA is an MCP server used by client companies, and reliability matters.
 
 Be thorough. Be rigorous. Every finding must be earned with evidence.
 
@@ -19,7 +19,7 @@ Be thorough. Be rigorous. Every finding must be earned with evidence.
 `server/`, `tools/`, `core/`, `transport/`, `platforms/`, `input_models/`, `ingest.py`, `testing/`
 
 **Skip entirely:**
-`netkb/` (virtualenv), `lab_configs/` (provisioning scripts), `docs/` (KB content), `data/` (ChromaDB artifacts), `metadata/` (design docs)
+`yana/` (virtualenv), `lab_configs/` (provisioning scripts), `docs/` (KB content), `data/` (ChromaDB artifacts), `metadata/` (design docs)
 
 **Scope narrowing:** If `$ARGUMENTS` is provided (space-separated paths), focus depth analysis on those paths. Still verify cross-module sync and include a complete report structure.
 
@@ -27,9 +27,9 @@ Be thorough. Be rigorous. Every finding must be earned with evidence.
 
 ## Background Material
 
-Before starting, read these three files. They contain YANAA-specific domain knowledge — known risk areas, integration patterns, and cross-module contracts you need to verify:
+Before starting, read these three files. They contain YANA-specific domain knowledge — known risk areas, integration patterns, and cross-module contracts you need to verify:
 
-- `.claude/skills/audit-codebase/checklists/async-safety.md` — YANAA's async patterns and known concurrency risk areas
+- `.claude/skills/audit-codebase/checklists/async-safety.md` — YANA's async patterns and known concurrency risk areas
 - `.claude/skills/audit-codebase/checklists/integration.md` — Vault, NetBox, ChromaDB, and Scrapli integration points to examine
 - `.claude/skills/audit-codebase/checklists/sync-check.md` — cross-module contracts that must be verified (tool registrations, model enums, platform map keys, CLAUDE.md accuracy)
 

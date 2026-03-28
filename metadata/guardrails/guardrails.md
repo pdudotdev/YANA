@@ -2,7 +2,7 @@
 
 Architectural protections that prevent unsafe commands, credential exposure, and prompt injection. Organized by enforcement type: code-enforced (hard stops) > config-enforced (deny rules) > behavioral (prompt-level).
 
-YANAA is **read-only by design**. It never pushes configuration to devices. It has no `run_show` tool — all device queries go through specialized tools with static command maps.
+YANA is **read-only by design**. It never pushes configuration to devices. It has no `run_show` tool — all device queries go through specialized tools with static command maps.
 
 ---
 
@@ -34,7 +34,7 @@ No other user-controlled input reaches a command string. There is no `run_show` 
 
 ### No run_show Tool
 
-YANAA deliberately omits a `run_show` fallback tool. In a multi-vendor environment, raw command execution is error-prone (vendor syntax differences) and expands the attack surface. All device queries are routed through the platform_map, which resolves the correct vendor-specific command automatically.
+YANA deliberately omits a `run_show` fallback tool. In a multi-vendor environment, raw command execution is error-prone (vendor syntax differences) and expands the attack surface. All device queries are routed through the platform_map, which resolves the correct vendor-specific command automatically.
 
 ### SSH Transport (`transport/ssh.py`)
 
@@ -83,7 +83,7 @@ Defense-in-depth against prompt injection via device output. A device could theo
 
 ### All 7 MCP Tools Are Read-Only
 
-No MCP tool in YANAA issues write commands:
+No MCP tool in YANA issues write commands:
 - `search_knowledge_base` — reads from local ChromaDB (no network access)
 - `get_ospf` — runs read-only OSPF show commands via static platform_map
 - `get_interfaces` — runs read-only interface status commands via static platform_map

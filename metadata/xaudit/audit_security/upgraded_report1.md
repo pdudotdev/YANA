@@ -1,10 +1,10 @@
-# netKB Security Audit Report — 2026-03-27
+# YANA Security Audit Report — 2026-03-27
 
 ---
 
 ## 1. Executive Summary
 
-netKB presents a **well-defended read-only architecture** with strong code-enforced controls at the primary attack surface (MCP tool arguments). The most critical finding is a **command injection bypass via NetBox-sourced VRF values** (S2-01): VRF names from the MCP tool call are validated by a strict regex, but VRF names sourced from NetBox inventory bypass this validation entirely and are interpolated directly into CLI commands sent to devices. The strongest architectural control is the absence of a `run_show` tool, which code-enforces the read-only boundary and cannot be circumvented through prompt injection.
+YANA presents a **well-defended read-only architecture** with strong code-enforced controls at the primary attack surface (MCP tool arguments). The most critical finding is a **command injection bypass via NetBox-sourced VRF values** (S2-01): VRF names from the MCP tool call are validated by a strict regex, but VRF names sourced from NetBox inventory bypass this validation entirely and are interpolated directly into CLI commands sent to devices. The strongest architectural control is the absence of a `run_show` tool, which code-enforces the read-only boundary and cannot be circumvented through prompt injection.
 
 ---
 
@@ -47,11 +47,11 @@ SSH_STRICT_HOST_KEY = os.getenv("SSH_STRICT_HOST_KEY", "").lower() in ("true", "
 
 **Attack chain:**
 1. The code default is `False` — strict host key checking is disabled unless the environment variable is explicitly set.
-2. An attacker positioned on the network path between the netKB server and a managed device performs an SSH man-in-the-middle attack.
+2. An attacker positioned on the network path between the YANA server and a managed device performs an SSH man-in-the-middle attack.
 3. Without host key verification, Scrapli connects to the attacker's host, sending credentials (username/password) in the SSH handshake.
 4. Attacker captures SSH credentials and gains access to all managed network devices.
 
-**Prerequisites:** Network-level MITM position between netKB server and managed devices. The `.env` file reportedly sets this to `true`, but this cannot be verified due to (correctly applied) deny rules, and the code default is insecure.
+**Prerequisites:** Network-level MITM position between YANA server and managed devices. The `.env` file reportedly sets this to `true`, but this cannot be verified due to (correctly applied) deny rules, and the code default is insecure.
 
 **Impact:** Full credential exposure for all managed device accounts. Lateral movement to all network devices.
 
@@ -227,7 +227,7 @@ ChromaDB files in `data/chroma/` are loaded with no integrity check. A host-leve
 
 **Persistent failure state:** When Vault fails, `_cache[path] = _VAULT_FAILED` permanently caches the failure (S4-02). All subsequent lookups for that path will use env vars for the lifetime of the process, even if Vault recovers. This is a graceful-but-sticky degradation.
 
-**Per-device credential lookup:** `transport/ssh.py:31-32` attempts per-cli_style credential lookup (`netkb/router{cli_style}`), falling back to the global `USERNAME`/`PASSWORD`. The `cli_style` value comes from NetBox (`custom_fields.cli_style`). A compromised NetBox could set `cli_style` to an arbitrary string, causing Vault lookups for attacker-controlled paths (e.g., `netkb/routerattacker-path`). However, Vault path traversal is not feasible here because `hvac` treats the path as an opaque string and Vault's path-based ACLs would deny access to unauthorized paths.
+**Per-device credential lookup:** `transport/ssh.py:31-32` attempts per-cli_style credential lookup (`yana/router{cli_style}`), falling back to the global `USERNAME`/`PASSWORD`. The `cli_style` value comes from NetBox (`custom_fields.cli_style`). A compromised NetBox could set `cli_style` to an arbitrary string, causing Vault lookups for attacker-controlled paths (e.g., `yana/routerattacker-path`). However, Vault path traversal is not feasible here because `hvac` treats the path as an opaque string and Vault's path-based ACLs would deny access to unauthorized paths.
 
 **Credential exfiltration paths:**
 - `.env` file: Protected by 3 deny rules (Read patterns) and 4 Bash deny rules (cat/less/head/tail/more). See Controls Effectiveness Matrix for bypass analysis.
