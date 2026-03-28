@@ -1,4 +1,4 @@
-# ✨ YANAA • Network Knowledge Base
+# ✨ YANAA • Yet Another Network Automation Agent
 
 [![Version](https://img.shields.io/badge/version-1.0-1a1a2e)](https://github.com/pdudotdev/YANAA/releases/tag/1.0.0)
 ![License](https://img.shields.io/badge/license-GPLv3-1a1a2e)
