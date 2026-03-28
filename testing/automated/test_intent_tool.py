@@ -1,4 +1,4 @@
-"""UT-011: query_intent tool."""
+"""UT-014: query_intent tool."""
 from unittest.mock import patch
 
 import pytest

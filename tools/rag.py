@@ -1,14 +1,15 @@
 """RAG tool: search the OSPF knowledge base."""
+import asyncio
 import logging
-from pathlib import Path
 
 from input_models.models import KBQuery
+from tools import CHROMA_DIR
 
-_CHROMA_DIR = str(Path(__file__).resolve().parent.parent / "data" / "chroma")
+_CHROMA_DIR = str(CHROMA_DIR)
 _COLLECTION = "ospf_kb"
 _EMBEDDING_MODEL = "all-MiniLM-L6-v2"
 
-log = logging.getLogger("netkb.rag")
+log = logging.getLogger("yanaa.rag")
 
 # Lazy-initialized at first call so a ChromaDB failure does not prevent
 # the device tools (get_ospf, get_interfaces) from loading.
@@ -52,9 +53,12 @@ async def search_knowledge_base(params: KBQuery) -> dict:
     if where:
         search_kwargs["filter"] = where
 
-    try:
+    def _sync_search():
         vs = _get_vectorstore()
-        results = vs.similarity_search(params.query, **search_kwargs)
+        return vs.similarity_search(params.query, **search_kwargs)
+
+    try:
+        results = await asyncio.to_thread(_sync_search)
     except Exception as exc:
         log.error("Knowledge base search failed: %s", exc)
         return {"error": f"Knowledge base unavailable: {exc}"}

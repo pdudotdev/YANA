@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# netKB test runner — automated + optional live tests
+# YANAA test runner — automated + optional live tests
 
 cd "$(dirname "$0")/.."
 PYTHON="netkb/bin/python"
@@ -38,7 +38,7 @@ run_suite() {
 
 echo ""
 echo "========================================="
-echo "  netKB Test Runner"
+echo "  YANAA Test Runner"
 echo "========================================="
 echo ""
 

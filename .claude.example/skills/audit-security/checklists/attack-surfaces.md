@@ -1,6 +1,6 @@
-# Attack Surfaces — netKB
+# Attack Surfaces — YANAA
 
-Use this during Phase 3. This defines every entry point into netKB and the data flow for each user-controlled input.
+Use this during Phase 3. This defines every entry point into YANAA and the data flow for each user-controlled input.
 
 ---
 
@@ -12,7 +12,7 @@ Use this during Phase 3. This defines every entry point into netKB and the data 
         | Tool calls (JSON arguments, LLM-generated, untrusted)
         | No authentication layer
         v
-[netKB MCP Server — FastMCP]
+[YANAA MCP Server — FastMCP]
         |
         |-- search_knowledge_base ──> [ChromaDB / HuggingFace Embeddings] (local)
         |
@@ -82,7 +82,7 @@ MCP tool call
   → command_template.replace("{vrf}", vrf_name)
   → SSH command string sent to device
 ```
-**Risk zone:** String interpolation into CLI command. This is the highest-risk data flow in netKB.
+**Risk zone:** String interpolation into CLI command. This is the highest-risk data flow in YANAA.
 Key question: Does `_VRF_RE` reject all values that could alter command semantics?
 
 ### `query` (KBQuery)

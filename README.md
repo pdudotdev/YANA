@@ -1,8 +1,8 @@
-# ✨ netKB • Network Knowledge Base
+# ✨ YANAA • Network Knowledge Base
 
-[![Version](https://img.shields.io/badge/version-1.0-1a1a2e)](https://github.com/pdudotdev/netKB/releases/tag/1.0.0)
+[![Version](https://img.shields.io/badge/version-1.0-1a1a2e)](https://github.com/pdudotdev/YANAA/releases/tag/1.0.0)
 ![License](https://img.shields.io/badge/license-GPLv3-1a1a2e)
-[![Last Commit](https://img.shields.io/github/last-commit/pdudotdev/netKB?color=1a1a2e)](https://github.com/pdudotdev/netKB/commits/main/)
+[![Last Commit](https://img.shields.io/github/last-commit/pdudotdev/YANAA?color=1a1a2e)](https://github.com/pdudotdev/YANAA/commits/main/)
 
 | | |
 |---|---|
@@ -80,7 +80,7 @@ Combines documentation retrieval (RFCs + vendor guides + network intent) with li
 ▫️ **Step 1 - Install:**
 ```bash
 # Create virtualenv and install dependencies
-git clone https://github.com/pdudotdev/netKB
+git clone https://github.com/pdudotdev/YANAA
 python3 -m venv netkb
 netkb/bin/pip install torch --index-url https://download.pytorch.org/whl/cpu 
 netkb/bin/pip install -r requirements.txt
@@ -103,12 +103,12 @@ vault operator unseal                                  # after every restart
 
 > 🔑 Save the unseal key output from `vault operator init` somewhere safe - you'll need it every time Vault restarts or seals. Without it, a sealed Vault cannot be recovered.
 
-> ⚠️ netKB requires Vault to be **running and unsealed** before any run. If Vault is unavailable, credential lookups fall back to env vars (see `.env.example`).
+> ⚠️ YANAA requires Vault to be **running and unsealed** before any run. If Vault is unavailable, credential lookups fall back to env vars (see `.env.example`).
 
 Store secrets:
 ```
-vault kv put secret/netkb/router username=<user> password=<pass>
-vault kv put secret/netkb/netbox token=<token>
+vault kv put secret/yanaa/router username=<user> password=<pass>
+vault kv put secret/yanaa/netbox token=<token>
 ```
 
 ▫️ **Step 3 - Configure `.env`:**
@@ -127,7 +127,7 @@ claude auth login
 
 ▫️ **Step 5 - Register the MCP server:**
 ```
-claude mcp add netkb -s user -- /path/to/netkb/bin/python /path/to/netKB/server/MCPServer.py
+claude mcp add yanaa -s user -- /path/to/netkb/bin/python /path/to/YANAA/server/MCPServer.py
 ```
 
 ▫️ **Step 6 - Ingest docs into ChromaDB:**
@@ -150,7 +150,7 @@ netkb/bin/python ingest.py
 ## 🦾 Usage
 
 ```
-cd /path/to/netKB
+cd /path/to/YANAA
 claude
 
 > What causes OSPF neighbors to get stuck in EXSTART state?
@@ -171,7 +171,7 @@ netkb/bin/python ingest.py --clean
 ## 🏗️ Project Structure
 
 ```
-netKB/
+YANAA/
 ├── server/
 │   └── MCPServer.py              # FastMCP server (7 tools)
 ├── tools/                        # MCP tool implementations
@@ -187,7 +187,7 @@ netKB/
 │   ├── netbox.py                 # NetBox device inventory
 │   ├── inventory.py              # Device dict
 │   ├── settings.py               # Credentials + SSH config
-│   └── legacy/                   # Network context (ingested into ChromaDB)
+│   └── legacy/                   # JSON fallback when NetBox unavailable
 │       ├── INTENT.json
 │       └── NETWORK.json
 ├── transport/                    # SSH execution (Scrapli)
@@ -208,7 +208,7 @@ netKB/
 ├── skills/
 │   └── ospf/                     # OSPF skill file for specific troubleshooting
 ├── testing/
-│   ├── automated/                # Unit + integration tests (225 tests)
+│   ├── automated/                # Unit + integration tests (146 test functions)
 │   ├── live/                     # Live lab tests (35 tests) + results report
 │   └── run_tests.sh              # Test runner (--live for lab tests)
 ├── ingest.py                     # RAG ingestion pipeline

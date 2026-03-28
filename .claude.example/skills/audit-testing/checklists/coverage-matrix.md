@@ -1,4 +1,4 @@
-# Coverage Matrix — netKB
+# Coverage Matrix — YANAA
 
 Use this during Phase 5. The table below is a pre-built starting point based on the known codebase structure. Verify it is still accurate (files exist, mappings are correct), then fill in the "Functions Tested" and "Functions NOT Tested" columns based on your reading of the test files.
 

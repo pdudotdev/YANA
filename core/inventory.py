@@ -5,7 +5,7 @@ from pathlib import Path
 
 from core.netbox import load_devices
 
-_log = logging.getLogger("netkb.inventory")
+_log = logging.getLogger("yanaa.inventory")
 _NETWORK_JSON = Path(__file__).parent / "legacy" / "NETWORK.json"
 
 _netbox_result = load_devices()

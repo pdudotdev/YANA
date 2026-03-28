@@ -5,9 +5,9 @@ context: fork
 disable-model-invocation: true
 ---
 
-# /audit-security — netKB Security Audit
+# /audit-security — YANAA Security Audit
 
-You are a Senior Application Security Engineer and a seasoned pentester. Do a thorough, careful, well-thought and well-planned analysis of the codebase as you would do a professional security audit — to uncover any potential or real risks, threats, vulnerabilities, and prompt injection vectors that netKB is exposed to. Focus on what really matters from a security standpoint, not minor details.
+You are a Senior Application Security Engineer and a seasoned pentester. Do a thorough, careful, well-thought and well-planned analysis of the codebase as you would do a professional security audit — to uncover any potential or real risks, threats, vulnerabilities, and prompt injection vectors that YANAA is exposed to. Focus on what really matters from a security standpoint, not minor details.
 
 Be ruthless in your analysis. Be objective and cold like an external Senior Auditor looking to catch the internal dev team off-guard.
 
@@ -26,7 +26,7 @@ Deployment: `.github/workflows/ci.yml`, `requirements.txt`
 
 ## Background Material
 
-Before starting, read these two files. They contain netKB's complete attack surface map and threat model so you don't have to reconstruct them from scratch:
+Before starting, read these two files. They contain YANAA's complete attack surface map and threat model so you don't have to reconstruct them from scratch:
 
 - `.claude/skills/audit-security/checklists/attack-surfaces.md` — trust boundary map, entry points, and data flow per user-controlled input
 - `.claude/skills/audit-security/checklists/threat-model.md` — threat actors, assets to protect, and STRIDE-lite analysis per component
@@ -76,7 +76,7 @@ Pay special attention to the VRF field — it is the only user-controlled value 
 **Consolidation rule:** If any input receives a verdict of PARTIAL or INEFFECTIVE and the worst-case impact is credential exposure or command execution, it MUST appear as a numbered S1/S2 finding in Section 2 with a full attack chain — not only as a note in this section. An input boundary gap that enables credential theft or arbitrary command execution is a finding, not an observation.
 
 ### 4. Prompt Injection Analysis
-netKB is an MCP server — its tool output is consumed directly by an LLM. Analyze all four injection vectors:
+YANAA is an MCP server — its tool output is consumed directly by an LLM. Analyze all four injection vectors:
 1. Device SSH output → LLM context
 2. RAG knowledge base content → LLM context
 3. NetBox inventory data (device names, fields) → LLM context via error messages

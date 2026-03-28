@@ -13,7 +13,7 @@ from core.settings import (
 )
 from core.vault import get_secret
 
-log = logging.getLogger("netkb.transport.ssh")
+log = logging.getLogger("yanaa.transport.ssh")
 
 _DEFINITIONS_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "platforms", "definitions")
 _CUSTOM_DEFINITIONS: dict[str, str] = {
@@ -28,8 +28,8 @@ def _build_cli(device: dict, timeout_ops: int | None = None) -> Cli:
     op_timeout = timeout_ops or SSH_TIMEOUT_OPS
 
     cli_style = device.get("cli_style", "")
-    username = get_secret(f"netkb/router{cli_style}", "username", quiet=True) or USERNAME
-    password = get_secret(f"netkb/router{cli_style}", "password", quiet=True) or PASSWORD
+    username = get_secret(f"yanaa/router{cli_style}", "username", quiet=True) or USERNAME
+    password = get_secret(f"yanaa/router{cli_style}", "password", quiet=True) or PASSWORD
 
     if platform == "mikrotik_routeros":
         auth = AuthOptions(username=f"{username}+ct", password=password)

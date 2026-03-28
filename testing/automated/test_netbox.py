@@ -136,17 +136,17 @@ class TestLoadIntent:
     def test_no_contexts_returns_none(self, monkeypatch):
         monkeypatch.setenv("NETBOX_URL", "http://netbox")
         mock_module, mock_nb = _make_pynetbox(contexts=[])
-        # Both netkb- and dblcheck- return empty
+        # Both yanaa- and dblcheck- return empty
         mock_nb.extras.config_contexts.filter.return_value = []
         with patch("core.netbox.get_secret", return_value="token"), \
              patch.dict("sys.modules", {"pynetbox": mock_module}):
             result = load_intent()
         assert result is None
 
-    def test_netkb_prefix_parsed(self, monkeypatch):
+    def test_yanaa_prefix_parsed(self, monkeypatch):
         monkeypatch.setenv("NETBOX_URL", "http://netbox")
         ctx = MagicMock()
-        ctx.name = "netkb-R1"
+        ctx.name = "yanaa-R1"
         ctx.data = {"roles": ["ABR"], "platform": "cisco_iosxe"}
         mock_module, _ = _make_pynetbox(contexts=[ctx])
         with patch("core.netbox.get_secret", return_value="token"), \
@@ -163,7 +163,7 @@ class TestLoadIntent:
         ctx.data = {"roles": ["LEAF"]}
 
         def filter_side_effect(name__isw=None):
-            if name__isw == "netkb-":
+            if name__isw == "yanaa-":
                 return []
             return [ctx]
 
@@ -178,10 +178,10 @@ class TestLoadIntent:
     def test_global_context_provides_autonomous_systems(self, monkeypatch):
         monkeypatch.setenv("NETBOX_URL", "http://netbox")
         ctx_global = MagicMock()
-        ctx_global.name = "netkb-global"
+        ctx_global.name = "yanaa-global"
         ctx_global.data = {"autonomous_systems": {"1010": {"name": "AS1010"}}}
         ctx_dev = MagicMock()
-        ctx_dev.name = "netkb-R1"
+        ctx_dev.name = "yanaa-R1"
         ctx_dev.data = {"roles": ["CORE"]}
         mock_module, _ = _make_pynetbox(contexts=[ctx_global, ctx_dev])
         with patch("core.netbox.get_secret", return_value="token"), \

@@ -1,4 +1,4 @@
-# Integration Point Checklist — netKB
+# Integration Point Checklist — YANAA
 
 Use this during Phase 6. For each integration point, verify the listed behaviors against the code you read in Phase 2.
 
@@ -23,7 +23,7 @@ Use this during Phase 6. For each integration point, verify the listed behaviors
 | Import-time `load_devices()` call | `core/inventory.py` calls `load_devices()` at module level. If NetBox is unreachable, what exception propagates? Does it crash the server import chain or get caught? |
 | Missing `primary_ip` | Does `load_devices()` skip devices with `primary_ip=None`? Verify the check is present and the device is excluded without crashing. |
 | Missing `platform` or `cli_style` | Does `load_devices()` skip devices with missing custom fields? Is a warning logged? |
-| `load_intent()` prefix fallback | Does it try `netkb-` prefix first, then fall back to `dblcheck-`? Verify both code paths exist. |
+| `load_intent()` prefix fallback | Does it try `yanaa-` prefix first, then fall back to `dblcheck-`? Verify both code paths exist. |
 | NetBox session timeout | `(5, 15)` — verify it's applied to the pynetbox session object before requests. |
 | Empty NetBox result | If `load_devices()` returns an empty dict (no devices in NetBox), does the server start with empty inventory and return clean errors on unknown device queries? |
 
@@ -49,4 +49,4 @@ Use this during Phase 6. For each integration point, verify the listed behaviors
 | Per-connection credential lookup | `get_secret()` is called in `_build_cli()` for every SSH connection. Since Vault results are cached, only the first connection to each cli_style pays the HTTP cost. Verify this is correct. |
 | MikroTik `+ct` suffix | Is `f"{username}+ct"` applied for MikroTik connections specifically, and NOT for other platforms? |
 | VyOS transport | Does VyOS use a different scrapli transport class (`Ssh2Options` or `TransportSsh2Options`) compared to other platforms? Is this set correctly in `_build_cli()`? |
-| Credential path per cli_style | Is the Vault path per cli_style (`netkb/router{cli_style}`) correct for all platforms, or does it use a shared path? |
+| Credential path per cli_style | Is the Vault path per cli_style (`yanaa/router{cli_style}`) correct for all platforms, or does it use a shared path? |

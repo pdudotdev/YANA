@@ -8,22 +8,25 @@ _real_get_device = _inv.get_device
 
 
 class TestGetDevice:
-    def test_known_device_returns_dict(self):
-        from core.inventory import get_device
-        result = get_device("R1")
+    def test_known_device_returns_dict(self, monkeypatch):
+        import core.inventory
+        monkeypatch.setattr(core.inventory, "get_device", _real_get_device)
+        result = core.inventory.get_device("R1")
         assert result["cli_style"] == "ios"
         assert result["host"] == "10.0.0.1"
 
-    def test_unknown_device_raises_key_error(self):
-        from core.inventory import get_device
+    def test_unknown_device_raises_key_error(self, monkeypatch):
+        import core.inventory
+        monkeypatch.setattr(core.inventory, "get_device", _real_get_device)
         with pytest.raises(KeyError) as exc_info:
-            get_device("NONEXISTENT")
+            core.inventory.get_device("NONEXISTENT")
         assert "NONEXISTENT" in str(exc_info.value)
 
-    def test_error_lists_known_devices(self):
-        from core.inventory import get_device
+    def test_error_lists_known_devices(self, monkeypatch):
+        import core.inventory
+        monkeypatch.setattr(core.inventory, "get_device", _real_get_device)
         with pytest.raises(KeyError) as exc_info:
-            get_device("GHOST")
+            core.inventory.get_device("GHOST")
         msg = str(exc_info.value)
         # Known devices from MOCK_DEVICES (R1–R6) should appear
         assert "R1" in msg or "known" in msg

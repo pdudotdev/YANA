@@ -51,6 +51,7 @@ class TestVault:
 
         result = core.vault.get_secret("test/path", "nonexistent", fallback_env="FALLBACK")
         assert result == "env_value"
+        assert "test/path" not in core.vault._sources
 
     def test_vault_failure_sets_sentinel(self, monkeypatch):
         """Failed Vault call caches _VAULT_FAILED and falls back."""
@@ -95,8 +96,8 @@ class TestVaultSourceTracking:
             import hvac
             hvac.Client.return_value.secrets.kv.v2.read_secret_version.return_value = mock_response
 
-            core.vault.get_secret("netkb/router", "username")
-            assert core.vault.get_source("netkb/router") == "vault"
+            core.vault.get_secret("yanaa/router", "username")
+            assert core.vault.get_source("yanaa/router") == "vault"
 
     def test_vault_failure_sets_source_env(self, monkeypatch):
         """Failed Vault read falls back and records source as 'env'."""
@@ -108,8 +109,8 @@ class TestVaultSourceTracking:
             import hvac
             hvac.Client.return_value.secrets.kv.v2.read_secret_version.side_effect = Exception("unreachable")
 
-            core.vault.get_secret("netkb/router", "username")
-            assert core.vault.get_source("netkb/router") == "env"
+            core.vault.get_secret("yanaa/router", "username")
+            assert core.vault.get_source("yanaa/router") == "env"
 
     def test_get_source_unknown_path(self):
         """Unqueried path returns 'unknown'."""

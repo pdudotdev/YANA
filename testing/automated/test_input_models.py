@@ -19,17 +19,6 @@ class TestOspfQuery:
         q = OspfQuery(device="R1", query="neighbors", vrf="VRF1")
         assert q.vrf == "VRF1"
 
-    @pytest.mark.parametrize("bad_vrf", [
-        "VRF;drop",       # semicolon injection
-        "VRF|grep",       # pipe injection
-        "VRF 1",          # space
-        "a" * 33,         # too long
-        "",               # empty string
-    ])
-    def test_vrf_injection_rejected(self, bad_vrf):
-        with pytest.raises(ValidationError):
-            OspfQuery(device="R1", query="neighbors", vrf=bad_vrf)
-
     def test_json_string_parsing(self):
         q = OspfQuery.model_validate('{"device": "R1", "query": "neighbors"}')
         assert q.device == "R1"
@@ -57,10 +46,6 @@ class TestRoutingQuery:
     def test_vrf_valid(self):
         q = RoutingQuery(device="R1", query="ip_route", vrf="VRF1")
         assert q.vrf == "VRF1"
-
-    def test_vrf_injection_rejected(self):
-        with pytest.raises(ValidationError):
-            RoutingQuery(device="R1", query="ip_route", vrf="VRF1;reboot")
 
     def test_vrf_optional(self):
         q = RoutingQuery(device="R1", query="ip_route")

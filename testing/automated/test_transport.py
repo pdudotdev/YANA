@@ -3,12 +3,6 @@ from unittest.mock import AsyncMock, patch
 
 
 class TestExecuteCommand:
-    async def test_unknown_device(self):
-        from transport import execute_command
-        result = await execute_command("NONEXISTENT", "show ip ospf neighbor")
-        assert "error" in result
-        assert "Unknown device" in result["error"]
-
     async def test_success_returns_structured_dict(self):
         with patch("transport.execute_ssh", new_callable=AsyncMock) as mock_ssh:
             mock_ssh.return_value = "Neighbor ID  State  Interface\n1.1.1.1  FULL  Eth0/1"
@@ -20,10 +14,11 @@ class TestExecuteCommand:
         assert "FULL" in result["raw"]
 
     async def test_unknown_device_error_shape(self):
-        """Unknown device error has only 'error' key — no device/cli_style."""
+        """Unknown device error has only 'error' key with descriptive message."""
         from transport import execute_command
         result = await execute_command("NONEXISTENT", "show version")
         assert set(result.keys()) == {"error"}
+        assert "Unknown device" in result["error"]
 
     async def test_ssh_failure_error_shape(self):
         """SSH failure error includes device and cli_style alongside error."""

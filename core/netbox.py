@@ -4,7 +4,7 @@ import os
 
 from core.vault import get_secret
 
-log = logging.getLogger("netkb.netbox")
+log = logging.getLogger("yanaa.netbox")
 
 
 def load_devices() -> dict | None:
@@ -13,7 +13,7 @@ def load_devices() -> dict | None:
     Returns {name: {host, platform, cli_style, vrf?}} or None if unavailable.
     """
     url = os.getenv("NETBOX_URL", "").strip()
-    token = (get_secret("netkb/netbox", "token", fallback_env="NETBOX_TOKEN") or "").strip()
+    token = (get_secret("yanaa/netbox", "token", fallback_env="NETBOX_TOKEN") or "").strip()
 
     if not url or not token:
         return None
@@ -64,15 +64,15 @@ def load_devices() -> dict | None:
 def load_intent() -> dict | None:
     """Load network intent from NetBox config contexts.
 
-    Expects config contexts named 'netkb-<device>' (per router) and
-    optionally 'netkb-global' (containing autonomous_systems data).
-    Falls back to 'dblcheck-<device>' prefix if netkb prefix not found.
+    Expects config contexts named 'yanaa-<device>' (per router) and
+    optionally 'yanaa-global' (containing autonomous_systems data).
+    Falls back to 'dblcheck-<device>' prefix if yanaa prefix not found.
 
     Returns {"autonomous_systems": {...}, "routers": {name: {...}, ...}}
     or None if unavailable.
     """
     url = os.getenv("NETBOX_URL", "").strip()
-    token = (get_secret("netkb/netbox", "token", fallback_env="NETBOX_TOKEN") or "").strip()
+    token = (get_secret("yanaa/netbox", "token", fallback_env="NETBOX_TOKEN") or "").strip()
 
     if not url or not token:
         return None
@@ -81,9 +81,9 @@ def load_intent() -> dict | None:
         import pynetbox
         nb = pynetbox.api(url, token=token)
         nb.http_session.timeout = (5, 15)
-        # Try netkb prefix first, fall back to dblcheck prefix
-        contexts = list(nb.extras.config_contexts.filter(name__isw="netkb-"))
-        prefix = "netkb-"
+        # Try yanaa prefix first, fall back to dblcheck prefix
+        contexts = list(nb.extras.config_contexts.filter(name__isw="yanaa-"))
+        prefix = "yanaa-"
         if not contexts:
             contexts = list(nb.extras.config_contexts.filter(name__isw="dblcheck-"))
             prefix = "dblcheck-"

@@ -1,4 +1,4 @@
-# Ghost Pass Detection Checklist — netKB
+# Ghost Pass Detection Checklist — YANAA
 
 A ghost pass is a test that always passes regardless of whether the function under test works correctly. It provides false confidence and is worse than no test.
 
@@ -19,7 +19,7 @@ Does the assertion verify the **result of the function**, or does it verify that
 
 ```python
 # Ghost pass: asserting mock was called, not that result is correct
-mock_get_secret.assert_called_once_with("netkb/router", "password")  ← tests nothing about behavior
+mock_get_secret.assert_called_once_with("yanaa/router", "password")  ← tests nothing about behavior
 
 # Real test: asserting actual result
 assert result == {"username": "admin", "password": "secret"}

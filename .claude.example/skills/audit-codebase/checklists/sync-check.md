@@ -1,4 +1,4 @@
-# Component Synchronization Checklist — netKB
+# Component Synchronization Checklist — YANAA
 
 Use this during Phase 7. For each check, verify the cross-module contract holds. Report PASS or FAIL with evidence (file:line).
 

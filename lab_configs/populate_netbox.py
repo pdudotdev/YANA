@@ -2,7 +2,7 @@
 
 Creates all required objects (sites, manufacturers, device types, platforms,
 device role, custom fields, devices, IP addresses) and assigns primary IPs.
-Also uploads per-device intent as config contexts so netKB can load
+Also uploads per-device intent as config contexts so YANAA can load
 network intent directly from NetBox at runtime.
 
 Idempotent: existing objects are reused or updated, not duplicated.
@@ -10,7 +10,7 @@ Idempotent: existing objects are reused or updated, not duplicated.
 Usage:
     python lab_configs/populate_netbox.py
 
-Requires NETBOX_URL in .env; NETBOX_TOKEN loaded from Vault (netkb/netbox) with fallback to NETBOX_TOKEN env var.
+Requires NETBOX_URL in .env; NETBOX_TOKEN loaded from Vault (yanaa/netbox) with fallback to NETBOX_TOKEN env var.
 """
 import json
 import os
@@ -57,9 +57,9 @@ def log(msg: str):
 
 def main():
     url = os.getenv("NETBOX_URL", "").strip()
-    token = (get_secret("netkb/netbox", "token", fallback_env="NETBOX_TOKEN") or "").strip()
+    token = (get_secret("yanaa/netbox", "token", fallback_env="NETBOX_TOKEN") or "").strip()
     if not url or not token:
-        print("ERROR: NETBOX_URL must be set in .env; NETBOX_TOKEN must be in Vault (netkb/netbox) or .env")
+        print("ERROR: NETBOX_URL must be set in .env; NETBOX_TOKEN must be in Vault (yanaa/netbox) or .env")
         sys.exit(1)
 
     nb = pynetbox.api(url, token=token)
@@ -255,15 +255,15 @@ def main():
     with open(INTENT_JSON) as f:
         intent: dict = json.load(f)
 
-    # 9a. Ensure the "netkb" tag exists
-    tag = nb.extras.tags.get(slug="netkb")
+    # 9a. Ensure the "yanaa" tag exists
+    tag = nb.extras.tags.get(slug="yanaa")
     if not tag:
-        tag = nb.extras.tags.create(name="netkb", slug="netkb",
+        tag = nb.extras.tags.create(name="yanaa", slug="yanaa",
                                     color="aa1409",
-                                    description="Managed by netKB")
-        log("  Created tag: netkb")
+                                    description="Managed by YANAA")
+        log("  Created tag: yanaa")
     else:
-        log("  Exists  tag: netkb")
+        log("  Exists  tag: yanaa")
 
     def _upsert_config_context(name: str, data: dict, device_ids: list[int]) -> None:
         existing = nb.extras.config_contexts.get(name=name)
@@ -283,19 +283,19 @@ def main():
     # 9b. Global config context: autonomous_systems (tagged, not device-specific)
     auto_sys = intent.get("autonomous_systems", {})
     if auto_sys:
-        existing_global = nb.extras.config_contexts.get(name="netkb-global")
+        existing_global = nb.extras.config_contexts.get(name="yanaa-global")
         if existing_global:
             existing_global.data = {"autonomous_systems": auto_sys}
             existing_global.save()
-            log("  Updated config context: netkb-global")
+            log("  Updated config context: yanaa-global")
         else:
             nb.extras.config_contexts.create(
-                name="netkb-global",
+                name="yanaa-global",
                 data={"autonomous_systems": auto_sys},
                 is_active=True,
-                tags=["netkb"],
+                tags=["yanaa"],
             )
-            log("  Created config context: netkb-global")
+            log("  Created config context: yanaa-global")
 
     # 9c. Per-device config contexts
     routers = intent.get("routers", {})
@@ -304,7 +304,7 @@ def main():
             log(f"  Skipped config context for {dev_name} (not in inventory)")
             continue
         _upsert_config_context(
-            name=f"netkb-{dev_name}",
+            name=f"yanaa-{dev_name}",
             data=router_data,
             device_ids=[devices[dev_name].id],
         )

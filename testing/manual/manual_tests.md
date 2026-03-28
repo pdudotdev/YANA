@@ -1,6 +1,6 @@
 # Manual Tests
 
-Type each prompt into the MCP client (Claude Desktop or claude-code connected to the netKB server).
+Type each prompt into the MCP client (Claude Desktop or claude-code connected to the YANAA server).
 Mark each test **PASS** / **FAIL** and note any unexpected behavior.
 
 ---
@@ -54,7 +54,7 @@ Mark each test **PASS** / **FAIL** and note any unexpected behavior.
 **Prompt:** `Which routers are ABRs in this network?`
 
 **Expected:**
-- Calls `search_knowledge_base` with `topic="intent"`
+- Calls `query_intent()` to retrieve topology roles from design intent
 - Correctly identifies D1C and D2B as ABRs
 - Optionally calls `get_ospf(device, "borders")` to confirm from live data
 

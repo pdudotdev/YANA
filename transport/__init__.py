@@ -6,7 +6,7 @@ from core.inventory import get_device
 from core.settings import SSH_MAX_CONCURRENT
 from transport.ssh import execute_ssh
 
-log = logging.getLogger("netkb.transport")
+log = logging.getLogger("yanaa.transport")
 
 _cmd_sem = asyncio.Semaphore(SSH_MAX_CONCURRENT)
 

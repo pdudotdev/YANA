@@ -1,15 +1,13 @@
 """Backend status tool."""
+import asyncio
 import logging
-from pathlib import Path
 
 import core.inventory
 import core.vault
 from core.netbox import load_intent
+from tools import CHROMA_DIR as _CHROMA_DIR, INTENT_JSON as _INTENT_JSON
 
-log = logging.getLogger("netkb.status")
-
-_INTENT_JSON = Path(__file__).resolve().parent.parent / "core" / "legacy" / "INTENT.json"
-_CHROMA_DIR = Path(__file__).resolve().parent.parent / "data" / "chroma"
+log = logging.getLogger("yanaa.status")
 
 
 async def get_status() -> dict:
@@ -27,11 +25,11 @@ async def get_status() -> dict:
 
     # Vault / credentials
     # Trigger secret resolution so _sources is populated (no-op if already cached)
-    core.vault.get_secret("netkb/router", "username", fallback_env="ROUTER_USERNAME", quiet=True)
-    vault_status = {"source": core.vault.get_source("netkb/router")}
+    core.vault.get_secret("yanaa/router", "username", fallback_env="ROUTER_USERNAME", quiet=True)
+    vault_status = {"source": core.vault.get_source("yanaa/router")}
 
     # Intent
-    intent = load_intent()
+    intent = await asyncio.to_thread(load_intent)
     if intent:
         intent_status = {
             "source": "netbox",

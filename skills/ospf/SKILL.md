@@ -130,7 +130,8 @@ get_ospf(device, "database")  → verify the aggregate Type 3 LSA exists
 
 To verify whether summarization is part of the network design intent, run:
 ```
-search_knowledge_base("area range summarization", topic="intent")
+query_intent(device="D1C")
+query_intent(device="D2B")
 ```
 
 This is intentional design, not a fault — verify against design intent before concluding it is a problem.
@@ -213,7 +214,7 @@ get_ospf(device, "database")    → look for non-zero forwarding address in Type
 
 **Symptom**: LSA present in LSDB but route not installed in RIB. If the forwarding address is not reachable via OSPF intra- or inter-area routes, the external route is silently discarded.
 
-> **Tool scope note:** netKB cannot directly verify routing table reachability of the forwarding address. If a non-zero forwarding address is found in the database, advise the operator to run `show ip route <forwarding-address>` on the affected router to confirm reachability.
+> **Tool scope note:** YANAA cannot directly verify routing table reachability of the forwarding address. If a non-zero forwarding address is found in the database, advise the operator to run `show ip route <forwarding-address>` on the affected router to confirm reachability.
 
 **Proxy check:** `get_ospf(device, "database")` — look for a Type 1/3 LSA whose prefix covers the forwarding address. If none exists, the forwarding address is very likely unreachable.
 
@@ -225,7 +226,7 @@ get_ospf(device, "database")    → look for non-zero forwarding address in Type
 - [ ] LSDB shows expected LSA types for the area type — `get_ospf(device, "database")`
 - [ ] For redistributed routes: Type 5 present in Area 0 (from E1C/E2C default or D1C EIGRP redistribution)
 - [ ] For stub areas: no Type 5 LSAs present in Area 1; default Type 3 from ABR is present
-- [ ] RIB installation: advise operator to verify on-device with `show ip route` (outside netKB's tool scope)
+- [ ] RIB installation: advise operator to verify on-device with `show ip route` (outside YANAA's tool scope)
 
 ---
 

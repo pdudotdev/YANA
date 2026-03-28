@@ -1,6 +1,6 @@
 # Workflow • From Question to Answer
 
-This document walks through exactly what happens when you ask netKB a question, using real data from the project.
+This document walks through exactly what happens when you ask YANAA a question, using real data from the project.
 
 ## The Question
 
@@ -8,9 +8,9 @@ This document walks through exactly what happens when you ask netKB a question, 
 "Why is D1C's OSPF neighbor stuck in INIT?"
 ```
 
-## The 6 MCP Tools
+## The 7 MCP Tools
 
-netKB exposes seven MCP tools registered in `server/MCPServer.py`. Together they cover the full investigation path from preflight to live device data:
+YANAA exposes seven MCP tools registered in `server/MCPServer.py`. Together they cover the full investigation path from preflight to live device data:
 
 | Tool | Purpose |
 |------|---------|
@@ -33,8 +33,8 @@ At the start of every investigation, the agent calls `get_status` (`tools/status
 | Field | Source resolution |
 |-------|------------------|
 | `inventory` | NetBox DCIM devices (primary) → `core/legacy/NETWORK.json` (fallback) → empty |
-| `vault` | HashiCorp Vault path `netkb/router` (primary) → env vars `ROUTER_USERNAME` / `ROUTER_PASSWORD` (fallback) |
-| `intent` | NetBox config contexts with `netkb-` prefix (primary) → `core/legacy/INTENT.json` (fallback) |
+| `vault` | HashiCorp Vault path `yanaa/router` (primary) → env vars `ROUTER_USERNAME` / `ROUTER_PASSWORD` (fallback) |
+| `intent` | NetBox config contexts with `yanaa-` prefix (primary) → `core/legacy/INTENT.json` (fallback) |
 | `chromadb` | ChromaDB directory existence check |
 
 Example output when NetBox is available but Vault is not configured:
@@ -154,7 +154,7 @@ When both `vendor` and `topic` are set, they are combined into a ChromaDB `$and`
 
 ### `query_intent`
 
-Returns network design intent (`tools/intent.py`). Pass `device="D1C"` for a single router's intent (roles, OSPF areas, direct links, BGP neighbors) or omit to return all routers. Intent is loaded live from NetBox config contexts with the `netkb-` prefix (primary) or `core/legacy/INTENT.json` (fallback).
+Returns network design intent (`tools/intent.py`). Pass `device="D1C"` for a single router's intent (roles, OSPF areas, direct links, BGP neighbors) or omit to return all routers. Intent is loaded live from NetBox config contexts with the `yanaa-` prefix (primary) or `core/legacy/INTENT.json` (fallback).
 
 Example response for `device="D1C"`:
 ```json
@@ -225,7 +225,7 @@ The platform map supports six vendors, each with three categories:
 | `routeros` | Username gets `+ct` suffix appended; `\r\n` return char |
 | `vyos` | `Ssh2Options` |
 
-Credentials come from `core/settings.py` which reads from Vault (`netkb/router`) with env var fallback (`ROUTER_USERNAME`, `ROUTER_PASSWORD`). Per-vendor credentials are supported via Vault paths like `netkb/routerios`.
+Credentials come from `core/settings.py` which reads from Vault (`yanaa/router`) with env var fallback (`ROUTER_USERNAME`, `ROUTER_PASSWORD`). Per-vendor credentials are supported via Vault paths like `yanaa/routerios`.
 
 SSH is retried once on failure (2s delay). `OpenException` (host unreachable) is not retried.
 
@@ -278,7 +278,7 @@ Investigation:
              → Top-k chunks (text + metadata)
 
   Intent:
-    query_intent → Design intent (NetBox config contexts netkb-* | INTENT.json)
+    query_intent → Design intent (NetBox config contexts yanaa-* | INTENT.json)
 
   Live device (get_ospf | get_interfaces | get_routing):
     Validate input (Pydantic — VRF injection guard)

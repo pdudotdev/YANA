@@ -3,8 +3,8 @@ import os
 
 from core.vault import get_secret
 
-USERNAME = get_secret("netkb/router", "username", fallback_env="ROUTER_USERNAME")
-PASSWORD = get_secret("netkb/router", "password", fallback_env="ROUTER_PASSWORD")
+USERNAME = get_secret("yanaa/router", "username", fallback_env="ROUTER_USERNAME")
+PASSWORD = get_secret("yanaa/router", "password", fallback_env="ROUTER_PASSWORD")
 
 SSH_TIMEOUT_OPS = 30
 SSH_RETRIES = 1

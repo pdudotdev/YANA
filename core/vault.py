@@ -2,7 +2,7 @@
 import logging
 import os
 
-log = logging.getLogger("netkb.vault")
+log = logging.getLogger("yanaa.vault")
 
 _VAULT_FAILED = object()
 _cache: dict[str, object] = {}

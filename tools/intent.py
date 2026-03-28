@@ -1,15 +1,13 @@
 """Network intent query tool."""
+import asyncio
 import json
 import logging
-from pathlib import Path
 
 from core.netbox import load_intent
 from input_models.models import IntentQuery
-from tools import _error_response
+from tools import INTENT_JSON as _INTENT_JSON, _error_response
 
-log = logging.getLogger("netkb.intent")
-
-_INTENT_JSON = Path(__file__).resolve().parent.parent / "core" / "legacy" / "INTENT.json"
+log = logging.getLogger("yanaa.intent")
 
 
 def _load_intent() -> dict | None:
@@ -33,7 +31,7 @@ async def query_intent(params: IntentQuery) -> dict:
 
     If no device is specified, returns intent for all devices.
     """
-    intent = _load_intent()
+    intent = await asyncio.to_thread(_load_intent)
     if not intent:
         return _error_response(None, "Intent unavailable — check NETBOX_URL/NETBOX_TOKEN or INTENT.json")
 
