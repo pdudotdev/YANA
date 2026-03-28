@@ -8,9 +8,9 @@ This document walks through exactly what happens when you ask YANA a question, u
 "Why is D1C's OSPF neighbor stuck in INIT?"
 ```
 
-## The 7 MCP Tools
+## The 8 MCP Tools
 
-YANA exposes seven MCP tools registered in `server/MCPServer.py`. Together they cover the full investigation path from preflight to live device data:
+YANA exposes eight MCP tools registered in `server/MCPServer.py`. Together they cover the full investigation path from preflight to live device data:
 
 | Tool | Purpose |
 |------|---------|
@@ -20,6 +20,7 @@ YANA exposes seven MCP tools registered in `server/MCPServer.py`. Together they 
 | `get_ospf` | Execute a live OSPF query against any supported device via SSH |
 | `get_interfaces` | Execute a live interface status query against any supported device via SSH |
 | `get_routing` | Execute a live routing table or policy query against any supported device via SSH |
+| `traceroute` | Trace the forwarding path from a device to a destination IP via SSH |
 | `query_intent` | Return network design intent for one or all routers |
 
 ---
@@ -171,7 +172,7 @@ Example response for `device="D1C"`:
 
 ### Live Device Queries — The SSH Pipeline
 
-`get_ospf`, `get_interfaces`, and `get_routing` all share the same execution pipeline. Here is the full code path for:
+`get_ospf`, `get_interfaces`, `get_routing`, and `traceroute` all share the same execution pipeline. Here is the full code path for:
 ```
 get_ospf(device="D1C", query="neighbors", vrf="VRF1")
 ```
@@ -212,6 +213,7 @@ The platform map supports six vendors, each with three categories:
 | `ospf` | `neighbors`, `database`, `borders`, `config`, `interfaces`, `details` |
 | `interfaces` | `interface_status` |
 | `routing_table` | `ip_route`, `route_maps`, `prefix_lists`, `policy_based_routing`, `access_lists` |
+| `tools` | `traceroute` |
 
 **4. Transport execution** (`transport/__init__.py` → `transport/ssh.py`)
 
@@ -280,7 +282,7 @@ Investigation:
   Intent:
     query_intent → Design intent (NetBox config contexts yana-* | INTENT.json)
 
-  Live device (get_ospf | get_interfaces | get_routing):
+  Live device (get_ospf | get_interfaces | get_routing | traceroute):
     Validate input (Pydantic — VRF injection guard)
     → Lookup device (inventory → get_device())
     → Resolve command (platform_map: cli_style → category → query → VRF sub)

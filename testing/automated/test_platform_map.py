@@ -80,7 +80,7 @@ class TestRoutingTableVrf:
     def test_junos_ip_route_with_vrf(self):
         device = {"cli_style": "junos"}
         result = get_action(device, "routing_table", "ip_route", vrf="VRF1")
-        assert result == "show route instance VRF1"
+        assert result == "show route table VRF1.inet.0"
 
     def test_ios_ip_route_no_vrf_variant(self):
         device = {"cli_style": "ios"}
@@ -97,7 +97,7 @@ class TestTracerouteVrf:
     def test_ios_traceroute_with_vrf(self):
         device = {"cli_style": "ios"}
         result = get_action(device, "tools", "traceroute", vrf="VRF1")
-        assert result == "traceroute ip vrf VRF1"
+        assert result == "traceroute vrf VRF1"
 
     def test_ios_traceroute_no_vrf(self):
         device = {"cli_style": "ios"}

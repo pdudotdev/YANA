@@ -113,6 +113,20 @@ class TestTraceroute:
         assert "address=10.0.0.1" in result["_command"]
         assert "src-address=192.168.1.1" in result["_command"]
 
+    async def test_ios_probe_limiting(self):
+        with patch("transport.execute_ssh", new_callable=AsyncMock) as mock_ssh:
+            mock_ssh.return_value = "mock output"
+            result = await traceroute(TracerouteInput(device="R1", destination="10.0.0.1"))
+        assert "probe 1" in result["_command"]
+        assert "timeout 2" in result["_command"]
+
+    async def test_aos_probe_limiting(self):
+        with patch("transport.execute_ssh", new_callable=AsyncMock) as mock_ssh:
+            mock_ssh.return_value = "mock output"
+            result = await traceroute(TracerouteInput(device="R4", destination="10.0.0.1"))
+        assert "probes 1" in result["_command"]
+        assert "timeout 2" in result["_command"]
+
 
 class TestVrfEndToEnd:
     async def test_explicit_vrf_in_final_command(self):

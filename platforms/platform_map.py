@@ -13,7 +13,7 @@ PLATFORM_MAP = {
             "details":    "show ip ospf",
         },
         "routing_table": {
-            "ip_route":             "show ip route",
+            "ip_route":             {"default": "show ip route", "vrf": "show ip route vrf {vrf}"},
             "route_maps":           "show route-map",
             "prefix_lists":         "show ip prefix-list",
             "policy_based_routing": "show route-map",
@@ -23,8 +23,7 @@ PLATFORM_MAP = {
             "interface_status": "show ip interface brief",
         },
         "tools": {
-            # `traceroute ip vrf <name>` avoids the IOS extended-traceroute interactive prompt
-            "traceroute": {"default": "traceroute", "vrf": "traceroute ip vrf {vrf}"},
+            "traceroute": {"default": "traceroute", "vrf": "traceroute vrf {vrf}"},
         },
     },
 
@@ -64,11 +63,11 @@ PLATFORM_MAP = {
             "details":    {"default": "show ospf overview",  "vrf": "show ospf overview instance {vrf}"},
         },
         "routing_table": {
-            "ip_route":             {"default": "show route",            "vrf": "show route instance {vrf}"},
-            "route_maps":           "show configuration policy-options policy-statement",
-            "prefix_lists":         "show configuration policy-options prefix-list",
-            "policy_based_routing": "show firewall filter",
-            "access_lists":         "show firewall filter",
+            "ip_route":             {"default": "show route", "vrf": "show route table {vrf}.inet.0"},
+            "route_maps":           "show configuration policy-options",
+            "prefix_lists":         "show configuration policy-options",
+            "policy_based_routing": "show configuration firewall",
+            "access_lists":         "show configuration firewall",
         },
         "interfaces": {
             "interface_status": "show interfaces terse",
@@ -115,8 +114,8 @@ PLATFORM_MAP = {
         },
         "routing_table": {
             "ip_route":             "/ip route print without-paging",
-            "route_maps":           "/routing filter print without-paging",
-            "prefix_lists":         "/routing filter print without-paging",
+            "route_maps":           "/routing/filter/rule print detail without-paging",
+            "prefix_lists":         "/ip/firewall/address-list print detail without-paging",
             "policy_based_routing": "/ip firewall mangle print without-paging",
             "access_lists":         "/ip firewall filter print without-paging",
         },

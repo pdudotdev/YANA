@@ -47,9 +47,20 @@ async def traceroute(params: TracerouteInput) -> dict:
         command = f"{base_cmd} address={params.destination}"
         if params.source:
             command += f" src-address={params.source}"
+    elif cli_style == "aos":
+        # AOS-CX syntax: traceroute <dest> [vrf <name>] [source <src>] [probes <n>] [timeout <s>]
+        command = f"traceroute {params.destination}"
+        vrf_name = params.vrf or device.get("vrf")
+        if vrf_name and vrf_name.lower() != "default":
+            command += f" vrf {vrf_name}"
+        if params.source:
+            command += f" source {params.source}"
+        command += " probes 1 timeout 2"
     else:
         command = f"{base_cmd} {params.destination}"
         if params.source:
             command += f" source {params.source}"
+        if cli_style == "ios":
+            command += " probe 1 timeout 2"
 
     return await execute_command(params.device, command, timeout_ops=SSH_TIMEOUT_OPS_LONG)

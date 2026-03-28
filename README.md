@@ -8,7 +8,7 @@
 |---|---|
 | **Platforms** | ![Cisco IOS](https://img.shields.io/badge/Cisco_IOS-0d47a1) ![Cisco IOS-XE](https://img.shields.io/badge/Cisco_IOS--XE-0d47a1) ![Arista EOS](https://img.shields.io/badge/Arista_EOS-0d47a1) ![Juniper JunOS](https://img.shields.io/badge/Juniper_JunOS-0d47a1) ![Aruba AOS](https://img.shields.io/badge/Aruba_AOS-0d47a1) ![Vyatta VyOS](https://img.shields.io/badge/Vyatta_VyOS-0d47a1) ![MikroTik RouterOS](https://img.shields.io/badge/MikroTik_RouterOS-0d47a1) ![FRR](https://img.shields.io/badge/FRR-0d47a1) |
 | **Transport** | ![SSH](https://img.shields.io/badge/SSH%20CLI-1565c0) ![Scrapli](https://img.shields.io/badge/Scrapli-1565c0) |
-| **Integrations** | ![NetBox](https://img.shields.io/badge/NetBox-1e88e5) ![Vault](https://img.shields.io/badge/Vault-1e88e5) ![MCP](https://img.shields.io/badge/MCP-1e88e5) ![CICD](https://img.shields.io/badge/CI/CD-1e88e5) |
+| **Integrations** | ![NetBox](https://img.shields.io/badge/NetBox-1e88e5) ![Vault](https://img.shields.io/badge/HashiCorp_Vault-1e88e5) ![MCP](https://img.shields.io/badge/MCP-1e88e5) ![ChromaDB](https://img.shields.io/badge/ChromaDB-1e88e5) ![CI/CD](https://img.shields.io/badge/CI/CD-1e88e5) |
 
 ## Table of Contents
 
@@ -32,7 +32,7 @@
 
 RAG-powered troubleshooting assistant for multi-vendor networks. 
 
-Combines documentation retrieval (RFCs + vendor guides + network intent) with live device queries across 5+ vendors.
+Combines documentation retrieval (RFCs, vendor guides) with live device queries across 5+ vendors.
 
 ▫️ **Supported models:**
 - [x] Haiku 4.5
@@ -40,10 +40,10 @@ Combines documentation retrieval (RFCs + vendor guides + network intent) with li
 - [x] Opus 4.6 (default, best reasoning)
 
 ▫️ **Operational Flow:**
-- [x] See [**WORKFLOW.md**](metadata/workflow/workflow.md)
+- [x] See [**WORKFLOW.md**](metadata/workflow/WORKFLOW.md)
 
 ▫️ **Operational Guardrails:**
-- [x] See [**GUARDRAILS.md**](metadata/guardrails/guardrails.md)
+- [x] See [**GUARDRAILS.md**](metadata/guardrails/GUARDRAILS.md)
 
 ## ⭐ What's New in v1.0
 
@@ -54,11 +54,11 @@ Combines documentation retrieval (RFCs + vendor guides + network intent) with li
 | Technology | Role |
 |-----------|------|
 | Python | Core language |
-| FastMCP | MCP server exposing 7 tools |
+| FastMCP | MCP server exposing 8 tools |
 | Claude | Reasoning, context, troubleshooting |
 | LangChain | RAG pipeline (chunking, embedding, retrieval) |
 | ChromaDB | Vector database for knowledge base |
-| NetBox | Device inventory (hostnames, IPs, platforms) |
+| NetBox | Device inventory (hostnames, IPs, intent) |
 | HashiCorp Vault | Credential management |
 | Scrapli | Multi-vendor SSH transport |
 
@@ -66,7 +66,7 @@ Combines documentation retrieval (RFCs + vendor guides + network intent) with li
 
 | Protocol | What's Checked |
 |----------|---------------|
-| **OSPF** | Neighbor states, area config, process config, LSDB |
+| **OSPF** | Adjacencies, area and area types, config, LSDB |
 | **Routing** | Table, route maps, prefix lists, PBR, ACLs |
 | **Interfaces** | Up/down state, expected operational status |
 
@@ -143,8 +143,9 @@ yana/bin/python ingest.py
 | `list_devices` | List inventory devices, optionally filtered by CLI style |
 | `get_ospf` | Query OSPF state (neighbors, LSDB, process config) on a live device |
 | `get_interfaces` | Query interface up/down status on a live device |
-| `get_routing` | Query routing table, route maps, and prefix lists on a live device |
+| `get_routing` | Query routing table, route maps, prefix lists, PBR, and ACLs on a live device |
 | `query_intent` | Retrieve network design intent from NetBox or local JSON |
+| `traceroute` | Trace the forwarding path from a device to a destination IP |
 | `search_knowledge_base` | Search network knowledge base (RFCs, vendor guides) with optional filters |
 
 ## 🦾 Usage
@@ -173,10 +174,10 @@ yana/bin/python ingest.py --clean
 ```
 YANA/
 ├── server/
-│   └── MCPServer.py              # FastMCP server (7 tools)
+│   └── MCPServer.py              # FastMCP server (8 tools)
 ├── tools/                        # MCP tool implementations
 │   ├── ospf.py                   # get_ospf
-│   ├── operational.py            # get_interfaces
+│   ├── operational.py            # get_interfaces, traceroute
 │   ├── routing.py                # get_routing
 │   ├── intent.py                 # query_intent
 │   ├── status.py                 # get_status
@@ -194,7 +195,7 @@ YANA/
 │   ├── __init__.py               # Command dispatcher + semaphore
 │   └── ssh.py                    # Multi-vendor SSH executor
 ├── platforms/                    # Vendor CLI command mapping
-│   ├── platform_map.py           # OSPF + interface commands (6 vendors)
+│   ├── platform_map.py           # OSPF, routing, interface + traceroute commands (6 vendors)
 │   └── definitions/              # Custom Scrapli definitions
 ├── input_models/
 │   └── models.py                 # Pydantic validation (OspfQuery, KBQuery, etc.)
@@ -206,10 +207,11 @@ YANA/
 │   ├── topology/                 # Test network diagram
 │   └── workflow/                 # RAG pipeline walkthrough
 ├── skills/
-│   └── ospf/                     # OSPF skill file for specific troubleshooting
+│   ├── ospf/                     # OSPF skill file for specific troubleshooting
+│   └── routing/                  # Routing skill file for path selection issues
 ├── testing/
-│   ├── automated/                # Unit + integration tests (146 test functions)
-│   ├── live/                     # Live lab tests (35 tests) + results report
+│   ├── automated/                # Unit + integration tests (165 test functions)
+│   ├── live/                     # Live lab tests (65 parametrized runs) + results report
 │   └── run_tests.sh              # Test runner (--live for lab tests)
 ├── ingest.py                     # RAG ingestion pipeline
 ├── CLAUDE.md                     # Troubleshooting workflow + tool reference
