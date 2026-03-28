@@ -20,11 +20,18 @@ At the start of every investigation, call `get_status` and display the result to
 
 Read the relevant skill file before starting any investigation:
 
-| Protocol | Skill file |
-|----------|-----------|
+| Protocol / Area | Skill file |
+|-----------------|-----------|
 | OSPF | `skills/ospf/SKILL.md` |
+| Routing / Path Selection | `skills/routing/SKILL.md` |
 
 The skill file contains decision trees, query sequences, and symptom-specific diagnosis paths. Follow it — do not improvise the diagnostic order.
+
+**Which skill to load:**
+- **OSPF skill** — when the issue is protocol adjacency, neighbor state, LSDB, area type, or external route redistribution failure.
+- **Routing skill** — when the issue is path selection, PBR, route-map or prefix-list filtering, ECMP behavior, or AD conflicts, and protocol neighbors are confirmed healthy.
+
+**Reachability issues** ("can't reach X from Y"): start with `traceroute` (Step 3) to localize the breaking hop *before* loading a protocol skill. Once the breaking hop is identified, load the appropriate skill for that device.
 
 ### Step 2: Search the Knowledge Base
 
@@ -46,8 +53,9 @@ Use these tools to gather live data:
 | `get_ospf` | Live OSPF data from a device (neighbors, database, borders, config, interfaces, details) |
 | `get_interfaces` | Live interface status from a device |
 | `get_routing` | Live routing table and policy data (ip_route, route_maps, prefix_lists, policy_based_routing, access_lists) |
+| `traceroute` | Trace the forwarding path from a device to a destination IP; pass `source` to force the probe's source address |
 
-Use `list_devices` when you need to discover what devices are available. Use `query_intent` to understand a device's design role before querying it live.
+Use `list_devices` when you need to discover what devices are available. Use `query_intent` to understand a device's design role before querying it live. Use `traceroute` as the first tool for any end-to-end reachability complaint — it localizes the breaking hop before protocol investigation begins.
 
 ### Step 4: Synthesize
 

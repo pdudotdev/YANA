@@ -14,7 +14,7 @@ logging.basicConfig(level=logging.INFO, format="%(name)s: %(message)s")
 
 from fastmcp import FastMCP
 from tools.ospf import get_ospf
-from tools.operational import get_interfaces
+from tools.operational import get_interfaces, traceroute
 from tools.rag import search_knowledge_base
 from tools.routing import get_routing
 from tools.intent import query_intent
@@ -30,6 +30,7 @@ mcp.tool(name="get_routing")(get_routing)
 mcp.tool(name="query_intent")(query_intent)
 mcp.tool(name="get_status")(get_status)
 mcp.tool(name="list_devices")(list_devices)
+mcp.tool(name="traceroute")(traceroute)
 
 if __name__ == "__main__":
     mcp.run()

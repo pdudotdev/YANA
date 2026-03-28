@@ -1,4 +1,4 @@
-"""Vendor CLI command mapping — OSPF and interfaces only."""
+"""Vendor CLI command mapping — OSPF, routing, interfaces, and tools."""
 
 PLATFORM_MAP = {
     # ── Cisco IOS-XE ─────────────────────────────────────────────────────
@@ -22,6 +22,9 @@ PLATFORM_MAP = {
         "interfaces": {
             "interface_status": "show ip interface brief",
         },
+        "tools": {
+            "traceroute": {"default": "traceroute", "vrf": "traceroute vrf {vrf}"},
+        },
     },
 
     # ── Arista EOS ───────────────────────────────────────────────────────
@@ -43,6 +46,9 @@ PLATFORM_MAP = {
         },
         "interfaces": {
             "interface_status": "show ip interface brief",
+        },
+        "tools": {
+            "traceroute": {"default": "traceroute", "vrf": "traceroute vrf {vrf}"},
         },
     },
 
@@ -66,6 +72,9 @@ PLATFORM_MAP = {
         "interfaces": {
             "interface_status": "show interfaces terse",
         },
+        "tools": {
+            "traceroute": {"default": "traceroute", "vrf": "traceroute routing-instance {vrf}"},
+        },
     },
 
     # ── Aruba AOS-CX ────────────────────────────────────────────────────
@@ -87,6 +96,9 @@ PLATFORM_MAP = {
         },
         "interfaces": {
             "interface_status": "show interface brief",
+        },
+        "tools": {
+            "traceroute": {"default": "traceroute", "vrf": "traceroute vrf {vrf}"},
         },
     },
 
@@ -110,6 +122,9 @@ PLATFORM_MAP = {
         "interfaces": {
             "interface_status": "/interface print brief without-paging",
         },
+        "tools": {
+            "traceroute": "/tool/traceroute",
+        },
     },
 
     # ── VyOS (FRRouting) ────────────────────────────────────────────────
@@ -131,6 +146,9 @@ PLATFORM_MAP = {
         },
         "interfaces": {
             "interface_status": "show interfaces",
+        },
+        "tools": {
+            "traceroute": {"default": "traceroute", "vrf": "traceroute vrf {vrf}"},
         },
     },
 }

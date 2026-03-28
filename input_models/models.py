@@ -1,7 +1,7 @@
 """Pydantic input models for MCP tools."""
 import json
 import re
-from typing import Literal
+from typing import Literal, Optional
 
 from pydantic import BaseModel, Field, field_validator, model_validator
 
@@ -60,6 +60,13 @@ class DeviceListQuery(BaseParamsModel):
 
 class IntentQuery(BaseParamsModel):
     device: str | None = Field(None, description="Device name to filter intent (omit for all devices)")
+
+
+class TracerouteInput(BaseParamsModel):
+    device: str = Field(..., description="Device name from inventory")
+    destination: str = Field(..., description="Destination IP address")
+    source: Optional[str] = Field(None, description="Source IP address (forces traceroute to use this interface)")
+    vrf: str | None = Field(None, description="Optional VRF name")
 
 
 class KBQuery(BaseParamsModel):
