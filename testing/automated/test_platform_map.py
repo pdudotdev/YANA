@@ -54,6 +54,17 @@ class TestApplyVrf:
         result = _apply_vrf("show ip ospf neighbor", None)
         assert result == "show ip ospf neighbor"
 
+    def test_default_vrf_treated_as_no_vrf(self):
+        """'default' VRF name must use the default (non-VRF) command variant."""
+        action = {"default": "show ip ospf neighbor", "vrf": "show ip ospf neighbor vrf {vrf}"}
+        result = _apply_vrf(action, "default")
+        assert result == "show ip ospf neighbor"
+
+    def test_default_vrf_case_insensitive(self):
+        action = {"default": "show ip ospf neighbor", "vrf": "show ip ospf neighbor vrf {vrf}"}
+        assert _apply_vrf(action, "DEFAULT") == "show ip ospf neighbor"
+        assert _apply_vrf(action, "Default") == "show ip ospf neighbor"
+
 
 class TestRoutingTableVrf:
     def test_eos_ip_route_with_vrf(self):
@@ -86,7 +97,7 @@ class TestTracerouteVrf:
     def test_ios_traceroute_with_vrf(self):
         device = {"cli_style": "ios"}
         result = get_action(device, "tools", "traceroute", vrf="VRF1")
-        assert result == "traceroute vrf VRF1"
+        assert result == "traceroute ip vrf VRF1"
 
     def test_ios_traceroute_no_vrf(self):
         device = {"cli_style": "ios"}
@@ -106,13 +117,13 @@ class TestTracerouteVrf:
     def test_routeros_traceroute_no_vrf_variant(self):
         device = {"cli_style": "routeros"}
         result = get_action(device, "tools", "traceroute")
-        assert result == "/tool/traceroute"
+        assert result == "/tool/traceroute count=1"
 
     def test_routeros_traceroute_ignores_vrf(self):
         """RouterOS has no VRF variant — VRF is silently ignored."""
         device = {"cli_style": "routeros"}
         result = get_action(device, "tools", "traceroute", vrf="VRF1")
-        assert result == "/tool/traceroute"
+        assert result == "/tool/traceroute count=1"
 
 
 class TestGetAction:

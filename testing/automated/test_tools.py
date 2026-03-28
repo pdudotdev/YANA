@@ -96,8 +96,8 @@ class TestTraceroute:
     async def test_eos_vrf_in_command(self):
         with patch("transport.execute_ssh", new_callable=AsyncMock) as mock_ssh:
             mock_ssh.return_value = "mock output"
-            result = await traceroute(TracerouteInput(device="R2", destination="10.0.0.1", vrf="VRF1"))
-        assert "vrf VRF1" in result["_command"]
+            result = await traceroute(TracerouteInput(device="R2", destination="10.0.0.1", vrf="VRF2"))
+        assert "vrf VRF2" in result["_command"]
         assert "10.0.0.1" in result["_command"]
 
     async def test_routeros_address_syntax(self):

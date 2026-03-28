@@ -23,7 +23,8 @@ PLATFORM_MAP = {
             "interface_status": "show ip interface brief",
         },
         "tools": {
-            "traceroute": {"default": "traceroute", "vrf": "traceroute vrf {vrf}"},
+            # `traceroute ip vrf <name>` avoids the IOS extended-traceroute interactive prompt
+            "traceroute": {"default": "traceroute", "vrf": "traceroute ip vrf {vrf}"},
         },
     },
 
@@ -64,8 +65,8 @@ PLATFORM_MAP = {
         },
         "routing_table": {
             "ip_route":             {"default": "show route",            "vrf": "show route instance {vrf}"},
-            "route_maps":           "show policy-options policy-statement",
-            "prefix_lists":         "show policy-options prefix-list",
+            "route_maps":           "show configuration policy-options policy-statement",
+            "prefix_lists":         "show configuration policy-options prefix-list",
             "policy_based_routing": "show firewall filter",
             "access_lists":         "show firewall filter",
         },
@@ -123,7 +124,8 @@ PLATFORM_MAP = {
             "interface_status": "/interface print brief without-paging",
         },
         "tools": {
-            "traceroute": "/tool/traceroute",
+            # count=1 limits to one probe per hop so the command terminates (default is continuous)
+            "traceroute": "/tool/traceroute count=1",
         },
     },
 
@@ -155,7 +157,14 @@ PLATFORM_MAP = {
 
 
 def _apply_vrf(action, vrf_name: str | None):
-    """Apply VRF substitution to an action entry."""
+    """Apply VRF substitution to an action entry.
+
+    vrf_name of "default" (case-insensitive) is treated as no VRF — it means the
+    global routing table and no vendor accepts "default" as an explicit VRF argument.
+    """
+    if vrf_name and vrf_name.lower() == "default":
+        vrf_name = None
+
     if isinstance(action, dict) and "default" in action and "vrf" in action:
         template = action["vrf"] if vrf_name else action["default"]
         return template.replace("{vrf}", vrf_name) if vrf_name else template

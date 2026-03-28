@@ -40,10 +40,10 @@ Combines documentation retrieval (RFCs + vendor guides + network intent) with li
 - [x] Opus 4.6 (default, best reasoning)
 
 ▫️ **Operational Flow:**
-- [x] See [**workflow.md**](metadata/workflow/workflow.md)
+- [x] See [**WORKFLOW.md**](metadata/workflow/workflow.md)
 
 ▫️ **Operational Guardrails:**
-- [x] See [**guardrails.md**](metadata/guardrails/guardrails.md)
+- [x] See [**GUARDRAILS.md**](metadata/guardrails/guardrails.md)
 
 ## ⭐ What's New in v1.0
 
