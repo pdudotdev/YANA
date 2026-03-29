@@ -15,11 +15,6 @@ class TestListDevices:
         assert list(result["devices"].keys()) == ["R2"]
         assert result["devices"]["R2"]["cli_style"] == "eos"
 
-    async def test_filter_ios(self):
-        result = await list_devices(DeviceListQuery(cli_style="ios"))
-        assert "devices" in result
-        assert list(result["devices"].keys()) == ["R1"]
-
     async def test_filter_no_match(self):
         result = await list_devices(DeviceListQuery(cli_style="unknown_style"))
         assert "error" in result

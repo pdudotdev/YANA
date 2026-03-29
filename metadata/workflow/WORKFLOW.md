@@ -1,294 +1,240 @@
-# Workflow • From Question to Answer
+# YANA — How It Works
 
-This document walks through exactly what happens when you ask YANA a question, using real data from the project.
+YANA is an MCP server that gives Claude real-time access to a multi-vendor network. It has two modes of operation: **interactive troubleshooting** (user asks questions, agent investigates) and **automated QA** (Ansible runs health checks, agent investigates failures).
 
-## The Question
-
-```
-"Why is D1C's OSPF neighbor stuck in INIT?"
-```
-
-## The 8 MCP Tools
-
-YANA exposes eight MCP tools registered in `server/MCPServer.py`. Together they cover the full investigation path from preflight to live device data:
-
-| Tool | Purpose |
-|------|---------|
-| `get_status` | Report active data sources (inventory, credentials, intent, documentation) |
-| `list_devices` | List inventory devices, optionally filtered by CLI style |
-| `search_knowledge_base` | RAG search over ChromaDB knowledge base with optional vendor/topic/top\_k filters |
-| `get_ospf` | Execute a live OSPF query against any supported device via SSH |
-| `get_interfaces` | Execute a live interface status query against any supported device via SSH |
-| `get_routing` | Execute a live routing table or policy query against any supported device via SSH |
-| `traceroute` | Trace the forwarding path from a device to a destination IP via SSH |
-| `query_intent` | Return network design intent for one or all routers |
+Both modes use the same 8 MCP tools and the same diagnostic workflow — the difference is how the investigation starts.
 
 ---
 
-## Step 0: Check Data Sources — `get_status`
+## The Tools
 
-At the start of every investigation, the agent calls `get_status` (`tools/status.py`) and displays the result as a table. This confirms which backends are active before any queries run.
+YANA exposes 8 tools registered in `server/MCPServer.py`:
 
-`get_status` checks four subsystems:
+| Tool | Purpose | Backend |
+|------|---------|---------|
+| `get_status` | Report active data sources (inventory, credentials, intent, KB) | Local checks |
+| `list_devices` | List inventory devices, optionally filtered by vendor | `core/inventory.py` |
+| `search_knowledge_base` | Semantic search over RFCs and vendor docs | ChromaDB + MiniLM embeddings |
+| `query_intent` | Network design intent (roles, OSPF areas, links) | NetBox or `core/legacy/INTENT.json` |
+| `get_ospf` | Live OSPF queries (neighbors, database, borders, config, interfaces, details) | SSH via Scrapli |
+| `get_interfaces` | Live interface status | SSH via Scrapli |
+| `get_routing` | Live routing table and policy data (ip_route, route_maps, prefix_lists, PBR, ACLs) | SSH via Scrapli |
+| `traceroute` | Trace forwarding path from a device to a destination | SSH via Scrapli |
 
-| Field | Source resolution |
-|-------|------------------|
-| `inventory` | NetBox DCIM devices (primary) → `core/legacy/NETWORK.json` (fallback) → empty |
-| `vault` | HashiCorp Vault path `yana/router` (primary) → env vars `ROUTER_USERNAME` / `ROUTER_PASSWORD` (fallback) |
-| `intent` | NetBox config contexts with `yana-` prefix (primary) → `core/legacy/INTENT.json` (fallback) |
-| `chromadb` | ChromaDB directory existence check |
+### The SSH Pipeline
 
-Example output when NetBox is available but Vault is not configured:
+All live device tools (`get_ospf`, `get_interfaces`, `get_routing`, `traceroute`) share the same execution path:
 
 ```
-| inventory | netbox       | 16 devices |
-| vault     | env          |            |
-| intent    | netbox       | 16 routers |
-| chromadb  | available    |            |
+User query
+  → Pydantic validation (VRF regex: ^[a-zA-Z0-9_-]{1,32}$)
+  → Device lookup (core/inventory.py — loaded from NetBox or NETWORK.json)
+  → Command resolution (platforms/platform_map.py — 6 vendors × all query types)
+  → SSH execution (transport/ssh.py — Scrapli, semaphore-limited, 1 retry)
+  → Response: {device, _command, cli_style, raw}
 ```
 
-The vault source (`"vault"` vs `"env"`) is tracked by `_sources` in `core/vault.py` — populated as a side-effect of `get_secret()` calls at server startup (`core/settings.py` imports trigger credential resolution).
+Credentials come from HashiCorp Vault (`yana/router`) with env var fallback. Six vendors are supported: Cisco IOS, Arista EOS, Juniper JunOS, Aruba AOS-CX, MikroTik RouterOS, VyOS.
+
+### The Knowledge Base
+
+`search_knowledge_base` performs RAG (Retrieval-Augmented Generation):
+
+1. **Ingestion** (one-time, via `python ingest.py`): Markdown files from `docs/` are chunked, embedded with `all-MiniLM-L6-v2`, and stored in ChromaDB with metadata (vendor, topic, source).
+2. **Query**: The user's question is embedded into the same vector space. ChromaDB returns the top-k most similar chunks by cosine distance.
+3. **Filters**: Optional `vendor` and `topic` filters narrow results before similarity search.
+
+Device inventory and design intent are NOT in ChromaDB — they are served live by `list_devices` and `query_intent`.
 
 ---
 
-## Step 1: Load the Protocol Skill
+## Mode 1: Interactive Troubleshooting
 
-Before starting any investigation, the agent reads the relevant skill file. For OSPF that is `skills/ospf/SKILL.md`.
+The user asks a question in Claude Code. The agent follows the diagnostic workflow defined in `CLAUDE.md`:
 
-`CLAUDE.md` is the top-level agent instruction file — it defines the troubleshooting workflow itself. Skill files (`skills/<protocol>/SKILL.md`) are protocol-specific documents that contain decision trees, query sequences, and symptom-specific diagnosis paths (e.g. which queries to run when a neighbor is stuck in EXSTART vs. INIT). The agent follows the skill — it does not improvise the diagnostic order.
-
----
-
-## Step 2: Search the Knowledge Base — `search_knowledge_base`
-
-### 2a. Ingestion (One-Time Setup)
-
-Before any question can be answered, the knowledge base must be built. This happens once when you run `python ingest.py`.
-
-**Loading:** `ingest.py` reads all `.md` files from `docs/`. Each file becomes a LangChain `Document` object with metadata derived from its filename. Device inventory and network intent are **not** stored in ChromaDB — they are served at query time by `query_intent` (from NetBox or a local JSON fallback).
-
-Example — `rfc2328_summary.md` gets metadata:
-```json
-{"vendor": "all", "topic": "rfc", "source": "rfc2328_summary.md"}
-```
-
-**Chunking:** The `RecursiveCharacterTextSplitter` breaks each document into ~800 character chunks (overlap: 100 chars), splitting at section headers and paragraphs to keep chunks coherent.
-
-The full `rfc2328_summary.md` (~4000 chars) becomes multiple chunks. One of them is:
+### Step 0 — Preflight
 
 ```
-- **DOWN**: No Hello packets received from this neighbor. Initial state.
-- **INIT**: A Hello was received but the local router's ID was not in the
-  neighbor's Hello. One-way communication only.
-- **2WAY**: Bidirectional communication confirmed. Both routers see each
-  other's Router ID in Hello packets...
-- **EXSTART**: Master/slave negotiation for Database Description (DD)
-  exchange begins...
+get_status()
 ```
 
-This chunk is 731 characters. It inherited the metadata `{source: "rfc2328_summary.md", topic: "rfc", vendor: "all"}`.
+Confirms which backends are active: inventory source (NetBox or JSON), credential source (Vault or env vars), intent source, and ChromaDB availability. Displayed as a table before any investigation begins.
 
-**Embedding:** The `all-MiniLM-L6-v2` model (running locally, no API call) reads that chunk and produces a vector of 384 numbers:
+### Step 1 — Load the Protocol Skill
 
-```
-[-0.0302, -0.0195, 0.0166, -0.0345, 0.0212, -0.0464, -0.0415, -0.0128, -0.0797, 0.0049, ... ]
-(384 dimensions total)
-```
+The agent reads the relevant skill file before starting. Skill files contain decision trees and query sequences — the agent follows them, it does not improvise.
 
-These numbers encode the *meaning* of the text in a mathematical space. Text about similar topics produces similar vectors.
+| When to use | Skill file |
+|-------------|-----------|
+| Adjacency, neighbor state, LSDB, area type | `skills/ospf/SKILL.md` |
+| Path selection, PBR, route-maps, prefix-lists, AD conflicts | `skills/routing/SKILL.md` |
+| Reachability ("can't reach X from Y") | Start with `traceroute` to find the breaking hop, then load the appropriate skill |
 
-**Storage:** ChromaDB stores the chunk as a record:
-
-```
-ID:        1181ff8e-1983-4b59-a772-3374a3b6baa1
-Text:      "- **DOWN**: No Hello packets received..."  (731 chars)
-Metadata:  {"source": "rfc2328_summary.md", "topic": "rfc", "vendor": "all"}
-Vector:    [-0.0302, -0.0195, 0.0166, ...]  (384 floats)
-```
-
-This happens for all chunks across all documents. The database is now ready.
-
-### 2b. Query
-
-Now you ask: `"Why is D1C's OSPF neighbor stuck in INIT?"`
-
-**Question → Vector:** The same embedding model converts the question into a 384-dim vector:
+### Step 2 — Search the Knowledge Base
 
 ```
-Question: "Why is D1C's OSPF neighbor stuck in INIT"
-Vector:   [0.0193, -0.0532, 0.0135, -0.0071, 0.1528, 0.0054, -0.0898, -0.0029, -0.0993, 0.0045, ...]
+search_knowledge_base(query="OSPF neighbor stuck in INIT", topic="rfc")
 ```
 
-**Similarity Search:** ChromaDB compares the question vector against all stored chunk vectors using cosine distance. Lower distance = more similar meaning.
+Returns RFC text and vendor documentation relevant to the issue. The embedding model maps the question to nearby chunks even when the exact words differ.
 
-Results ranked by relevance:
+### Step 3 — Query Live Devices
+
+The agent queries the devices involved in the issue:
 
 ```
-Distance: 0.9453  →  rfc2328_summary.md  — "Common Stuck States and Causes" table
-Distance: 1.0184  →  vendor_cisco_ios.md  — Cisco IOS OSPF configuration syntax
-Distance: 1.0490  →  vendor_arista_eos.md — Arista EOS VRF configuration
+query_intent(device="D1C")        # what SHOULD the network look like?
+get_ospf("D1C", "neighbors")      # what DOES it look like?
+get_ospf("D1C", "interfaces")     # check timers, area, passive, auth
+traceroute("E1C", "192.168.42.1") # where does the path break?
 ```
 
-The top result (distance 0.9453) is the "Common Stuck States and Causes" chunk — which directly explains INIT, EXSTART, and other stuck states. The system found the right answer even though the question used different words than the stored text.
+The skill file dictates which queries to run and in what order. For OSPF adjacency issues, the checklist is: timers → area type → network type → auth → passive → MTU → interface state. Stop at the first mismatch.
 
-**Return to Claude:** The top `top_k` chunks (default 5, text + metadata) are returned via the MCP tool response.
+### Step 4 — Synthesize
 
-### 2c. Search Parameters
+The agent combines knowledge base context with live data. When they conflict, live data wins. The report states:
 
-`search_knowledge_base` accepts optional filters defined in `input_models/models.py`:
+- What the data shows
+- Root cause with RFC citation
+- Fix direction (configuration guidance only — YANA never pushes config)
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `query` | str (max 500 chars) | required | Free-text search question |
-| `vendor` | Literal enum \| None | None | Filter by vendor: `arista_eos`, `cisco_ios`, `juniper_junos`, `aruba_aoscx`, `mikrotik_ros` |
-| `topic` | Literal enum \| None | None | Filter by topic: `rfc`, `vendor_guide` |
-| `top_k` | int (1–10) | 5 | Number of results to return |
+### Example
 
-When both `vendor` and `topic` are set, they are combined into a ChromaDB `$and` clause:
-```python
-{"$and": [{"vendor": "cisco_ios"}, {"topic": "vendor_guide"}]}
+```
+User: "Why can't E1C reach A2A's loopback?"
+
+Agent:
+  1. get_status()           → NetBox, Vault, ChromaDB all active
+  2. Reads skills/ospf/SKILL.md
+  3. get_routing("E1C", "ip_route")  → 192.168.42.1 missing from VRF1
+  4. get_ospf("E1C", "database")     → No Type 3 LSA for 192.168.42.1
+  5. query_intent()          → A2A should be in Area 1 (stub), connected via D1C/D2B
+  6. get_ospf("D1C", "neighbors")    → D1C has no adjacency with A2A
+  7. get_ospf("A2A", "interfaces")   → A2A's Area 1 is "normal", not stub
+  8. search_knowledge_base("E-bit mismatch stub area", topic="rfc")
+
+  Report: A2A is missing `area 1 stub`. RFC 2328 §10.5: E-bit mismatch
+          causes Hellos to be silently discarded. Fix: add stub config to A2A.
 ```
 
 ---
 
-## Step 3: Query Live Data
+## Mode 2: Automated QA
 
-### `query_intent`
+Health checks run via Ansible playbooks over NETCONF. When a check fails, the `/qa` skill triggers the same diagnostic workflow.
 
-Returns network design intent (`tools/intent.py`). Pass `device="D1C"` for a single router's intent (roles, OSPF areas, direct links, BGP neighbors) or omit to return all routers. Intent is loaded live from NetBox config contexts with the `yana-` prefix (primary) or `core/legacy/INTENT.json` (fallback).
+### How the Tests Run
 
-Example response for `device="D1C"`:
-```json
-{
-  "device": "D1C",
-  "intent": {
-    "roles": ["ABR", "OSPF_AREA0_DISTRIBUTION"],
-    "igp": {"ospf": {"router_id": "11.11.11.11", "areas": {"0": [...], "1": [...]}}},
-    "direct_links": {"A1M": {"local_interface": "Ethernet0/1", "local_ip": "10.1.1.2"}},
-    "bgp": {}
-  }
-}
+```
+cd ansible && ansible-playbook playbooks/network_qa.yml
 ```
 
-### Live Device Queries — The SSH Pipeline
+**Pipeline:**
 
-`get_ospf`, `get_interfaces`, `get_routing`, and `traceroute` all share the same execution pipeline. Here is the full code path for:
 ```
-get_ospf(device="D1C", query="neighbors", vrf="VRF1")
+network_qa.yml (entry point)
+  → Discovers test cases in ansible/test_cases/*.yml
+  → Loops through each, calling _run_check.yml
+      → NETCONF GET to the target device (ietf-routing YANG model)
+      → Custom Jinja2 filter asserts the expected condition (e.g. route_exists)
+      → Records pass/fail with RFC reference and raw output
+  → Writes results to ansible/results/results_<timestamp>.json
+  → Prints summary: N passed, M failed
 ```
 
-**1. Input validation** (`input_models/models.py`)
+**Test case format** (example: `test_cases/route_to_a2a.yml`):
 
-Pydantic validates the request before any I/O:
-- `query` must be one of the allowed Literal values for the tool (e.g. `"neighbors"` for `get_ospf`)
-- `vrf` must match `^[a-zA-Z0-9_-]{1,32}$` or be `None` (injection guard)
-- Injection attempts in `vrf` (semicolons, pipes, subshell syntax, Unicode lookalikes, etc.) raise `ValidationError` here
-
-**2. Device lookup** (`core/inventory.py:get_device()`)
-
-Looks up `"D1C"` in the inventory dict loaded from NetBox at startup. Returns:
-```python
-{"host": "172.20.20.11", "platform": "cisco_iosxe", "cli_style": "ios", "vrf": "VRF1"}
+```yaml
+scenario: route_to_a2a
+description: "Verify E1C has route to A2A loopback 192.168.42.1 in VRF1"
+rfc_ref: RFC 2328 §16
+device: E1C
+vrf: VRF1
+assert_route_exists: "192.168.42.1"
 ```
-Unknown device names raise `KeyError` with the list of known devices, surfaced as a clean error response.
 
-**3. Command resolution** (`platforms/platform_map.py:get_action()`)
+Each test case defines: which device to query, which VRF, and what to assert. The NETCONF connection uses `ietf-routing` YANG for routing table reads. Credentials come from HashiCorp Vault via the `community.hashi_vault` Ansible collection.
 
-Maps the request to a vendor-specific CLI command:
+### Investigating Failures — `/qa`
 
-1. `PLATFORM_MAP["ios"]["ospf"]["neighbors"]` → `"show ip ospf neighbor"`
-2. IOS handles VRF at the OSPF process level — no VRF keyword in show commands, so the string is returned as-is.
+When tests fail, the user runs `/qa` in Claude Code. The skill (`/.claude/skills/qa/SKILL.md`) drives a structured investigation:
 
-For an EOS device with VRF:
-1. `PLATFORM_MAP["eos"]["ospf"]["neighbors"]` → `{"default": "show ip ospf neighbor", "vrf": "show ip ospf neighbor vrf {vrf}"}`
-2. `_apply_vrf()` selects the `"vrf"` template and substitutes `{vrf}` with `"VRF1"`:
-   ```
-   show ip ospf neighbor vrf VRF1
-   ```
+```
+/qa
+  1. Load latest results JSON from ansible/results/
+  2. Triage: separate passes from failures
+  3. Present numbered failure list to the user
+  4. User picks a failure to investigate
+  5. Agent reads the test case YAML to understand what was checked
+  6. Agent runs the same diagnostic workflow as Mode 1:
+     - query_intent() → expected state
+     - get_ospf/get_routing/get_interfaces → live state
+     - Follows skill decision trees to trace the root cause
+     - search_knowledge_base → RFC context
+  7. Reports findings (scenario, observed, current state, root cause, RFC basis)
+  8. Re-presents remaining failures — user picks next, or stops
+```
 
-The platform map supports six vendors, each with three categories:
+If multiple failures share a root cause, the agent says so after investigating the first one — the user can skip the rest.
 
-| Category | Queries |
-|----------|---------|
-| `ospf` | `neighbors`, `database`, `borders`, `config`, `interfaces`, `details` |
-| `interfaces` | `interface_status` |
-| `routing_table` | `ip_route`, `route_maps`, `prefix_lists`, `policy_based_routing`, `access_lists` |
-| `tools` | `traceroute` |
+### Example
 
-**4. Transport execution** (`transport/__init__.py` → `transport/ssh.py`)
+```
+User: /qa
 
-`execute_command()` acquires a semaphore slot (max 5 concurrent SSH sessions), then calls `execute_ssh()`.
+Agent:
+  Network QA — 0 passed, 1 failed
 
-`execute_ssh()` (scrapli2) builds a `Cli` object per device with vendor-specific options:
+  Failures:
+    1. route_to_a2a   RFC 2328 §16   Verify E1C has route to A2A loopback
 
-| cli_style | Notes |
-|-----------|-------|
-| `ios`, `eos`, `junos`, `aos` | Standard `BinOptions` SSH |
-| `routeros` | Username gets `+ct` suffix appended; `\r\n` return char |
-| `vyos` | `Ssh2Options` |
+  Which failure would you like to investigate?
 
-Credentials come from `core/settings.py` which reads from Vault (`yana/router`) with env var fallback (`ROUTER_USERNAME`, `ROUTER_PASSWORD`). Per-vendor credentials are supported via Vault paths like `yana/routerios`.
+User: 1
 
-SSH is retried once on failure (2s delay). `OpenException` (host unreachable) is not retried.
+Agent: [runs full investigation — same tools, same skills, same report format as Mode 1]
 
-The raw CLI output is returned as-is — no normalization layer.
-
-**5. Response envelope** (`transport/__init__.py`)
-
-```python
-{
-  "device":    "D1C",
-  "_command":  "show ip ospf neighbor",
-  "cli_style": "ios",
-  "raw":       "Neighbor ID  Pri  State  Dead Time  Address    Interface\n1.1.1.1   1  INIT/DR  00:00:38  10.1.1.1  Ethernet0/1\n..."
-}
+  Root cause: A2A is missing area 1 stub configuration.
+  RFC 2328 §10.5: E-bit mismatch causes Hello packets to be discarded.
+  Recovery: network is still broken — A2A remains isolated.
 ```
 
 ---
 
-## Step 4: Synthesize
-
-Combine KB context with live device data. When they conflict, trust the live data — the device is the ground truth.
-
-The agent states clearly:
-- What the data shows (e.g. neighbor is in INIT, Hello interval mismatch detected)
-- What the root cause is (or what further information is needed)
-- Configuration direction only — never suggest or apply device configuration changes
-
----
-
-## Why This Works
-
-The embedding model maps both *"INIT state means Hello one-way"* and *"Why is D1C's neighbor stuck in INIT"* to nearby points in 384-dimensional space — because they're about the same concept. A keyword search would miss this (the word "stuck" doesn't appear in the RFC text), but vector similarity catches the semantic relationship.
-
-For live data, the flat platform map (`cli_style → category → query → command`) keeps vendor differences explicit and testable. Adding a new vendor means adding one dict entry per category — no inheritance, no runtime dispatch complexity.
-
----
-
-## Summary
+## Architecture Summary
 
 ```
-Preflight:
-  get_status → Inventory / Vault / Intent / ChromaDB sources
+                    ┌─────────────────────────────────────────┐
+                    │            Claude Code (UI)              │
+                    │                                         │
+                    │   Mode 1: User asks a question          │
+                    │   Mode 2: User runs /qa after tests     │
+                    └──────────────┬──────────────────────────┘
+                                   │ MCP protocol
+                    ┌──────────────▼──────────────────────────┐
+                    │         YANA MCP Server                  │
+                    │         server/MCPServer.py              │
+                    │                                         │
+                    │   8 tools registered via FastMCP         │
+                    └──┬───────┬───────┬───────┬──────────────┘
+                       │       │       │       │
+              ┌────────▼──┐ ┌──▼────┐ ┌▼─────┐ ┌▼──────────┐
+              │ SSH tools  │ │ RAG   │ │Intent│ │ Status    │
+              │ get_ospf   │ │search │ │query │ │ get_status│
+              │ get_routing│ │_kb    │ │_intent││ list_dev  │
+              │ get_intf   │ │       │ │      │ │           │
+              │ traceroute │ │       │ │      │ │           │
+              └─────┬──────┘ └───┬───┘ └──┬───┘ └───────────┘
+                    │            │        │
+         ┌──────────▼──┐  ┌─────▼───┐ ┌──▼──────┐
+         │  Scrapli SSH │  │ChromaDB │ │ NetBox  │
+         │  6 vendors   │  │ + MiniLM│ │ or JSON │
+         │  Vault creds │  │         │ │         │
+         └──────────────┘  └─────────┘ └─────────┘
 
-Investigation:
-  Load skill → skills/ospf/SKILL.md
-
-  Knowledge base:
-    Question → Vector (all-MiniLM-L6-v2)
-             → Cosine similarity search (ChromaDB)
-             → Top-k chunks (text + metadata)
-
-  Intent:
-    query_intent → Design intent (NetBox config contexts yana-* | INTENT.json)
-
-  Live device (get_ospf | get_interfaces | get_routing | traceroute):
-    Validate input (Pydantic — VRF injection guard)
-    → Lookup device (inventory → get_device())
-    → Resolve command (platform_map: cli_style → category → query → VRF sub)
-    → Execute SSH (scrapli2 — semaphore-limited, 1 retry, per-vendor options)
-    → Response envelope {device, _command, cli_style, raw}
-
-  Synthesis:
-    KB chunks + Intent + Live data → Grounded answer (trust live data on conflict)
+  Ansible QA (separate process, not MCP):
+    ansible-playbook network_qa.yml
+      → NETCONF GET via ncclient (ietf-routing YANG)
+      → Results JSON → consumed by /qa skill in Claude
 ```

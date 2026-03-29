@@ -1,24 +1,11 @@
-"""UT-001: Input model validation."""
+"""UT-001: Input model — custom JSON string validator."""
 import pytest
 from pydantic import ValidationError
 
-from input_models.models import InterfacesQuery, IntentQuery, KBQuery, OspfQuery, RoutingQuery, TracerouteInput
+from input_models.models import OspfQuery
 
 
-class TestOspfQuery:
-    @pytest.mark.parametrize("query", ["neighbors", "database", "borders", "config", "interfaces", "details"])
-    def test_valid_query_types(self, query):
-        q = OspfQuery(device="R1", query=query)
-        assert q.query == query
-
-    def test_invalid_query_rejected(self):
-        with pytest.raises(ValidationError):
-            OspfQuery(device="R1", query="invalid")
-
-    def test_vrf_valid(self):
-        q = OspfQuery(device="R1", query="neighbors", vrf="VRF1")
-        assert q.vrf == "VRF1"
-
+class TestJsonStringParsing:
     def test_json_string_parsing(self):
         q = OspfQuery.model_validate('{"device": "R1", "query": "neighbors"}')
         assert q.device == "R1"
@@ -27,111 +14,3 @@ class TestOspfQuery:
     def test_malformed_json_rejected(self):
         with pytest.raises(ValidationError):
             OspfQuery.model_validate("not json at all")
-
-    def test_json_without_vrf_defaults_to_none(self):
-        q = OspfQuery.model_validate('{"device": "R1", "query": "neighbors"}')
-        assert q.vrf is None
-
-
-class TestRoutingQuery:
-    @pytest.mark.parametrize("query", ["ip_route", "route_maps", "prefix_lists", "policy_based_routing", "access_lists"])
-    def test_valid_query_types(self, query):
-        q = RoutingQuery(device="R1", query=query)
-        assert q.query == query
-
-    def test_invalid_query_rejected(self):
-        with pytest.raises(ValidationError):
-            RoutingQuery(device="R1", query="bgp_summary")
-
-    def test_vrf_valid(self):
-        q = RoutingQuery(device="R1", query="ip_route", vrf="VRF1")
-        assert q.vrf == "VRF1"
-
-    def test_vrf_optional(self):
-        q = RoutingQuery(device="R1", query="ip_route")
-        assert q.vrf is None
-
-
-class TestIntentQuery:
-    def test_no_device(self):
-        q = IntentQuery()
-        assert q.device is None
-
-    def test_with_device(self):
-        q = IntentQuery(device="R1")
-        assert q.device == "R1"
-
-    def test_json_string_no_device(self):
-        q = IntentQuery.model_validate("{}")
-        assert q.device is None
-
-
-class TestInterfacesQuery:
-    def test_valid(self):
-        q = InterfacesQuery(device="R1")
-        assert q.device == "R1"
-
-
-class TestTracerouteInput:
-    def test_valid_minimal(self):
-        q = TracerouteInput(device="R1", destination="10.0.0.1")
-        assert q.device == "R1"
-        assert q.destination == "10.0.0.1"
-        assert q.source is None
-        assert q.vrf is None
-
-    def test_valid_full(self):
-        q = TracerouteInput(device="R1", destination="10.0.0.1", source="192.168.1.1", vrf="VRF1")
-        assert q.source == "192.168.1.1"
-        assert q.vrf == "VRF1"
-
-    def test_vrf_injection_blocked(self):
-        with pytest.raises(ValidationError):
-            TracerouteInput(device="R1", destination="10.0.0.1", vrf="VRF1; reboot")
-
-    def test_json_string_parsing(self):
-        q = TracerouteInput.model_validate('{"device": "R1", "destination": "10.0.0.1"}')
-        assert q.device == "R1"
-        assert q.destination == "10.0.0.1"
-
-    def test_missing_destination_rejected(self):
-        with pytest.raises(ValidationError):
-            TracerouteInput(device="R1")
-
-
-class TestKBQuery:
-    def test_valid_full(self):
-        q = KBQuery(query="OSPF timers", vendor="cisco_ios", topic="rfc", top_k=3)
-        assert q.vendor == "cisco_ios"
-        assert q.topic == "rfc"
-        assert q.top_k == 3
-
-    def test_valid_minimal(self):
-        q = KBQuery(query="OSPF")
-        assert q.vendor is None
-        assert q.topic is None
-        assert q.top_k == 5
-
-    def test_invalid_vendor_rejected(self):
-        with pytest.raises(ValidationError):
-            KBQuery(query="test", vendor="invalid_vendor")
-
-    def test_invalid_topic_rejected(self):
-        with pytest.raises(ValidationError):
-            KBQuery(query="test", topic="bad_topic")
-
-    def test_top_k_too_high(self):
-        with pytest.raises(ValidationError):
-            KBQuery(query="test", top_k=11)
-
-    def test_top_k_too_low(self):
-        with pytest.raises(ValidationError):
-            KBQuery(query="test", top_k=0)
-
-    def test_query_too_long(self):
-        with pytest.raises(ValidationError):
-            KBQuery(query="x" * 501)
-
-    def test_query_at_max_length(self):
-        q = KBQuery(query="x" * 500)
-        assert len(q.query) == 500

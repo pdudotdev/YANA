@@ -1,6 +1,6 @@
 # ✨ YANA • Yet Another Network Agent
 
-[![Version](https://img.shields.io/badge/version-1.0-1a1a2e)](https://github.com/pdudotdev/YANA/releases/tag/1.0.0)
+[![Version](https://img.shields.io/badge/version-1.1-1a1a2e)](https://github.com/pdudotdev/YANA/releases/tag/v1.1.0)
 ![License](https://img.shields.io/badge/license-GPLv3-1a1a2e)
 [![Last Commit](https://img.shields.io/github/last-commit/pdudotdev/YANA?color=1a1a2e)](https://github.com/pdudotdev/YANA/commits/main/)
 
@@ -210,14 +210,14 @@ YANA/
 ├── skills/
 │   ├── ospf/                     # OSPF skill file for specific troubleshooting
 │   └── routing/                  # Routing skill file for path selection issues
-├── ansible/                      # OSPF QA test framework (NETCONF + Ansible)
-│   ├── playbooks/                # ospf_qa.yml executor + scenario runner
-│   ├── test_cases/               # YAML test scenarios (baseline, auth, timers, etc.)
+├── ansible/                      # Network QA health checks (NETCONF + Ansible)
+│   ├── playbooks/                # network_qa.yml entry point + _run_check.yml
+│   ├── test_cases/               # YAML test definitions (route checks, health checks)
 │   ├── results/                  # JSON test results (used by /qa skill)
 │   ├── inventory/                # Lab device inventory (E1C, C1J)
 │   └── collections/              # Ansible collections (netcommon, community.general)
 ├── testing/
-│   ├── automated/                # Unit + integration tests (165 test functions)
+│   ├── automated/                # Unit + integration tests (169 test functions)
 │   ├── live/                     # Live lab tests (65 parametrized runs) + results report
 │   └── run_tests.sh              # Test runner (--live for lab tests)
 ├── ingest.py                     # RAG ingestion pipeline
@@ -231,7 +231,7 @@ YANA/
 
 ## 🧪 QA & Ansible
 
-Automated OSPF QA tests run via Ansible playbooks that push NETCONF config changes, assert protocol behavior against RFC expectations, then tear down and verify recovery.
+Network QA health checks run via Ansible playbooks that query device state over NETCONF and assert expected conditions (route presence, protocol state) against design intent.
 
 **Prerequisites:**
 - `ansible-core` and `ncclient` installed in the venv (both included in `requirements.txt`)
@@ -246,8 +246,8 @@ Automated OSPF QA tests run via Ansible playbooks that push NETCONF config chang
 **Running tests:**
 ```bash
 cd ansible
-ansible-playbook playbooks/ospf_qa.yml                              # all scenarios
-ansible-playbook playbooks/ospf_qa.yml -e scenario_filter=auth_mismatch  # single scenario
+ansible-playbook playbooks/network_qa.yml                              # all checks
+ansible-playbook playbooks/network_qa.yml -e scenario_filter=route_to_a2a  # single check
 ```
 
 Results are written to `ansible/results/results_<timestamp>.json`.

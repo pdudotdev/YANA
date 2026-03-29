@@ -1,6 +1,6 @@
 ---
-# _run_scenario.yml — executes one test case file.
-# Called in a loop from ospf_qa.yml with test_case_path as the loop var.
+# _run_check.yml — executes one test case file.
+# Called in a loop from network_qa.yml with test_case_path as the loop var.
 
 - name: "Load scenario: {{ test_case_path | basename }}"
   ansible.builtin.include_vars:

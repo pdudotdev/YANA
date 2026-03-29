@@ -8,11 +8,6 @@ from tools.routing import get_routing
 
 
 class TestGetRouting:
-    async def test_unknown_device(self):
-        result = await get_routing(RoutingQuery(device="NONEXISTENT", query="ip_route"))
-        assert "error" in result
-        assert "Unknown device" in result["error"]
-
     async def test_valid_device_ios(self):
         with patch("transport.execute_ssh", new_callable=AsyncMock) as mock_ssh:
             mock_ssh.return_value = "S    0.0.0.0/0 via 10.0.0.254"

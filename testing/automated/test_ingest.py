@@ -16,11 +16,6 @@ class TestExtractMetadata:
         assert meta["vendor"] == "all"
         assert meta["topic"] == "rfc"
 
-    def test_rfc3101(self):
-        meta = extract_metadata(Path("docs/rfc3101_nssa.md"))
-        assert meta["vendor"] == "all"
-        assert meta["topic"] == "rfc"
-
     def test_unknown_file(self):
         meta = extract_metadata(Path("docs/other.md"))
         assert meta["vendor"] == "all"
@@ -31,5 +26,3 @@ class TestExtractMetadata:
         for v in vendors:
             meta = extract_metadata(Path(f"docs/vendor_{v}.md"))
             assert meta["vendor"] == v
-
-

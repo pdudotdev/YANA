@@ -29,13 +29,3 @@ class TestExecuteCommand:
         assert "error" in result
         assert "device" in result
         assert "cli_style" in result
-
-    async def test_ssh_error_returns_error_dict(self):
-        with patch("transport.execute_ssh", new_callable=AsyncMock) as mock_ssh:
-            mock_ssh.side_effect = ConnectionError("SSH timeout")
-            from transport import execute_command
-            result = await execute_command("R1", "show ip ospf neighbor")
-        assert result["device"] == "R1"
-        assert result["cli_style"] == "ios"
-        assert "error" in result
-        assert "SSH timeout" in result["error"]

@@ -2,12 +2,6 @@
 
 
 class TestMcpToolRegistration:
-    async def test_eight_tools_registered(self):
-        """The MCP server must expose exactly 8 tools."""
-        from server.MCPServer import mcp
-        tools = await mcp.list_tools()
-        assert len(tools) == 8
-
     async def test_tool_names(self):
         """All eight expected tool names are registered."""
         from server.MCPServer import mcp

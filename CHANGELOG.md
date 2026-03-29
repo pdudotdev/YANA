@@ -145,3 +145,38 @@ Initial release. RAG-powered OSPF knowledge base assistant for multi-vendor netw
 - **UT-009** (MCP Server) — updated to assert 8 tools; `"traceroute"` added to expected names set.
 - **UT-001** (Input Models) — `TestTracerouteInput` class added (5 tests: minimal, full, VRF injection, JSON parsing, missing destination).
 - **UT-015** (Security Controls) — `TracerouteInput` VRF injection tests added (18 injection patterns blocked, 6 valid VRF names accepted).
+
+---
+
+## v1.1.0 — 2026-03-29
+
+### Ansible QA Framework
+
+- **Network QA playbooks** — new Ansible-based health check framework in `ansible/`. Entry point `playbooks/network_qa.yml` discovers test cases from `ansible/test_cases/*.yml`, runs each via `_run_check.yml`, and writes results to `ansible/results/results_<timestamp>.json`.
+- **NETCONF transport** — test checks query device state over NETCONF using the `ietf-routing` YANG model (`urn:ietf:params:xml:ns:yang:ietf-routing`) for VRF routing table reads. Credentials sourced from HashiCorp Vault via `community.hashi_vault` Ansible collection.
+- **Read-only test design** — replaced 3 fault-injection test cases (config push, convergence wait, teardown) with a single read-only routing table assertion. No configuration is pushed to devices.
+- **`route_exists` filter** (`ansible/filter_plugins/ospf_filters.py`) — Jinja2 filter that parses NETCONF XML and checks for a destination prefix in the routing table.
+- **Test case format** — declarative YAML defining device, VRF, assertion, and RFC reference. Example: `route_to_a2a.yml` verifies E1C has a route to A2A's loopback (192.168.42.1) in VRF1.
+- **ncclient device handler fix** — added `vars:` binding for `ansible_netconf_ncclient_device_handler` in the netcommon NETCONF plugin so inventory variables are read correctly (forces `iosxe` handler instead of `default`).
+
+### `/qa` Skill
+
+- **Generic investigation skill** (`.claude/skills/qa/SKILL.md`) — rewritten to be device- and test-agnostic. Loads latest results JSON, triages pass/fail, presents numbered failure list, user picks a failure to investigate, agent runs full diagnostic workflow (intent → live state → skill decision trees → KB search), reports findings, then re-presents remaining failures for the next pick.
+- **Shared root cause detection** — after investigating a failure, if its root cause likely explains other failures on the list, the agent says so — user can skip those.
+
+### Documentation
+
+- **`WORKFLOW.md`** — complete rewrite covering both operational modes: interactive troubleshooting (user asks questions) and automated QA (Ansible health checks + `/qa` skill). Includes tool table, SSH pipeline diagram, RAG pipeline explanation, step-by-step walkthroughs for both modes, concrete examples, and ASCII architecture diagram.
+- **`README.md`** — added QA & Ansible section with prerequisites, running instructions, and `/qa` skill usage. Updated project structure to reflect `ansible/` directory layout.
+
+### Test Cleanup
+
+- **269 → 169 tests** (37% reduction) — removed tests that verify Pydantic builtins, duplicate error paths, or Python language features rather than project logic.
+- Gutted `test_input_models.py` to 2 tests (JSON string parsing only — the custom `@model_validator`).
+- Trimmed `test_security.py` to OspfQuery variants only (same VRF regex shared across all models).
+- Removed trivial tests from `test_status.py` (Path.exists, enum string checks), `test_tools.py` (2-line dict builder, duplicate unknown_device), `test_transport.py` (duplicate SSH error), `test_list_devices.py` (duplicate filter), `test_ingest.py` (duplicate RFC), `test_mcp_server.py` (count implied by name check), `test_inventory.py` (fixture-testing, not production code).
+
+### Housekeeping
+
+- **`.gitignore`** — added `ansible/collections/ansible_collections/` and `ansible/results/` to prevent installed collections and ephemeral result files from being committed.
+- Old fault-injection test cases moved to `core/legacy/`.

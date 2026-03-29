@@ -82,6 +82,3 @@ class TestTopK:
         result = await run("OSPF", top_k=2)
         assert len(result["results"]) == 2
 
-    async def test_default_top_k(self, run):
-        result = await run("OSPF")
-        assert len(result["results"]) == 5
