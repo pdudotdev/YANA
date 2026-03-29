@@ -1,0 +1,19 @@
+---
+# ospf_adj_e1c_c1j.yml
+# Verify E1C (ASBR, IOS-XE) has a FULL OSPF adjacency with C1J (core, JunOS)
+# in Area 0. This is a backbone adjacency — if it drops, E1C loses its path
+# to the core and inter-area/external routes stop propagating.
+
+scenario: ospf_adj_e1c_c1j
+description: "Verify E1C has FULL OSPF adjacency with C1J (router-id 22.22.22.11)"
+rfc_ref: RFC 2328 §10.3
+rfc_citation: >
+  RFC 2328 Section 10.3: The Neighbor State Machine. A neighbor transitions
+  to FULL state only after complete database synchronization. Failure to
+  reach FULL indicates hello timer mismatch, area type mismatch, MTU
+  mismatch, authentication failure, or interface misconfiguration.
+device: E1C
+netconf_filter: |
+  <ospf-oper-data xmlns="http://cisco.com/ns/yang/Cisco-IOS-XE-ospf-oper"/>
+assertion: ospf_neighbor_full
+assert_value: "22.22.22.11"
