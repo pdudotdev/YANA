@@ -1,0 +1,61 @@
+---
+# _run_scenario.yml — executes one test case file.
+# Called in a loop from ospf_qa.yml with test_case_path as the loop var.
+
+- name: "Load scenario: {{ test_case_path | basename }}"
+  ansible.builtin.include_vars:
+    file: "{{ test_case_path }}"
+    name: scenario
+
+- name: "Run scenario: {{ scenario.scenario }}"
+  when: scenario_filter == '' or scenario_filter == scenario.scenario
+  block:
+
+    - name: "{{ scenario.scenario }} | NETCONF GET routing table"
+      ansible.netcommon.netconf_get:
+        filter: >-
+          <routing-state xmlns="urn:ietf:params:xml:ns:yang:ietf-routing">
+            <routing-instance><name>{{ scenario.vrf | default('default') }}</name></routing-instance>
+          </routing-state>
+        display: xml
+      delegate_to: "{{ scenario.device }}"
+      register: netconf_result
+
+    - name: "{{ scenario.scenario }} | Debug XML"
+      ansible.builtin.debug:
+        msg: "{{ netconf_result.output | truncate(500) }}"
+      when: ansible_verbosity >= 1
+
+    - name: "{{ scenario.scenario }} | Assert route exists"
+      ansible.builtin.set_fact:
+        _assertion_passed: "{{ netconf_result.output | route_exists(scenario.assert_route_exists) }}"
+        _assertion_output: "{{ netconf_result.output | truncate(500) }}"
+
+  rescue:
+
+    - name: "{{ scenario.scenario }} | RESCUE — record failure"
+      ansible.builtin.set_fact:
+        _assertion_passed: false
+        _assertion_output: "Error during test execution: {{ ansible_failed_result.msg | default('unknown error') }}"
+
+  always:
+
+    - name: "{{ scenario.scenario }} | Record result"
+      ansible.builtin.set_fact:
+        qa_results: >-
+          {{
+            qa_results + [{
+              'scenario': scenario.scenario,
+              'passed': _assertion_passed | bool,
+              'rfc_ref': scenario.rfc_ref,
+              'rfc_citation': scenario.rfc_citation,
+              'description': scenario.description,
+              'details': _assertion_output
+            }]
+          }}
+
+    - name: "{{ scenario.scenario }} | Print result"
+      ansible.builtin.debug:
+        msg: >
+          {{ '✓ PASS' if _assertion_passed else '✗ FAIL' }} — {{ scenario.scenario }}
+          ({{ scenario.rfc_ref }})

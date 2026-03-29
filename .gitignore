@@ -6,3 +6,6 @@ yana/
 .claude/
 .pytest_cache/
 .ruff_cache/
+ansible_test_cases/
+ansible/collections/ansible_collections/
+ansible/results/

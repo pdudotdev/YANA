@@ -13,6 +13,12 @@ python-dotenv>=1.2,<2.0
 # SSH transport
 scrapli2>=2.0.0rc1
 
+# NETCONF
+ncclient>=0.6,<1.0
+
+# Ansible (QA playbooks)
+ansible-core>=2.16,<3.0
+
 # NetBox inventory
 pynetbox>=7.0,<8.0
 

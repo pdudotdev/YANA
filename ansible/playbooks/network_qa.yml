@@ -1,0 +1,67 @@
+---
+# Network QA — runs health checks via NETCONF.
+#
+# Usage (run from ansible/ directory):
+#   ansible-playbook playbooks/network_qa.yml
+#   ansible-playbook playbooks/network_qa.yml -e scenario_filter=route_to_a2a
+#
+# Results are written to ansible/results/results_<timestamp>.json.
+# On failures, run /qa in Claude to investigate.
+
+- name: Network QA — NETCONF health checks
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    scenario_filter: ""
+    results_dir: "{{ playbook_dir }}/../results"
+    test_cases_dir: "{{ playbook_dir }}/../test_cases"
+
+  tasks:
+
+    - name: Find test case files
+      ansible.builtin.find:
+        paths: "{{ test_cases_dir }}"
+        patterns: "*.yml"
+        excludes: ".gitkeep"
+      register: found_files
+
+    - name: Fail if no test cases found
+      ansible.builtin.fail:
+        msg: >
+          No test case files found in {{ test_cases_dir }}.
+      when: found_files.files | length == 0
+
+    - name: Initialize results list
+      ansible.builtin.set_fact:
+        qa_results: []
+
+    - name: Execute test scenario
+      ansible.builtin.include_tasks: _run_check.yml
+      loop: "{{ found_files.files | map(attribute='path') | sort }}"
+      loop_control:
+        loop_var: test_case_path
+        label: "{{ test_case_path | basename }}"
+
+    - name: Ensure results directory exists
+      ansible.builtin.file:
+        path: "{{ results_dir }}"
+        state: directory
+        mode: "0755"
+
+    - name: Write results JSON
+      ansible.builtin.copy:
+        content: "{{ qa_results | to_nice_json }}"
+        dest: "{{ results_dir }}/results_{{ lookup('pipe', 'date +%Y%m%dT%H%M%S') }}.json"
+        mode: "0644"
+
+    - name: Print summary
+      ansible.builtin.debug:
+        msg: >
+          Results: {{ qa_results | selectattr('passed', 'equalto', true) | list | length }} passed,
+          {{ qa_results | selectattr('passed', 'equalto', false) | list | length }} failed
+          out of {{ qa_results | length }} scenarios.
+          {% if qa_results | selectattr('passed', 'equalto', false) | list | length > 0 %}
+          Run /qa in Claude to investigate failures.
+          {% endif %}

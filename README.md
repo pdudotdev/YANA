@@ -21,6 +21,7 @@
 - [Usage](#-usage)
 - [Knowledge Base](#-knowledge-base)
 - [Project Structure](#️-project-structure)
+- [QA & Ansible](#-qa--ansible)
 - [Test Network Topology](#-test-network-topology)
 - [Planned Upgrades](#️-planned-upgrades)
 - [Repository Lifecycle](#️-repository-lifecycle)
@@ -209,6 +210,12 @@ YANA/
 ├── skills/
 │   ├── ospf/                     # OSPF skill file for specific troubleshooting
 │   └── routing/                  # Routing skill file for path selection issues
+├── ansible/                      # OSPF QA test framework (NETCONF + Ansible)
+│   ├── playbooks/                # ospf_qa.yml executor + scenario runner
+│   ├── test_cases/               # YAML test scenarios (baseline, auth, timers, etc.)
+│   ├── results/                  # JSON test results (used by /qa skill)
+│   ├── inventory/                # Lab device inventory (E1C, C1J)
+│   └── collections/              # Ansible collections (netcommon, community.general)
 ├── testing/
 │   ├── automated/                # Unit + integration tests (165 test functions)
 │   ├── live/                     # Live lab tests (65 parametrized runs) + results report
@@ -220,6 +227,37 @@ YANA/
 ├── LICENSE
 ├── requirements.txt
 └── README.md
+```
+
+## 🧪 QA & Ansible
+
+Automated OSPF QA tests run via Ansible playbooks that push NETCONF config changes, assert protocol behavior against RFC expectations, then tear down and verify recovery.
+
+**Prerequisites:**
+- `ansible-core` and `ncclient` installed in the venv (both included in `requirements.txt`)
+- Ansible collections (netcommon, hashi_vault):
+  ```bash
+  cd ansible && ansible-galaxy collection install -r collections/requirements.yml
+  ```
+- HashiCorp Vault running and unsealed with credentials at `secret/yana/router` (`username`, `password`)
+- `VAULT_ADDR` and `VAULT_TOKEN` env vars exported
+- NETCONF-capable lab devices (IOS-XE, JunOS) reachable on port 830
+
+**Running tests:**
+```bash
+cd ansible
+ansible-playbook playbooks/ospf_qa.yml                              # all scenarios
+ansible-playbook playbooks/ospf_qa.yml -e scenario_filter=auth_mismatch  # single scenario
+```
+
+Results are written to `ansible/results/results_<timestamp>.json`.
+
+**Investigating failures:**
+
+Use the `/qa` skill in Claude to load the latest results, list failures, and run a guided investigation using YANA's live OSPF and routing tools:
+```
+claude
+> /qa
 ```
 
 ## 🔄 Test Network Topology
