@@ -110,13 +110,6 @@ claude
 
 The `/qa` skill loads the latest JUnit XML, lists all failures, and investigates each one using live device queries, network intent, and RFC context.
 
-**Ansible demo:** A reference Ansible QA implementation is included in `ansible/`. It runs NETCONF health checks and produces JUnit XML results. To use it:
-```bash
-pip install ansible-core ncclient
-cd ansible && ansible-galaxy collection install -r collections/requirements.yml
-ansible-playbook playbooks/network_qa.yml
-```
-
 ## Knowledge Base
 
 Protocol documentation lives in `docs/` as Markdown files. Each file is tagged with `vendor`, `topic`, and `protocol` metadata during ingestion.
@@ -167,11 +160,6 @@ YANA/
 ├── skills/
 │   ├── ospf/                     # OSPF diagnostic decision tree
 │   └── routing/                  # Routing diagnostic decision tree
-├── ansible/                      # Demo: Ansible QA health checks
-│   ├── playbooks/                # network_qa.yml + _run_check.yml
-│   ├── test_cases/               # YAML test definitions
-│   ├── templates/                # JUnit XML output template
-│   └── inventory/                # Lab device inventory
 ├── testing/
 │   ├── automated/                # Unit + integration tests
 │   ├── live/                     # Live lab tests

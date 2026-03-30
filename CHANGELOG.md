@@ -2,19 +2,7 @@
 
 ## v1.2.0 — 2026-03-30
 
-Removed Vault and NetBox, implemented RAG optimizations, standardized on JUnit XML for test results, added Makefile for setup.
-
-### Vault and NetBox Removal
-
-- **Deleted** `core/vault.py` and `core/netbox.py` — Vault and NetBox are production concerns, unnecessary for QA/lab networks.
-- **Deleted** `testing/automated/test_vault.py` and `testing/automated/test_netbox.py`.
-- **Moved** `core/legacy/NETWORK.json` → `data/NETWORK.json` and `core/legacy/INTENT.json` → `data/INTENT.json` — JSON is the primary (and only) data source, not a "legacy" fallback.
-- **Simplified `core/settings.py`** — credentials read directly from `ROUTER_USERNAME` / `ROUTER_PASSWORD` env vars.
-- **Simplified `core/inventory.py`** — JSON-only loading from `data/NETWORK.json`, no NetBox fallback.
-- **Simplified `tools/intent.py`** — JSON-only loading from `data/INTENT.json`, no NetBox fallback.
-- **Simplified `tools/status.py`** — reports 3 fields: inventory, intent, chromadb (removed vault).
-- **Simplified `transport/ssh.py`** — global credentials only (no per-vendor Vault lookup).
-- **Removed dependencies** from `requirements.txt`: `hvac`, `pynetbox`, `ncclient`, `ansible-core`.
+Implemented RAG optimizations, standardized on JUnit XML for test results, added Makefile for setup.
 
 ### RAG Optimizations
 
@@ -26,15 +14,13 @@ Removed Vault and NetBox, implemented RAG optimizations, standardized on JUnit X
 
 ### JUnit XML for Test Results
 
-- **`results/` directory** — test results now live at project root (was `ansible/results/`). Any test framework that outputs JUnit XML is supported.
-- **Ansible JUnit template** — `ansible/templates/junit_results.xml.j2` renders qa_results as JUnit XML with `<properties>` for device, rfc_ref, description, rfc_citation.
-- **Ansible playbook updated** — `network_qa.yml` writes JUnit XML to `results/results_<timestamp>.xml`.
-- **Ansible inventory** — switched from Vault lookups to env var lookups (`ROUTER_USERNAME`, `ROUTER_PASSWORD`, `ROUTER_PASSWORD_JUNOS`). Removed `community.hashi_vault` from collection requirements.
+- **`results/` directory** — test results live at project root as JUnit XML. Any test framework that outputs JUnit XML is supported (pytest, pyATS, Robot Framework, etc.).
+- **Static fixture** — `results/network_qa.xml` provides a realistic sample with 3 test scenarios (2 failures, 1 pass) covering OSPF adjacency, route existence, and route redistribution.
 
 ### `/qa` Skill Rewrite
 
 - Rewritten for JUnit XML parsing (was JSON). Loads `.xml` files from `results/`, parses `<testcase>` elements with `<properties>` and `<failure>` children.
-- Framework-agnostic — works with results from pytest, pyATS, Robot Framework, Ansible, or any JUnit XML producer.
+- Framework-agnostic — works with results from any JUnit XML producer.
 
 ### Makefile
 
@@ -200,15 +186,6 @@ Initial release. RAG-powered OSPF knowledge base assistant for multi-vendor netw
 
 ## v1.1.0 — 2026-03-29
 
-### Ansible QA Framework
-
-- **Network QA playbooks** — new Ansible-based health check framework in `ansible/`. Entry point `playbooks/network_qa.yml` discovers test cases from `ansible/test_cases/*.yml`, runs each via `_run_check.yml`, and writes results to `ansible/results/results_<timestamp>.json`.
-- **NETCONF transport** — test checks query device state over NETCONF using the `ietf-routing` YANG model (`urn:ietf:params:xml:ns:yang:ietf-routing`) for VRF routing table reads. Credentials sourced from HashiCorp Vault via `community.hashi_vault` Ansible collection.
-- **Read-only test design** — replaced 3 fault-injection test cases (config push, convergence wait, teardown) with a single read-only routing table assertion. No configuration is pushed to devices.
-- **`route_exists` filter** (`ansible/filter_plugins/ospf_filters.py`) — Jinja2 filter that parses NETCONF XML and checks for a destination prefix in the routing table.
-- **Test case format** — declarative YAML defining device, VRF, assertion, and RFC reference. Example: `route_to_a2a.yml` verifies E1C has a route to A2A's loopback (192.168.42.1) in VRF1.
-- **ncclient device handler fix** — added `vars:` binding for `ansible_netconf_ncclient_device_handler` in the netcommon NETCONF plugin so inventory variables are read correctly (forces `iosxe` handler instead of `default`).
-
 ### `/qa` Skill
 
 - **Generic investigation skill** (`.claude/skills/qa/SKILL.md`) — rewritten to be device- and test-agnostic. Loads latest results JSON, triages pass/fail, presents numbered failure list, user picks a failure to investigate, agent runs full diagnostic workflow (intent → live state → skill decision trees → KB search), reports findings, then re-presents remaining failures for the next pick.
@@ -216,8 +193,7 @@ Initial release. RAG-powered OSPF knowledge base assistant for multi-vendor netw
 
 ### Documentation
 
-- **`WORKFLOW.md`** — complete rewrite covering both operational modes: interactive troubleshooting (user asks questions) and automated QA (Ansible health checks + `/qa` skill). Includes tool table, SSH pipeline diagram, RAG pipeline explanation, step-by-step walkthroughs for both modes, concrete examples, and ASCII architecture diagram.
-- **`README.md`** — added QA & Ansible section with prerequisites, running instructions, and `/qa` skill usage. Updated project structure to reflect `ansible/` directory layout.
+- **`WORKFLOW.md`** — Includes tool table, SSH pipeline diagram, RAG pipeline explanation, step-by-step walkthroughs for both modes, concrete examples, and ASCII architecture diagram.
 
 ### Test Cleanup
 
@@ -228,5 +204,4 @@ Initial release. RAG-powered OSPF knowledge base assistant for multi-vendor netw
 
 ### Housekeeping
 
-- **`.gitignore`** — added `ansible/collections/ansible_collections/` and `ansible/results/` to prevent installed collections and ephemeral result files from being committed.
 - Old fault-injection test cases moved to `core/legacy/`.

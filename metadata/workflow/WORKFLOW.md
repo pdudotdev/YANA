@@ -153,10 +153,6 @@ When tests fail, the user runs `/qa` in Claude Code. The skill (`.claude/skills/
 
 If multiple failures share a root cause, the agent says so after investigating the first one — the user can skip the rest.
 
-### Ansible Demo
-
-A reference Ansible QA implementation is included in `ansible/`. It runs NETCONF health checks and produces JUnit XML results. This is just one example — any test framework that outputs JUnit XML works.
-
 ---
 
 ## Architecture Summary

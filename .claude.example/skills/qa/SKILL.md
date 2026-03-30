@@ -50,7 +50,6 @@ Wait for the user's response. If only one failure exists, ask anyway — the use
 
 ### 5a — Understand the test
 Read the `<properties>` from the selected `<testcase>` for device, RFC reference, and description.
-If a matching test case YAML exists in `ansible/test_cases/`, read it for additional context (optional).
 
 ### 5b — Load design intent
 ```
@@ -58,17 +57,10 @@ query_intent()
 ```
 Understand the expected topology, roles, and protocol configuration for the relevant devices.
 
-### 5c — Gather live state
-Query the device(s) from the `device` property using the appropriate YANA tools (`get_ospf`, `get_routing`, `get_interfaces`, `traceroute`). Start with the device under test, then work outward toward likely causes.
+### 5c — Follow the protocol skill decision tree
+Load the relevant skill file (`skills/ospf/SKILL.md`, `skills/routing/SKILL.md`) and follow its diagnostic tree. At each step in the tree, call the appropriate MCP tools (`get_ospf`, `get_routing`, `get_interfaces`, `traceroute`) and `search_knowledge_base` as needed. The skill dictates what to query — live device data and KB searches happen inline as the tree is walked, not as separate phases.
 
-### 5d — Trace the problem
-Follow the diagnostic trees in the relevant skill file (`skills/ospf/SKILL.md`, `skills/routing/SKILL.md`). Let the live data guide which devices to check next.
-
-### 5e — RFC context
-```
-search_knowledge_base(query="<failure-specific query>", topic="rfc")
-```
-Retrieve the RFC text that explains the observed behavior.
+Start with the device under test, then work outward toward likely causes. Let the live data guide which branch to follow next.
 
 ## Step 6 — Report and loop
 
