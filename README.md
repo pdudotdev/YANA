@@ -7,7 +7,7 @@
 | | |
 |---|---|
 | **Platforms** | ![Cisco IOS](https://img.shields.io/badge/Cisco_IOS-0d47a1) ![Cisco IOS-XE](https://img.shields.io/badge/Cisco_IOS--XE-0d47a1) ![Arista EOS](https://img.shields.io/badge/Arista_EOS-0d47a1) ![Juniper JunOS](https://img.shields.io/badge/Juniper_JunOS-0d47a1) ![Aruba AOS](https://img.shields.io/badge/Aruba_AOS-0d47a1) ![Vyatta VyOS](https://img.shields.io/badge/Vyatta_VyOS-0d47a1) ![MikroTik RouterOS](https://img.shields.io/badge/MikroTik_RouterOS-0d47a1) ![FRR](https://img.shields.io/badge/FRR-0d47a1) |
-| **Transport** | ![SSH](https://img.shields.io/badge/SSH%20CLI-1565c0) ![Scrapli](https://img.shields.io/badge/Scrapli-1565c0) ![NETCONF](https://img.shields.io/badge/NETCONF-1a1a2e) |
+| **Transport** | ![SSH](https://img.shields.io/badge/SSH%20CLI-1565c0) ![Scrapli](https://img.shields.io/badge/Scrapli-1565c0) |
 | **Integrations** | ![MCP](https://img.shields.io/badge/MCP-1e88e5) ![ChromaDB](https://img.shields.io/badge/ChromaDB-1e88e5) ![JUnit XML](https://img.shields.io/badge/JUnit_XML-1e88e5) |
 
 ## Overview
@@ -24,7 +24,7 @@ Run your tests with any framework. When something fails, YANA investigates - it 
 - [**GUARDRAILS.md**](metadata/guardrails/GUARDRAILS.md) - security controls
 
 **What's new:**
-- [**CHANGELOG.md**](CHANGELOG.md)
+- [**CHANGELOG.md**](CHANGELOG.md) - latest version
 
 ## Tech Stack
 
