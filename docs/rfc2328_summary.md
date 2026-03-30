@@ -7,8 +7,9 @@ OSPF routers form adjacencies through a defined state progression:
 ### States (in order)
 
 - **DOWN**: No Hello packets received from this neighbor. Initial state.
+- **ATTEMPT**: NBMA networks only. Unicast Hello sent to a statically configured neighbor but no Hello has been received back yet. Transitions to INIT on receipt of any Hello from that neighbor.
 - **INIT**: A Hello was received but the local router's ID was not in the neighbor's Hello. One-way communication only.
-- **2WAY**: Bidirectional communication confirmed. Both routers see each other's Router ID in Hello packets. On broadcast networks, DR/BDR election happens here. Non-DR/BDR routers stay in 2WAY (this is normal).
+- **2WAY**: Bidirectional communication confirmed. Both routers see each other's Router ID in Hello packets. On broadcast networks, DR/BDR election happens here. Non-DR/BDR routers stay in 2WAY with each other (this is normal).
 - **EXSTART**: Master/slave negotiation for Database Description (DD) exchange begins. The router with the higher Router ID becomes master.
 - **EXCHANGE**: DD packets are exchanged describing each router's LSDB contents.
 - **LOADING**: Link State Request packets sent for any LSAs the neighbor has that the local router lacks.
@@ -19,6 +20,7 @@ OSPF routers form adjacencies through a defined state progression:
 | Stuck State | Most Likely Cause |
 |-------------|-------------------|
 | INIT | One-way: remote side not listing local RID in Hello. ACL blocking 224.0.0.5, auth mismatch on remote, or passive interface on remote. |
+| ATTEMPT | NBMA only: unicast Hello sent but no response. Check static neighbor config, IP reachability, and ACLs. |
 | EXSTART/EXCHANGE | MTU mismatch (most common). OSPF includes MTU in DD packets; if received MTU exceeds local interface MTU, DD is rejected. Also: duplicate Router ID causes permanent deadlock. |
 | LOADING | Lossy link causing retransmission failures, or premature LSA aging (MaxAge). No timeout defined — stays stuck indefinitely. |
 
@@ -47,6 +49,18 @@ Hello and dead timers MUST match on both sides of a link for adjacency to form. 
 - DR and BDR IP addresses
 - List of neighbors (Router IDs of known neighbors)
 - Options field (E-bit for external capability, N-bit for NSSA)
+
+## OSPF Packet Types
+
+OSPF uses five packet types. All share a common 24-byte header (version, type, length, router-id, area-id, checksum, authentication).
+
+| Type | Name | Purpose |
+|------|------|---------|
+| 1 | Hello | Neighbor discovery, keepalive, DR/BDR election. Sent periodically on all OSPF interfaces. |
+| 2 | Database Description (DD) | Exchange LSDB summaries (LSA headers only). Master/slave roles negotiated. MTU included — mismatch here causes ExStart/Exchange deadlock. |
+| 3 | Link State Request (LSR) | Request specific LSAs discovered in DD exchange but not yet received. |
+| 4 | Link State Update (LSU) | Carries one or more full LSAs for flooding. Retransmitted until acknowledged. |
+| 5 | Link State Acknowledgment (LSAck) | Acknowledges received LSUs. Can be delayed and batched. Ensures reliable flooding. |
 
 ## LSA Types
 
@@ -79,13 +93,13 @@ All LSA types allowed. Connects to backbone via an ABR.
 - No Type 3, 4, or 5 LSAs (only Type 1 and 2)
 - ABR injects a single default route (Type 3)
 - Most restrictive — only intra-area routes plus default
-- Cisco proprietary extension; configured with `area X stub no-summary` on ABR
+- Originally a Cisco extension, now supported by all major vendors. Configured with `no-summary` on the ABR.
 
 ### NSSA (Not-So-Stubby Area)
 - No Type 5 LSAs from outside
 - Local ASBRs generate Type 7 LSAs (NSSA external)
 - ABR translates Type 7 to Type 5 for the backbone
-- Default route NOT automatically injected — requires `area X nssa default-information-originate`
+- Default route NOT automatically injected — requires explicit config on ABR
 
 ### NSSA Totally Stubby
 - Combines NSSA + totally stubby: no Type 3, 4, or 5 from outside
@@ -103,6 +117,17 @@ On broadcast and NBMA network types, OSPF elects a Designated Router (DR) and Ba
 
 All non-DR/BDR routers form FULL adjacency only with DR and BDR. Between themselves they remain in 2WAY state (this is normal, not a problem).
 
+## Virtual Links
+
+A virtual link logically connects a discontiguous backbone area across a non-backbone transit area, or reconnects an area that has lost its physical backbone link.
+
+- Modeled as an unnumbered point-to-point link belonging to the backbone area
+- Cost equals the intra-area distance between the two endpoints through the transit area
+- **Cannot traverse stub or NSSA areas** — the transit area must be a normal area
+- Configured between two ABRs that share a common non-backbone area
+- Must be configured on both endpoints
+- Authentication on the virtual link uses the backbone area's authentication settings
+
 ## External Metric Types
 
 Type 5 and Type 7 LSAs carry one of two metric types:
@@ -110,7 +135,7 @@ Type 5 and Type 7 LSAs carry one of two metric types:
 | Metric Type | Cost Calculation | Default |
 |-------------|-----------------|---------|
 | E1 | External cost + internal OSPF cost to ASBR | - |
-| E2 | External cost only (ignores internal distance) | Default on Cisco IOS |
+| E2 | External cost only (ignores internal distance) | Default on most vendors |
 
 **E1 always beats E2** for the same destination prefix, regardless of metric values. When both exist, E1 wins unconditionally.
 
@@ -126,13 +151,43 @@ When the LSDB changes, OSPF runs Dijkstra's Shortest Path First algorithm:
 3. Process Type 3 LSAs for inter-area routes
 4. Process Type 5/7 LSAs for external routes
 
-SPF is rate-limited by configurable timers (initial delay, hold time, maximum wait) to prevent CPU spikes during rapid topology changes.
+SPF is rate-limited by configurable timers (initial delay, hold time, maximum wait) to prevent CPU spikes during rapid topology changes. Equal-cost paths are all installed (ECMP).
 
-## Administrative Distance
+## Authentication Types
 
-OSPF routes have AD 110 by default. This determines preference when multiple routing protocols have routes to the same prefix:
+RFC 2328 defines three authentication types for OSPF packets:
 
-| Protocol | Default AD |
+| Type | Name | Details |
+|------|------|---------|
+| 0 | Null | No authentication. Default. |
+| 1 | Simple password | 8-byte plaintext key embedded in packet header. Insecure — visible in packet captures. |
+| 2 | Cryptographic | MD5 HMAC appended to packet. Key ID allows multiple keys; enables hitless key rotation. SHA variants added in RFC 5709. |
+
+Authentication is configured per-interface. Area-wide authentication (configuring all interfaces in an area at once) is a vendor convenience feature, not an RFC mechanism. Authentication type and key must match on both sides of each link.
+
+## LSA Aging and Refresh
+
+LSAs age as they propagate and while they sit in the LSDB:
+
+- **LS Age field**: Incremented in transit and while stored. Starts at 0 when originated.
+- **MaxAge**: 3600 seconds (1 hour). An LSA reaching MaxAge is purged from all LSDBs.
+- **LSRefreshTime**: 1800 seconds (30 minutes). Routers re-originate their own LSAs before they reach MaxAge to prevent premature flushing.
+- **Sequence numbers**: Signed 32-bit integer, range 0x80000001–0x7FFFFFFF. Higher sequence number = more recent. Used to determine which copy of an LSA is newer when two copies exist.
+- **Checksum**: Fletcher checksum computed over the LSA body (excluding the Age field). A checksum mismatch indicates database corruption.
+
+LSA group pacing (vendor feature): batches LSA refreshes to prevent simultaneous floods when many LSAs were originated at the same time.
+
+## Route Preference
+
+Note: Administrative distance (AD) is a vendor implementation concept, not defined in RFC 2328. RFC 2328 specifies preference ordering but not numeric values. The AD values below are widely used conventions (Cisco IOS defaults, followed by most vendors).
+
+**RFC 2328 path preference ordering** (highest to lowest):
+1. Intra-area routes (Type 1/2 LSAs, shortest path within area)
+2. Inter-area routes (Type 3 LSAs from ABR)
+3. External Type 1 routes (E1: external cost + internal cost to ASBR)
+4. External Type 2 routes (E2: external cost only)
+
+| Protocol | Typical AD |
 |----------|-----------|
 | Connected | 0 |
 | Static | 1 |
@@ -142,6 +197,8 @@ OSPF routes have AD 110 by default. This determines preference when multiple rou
 | IS-IS | 115 |
 | EIGRP (external) | 170 |
 | iBGP | 200 |
+
+Exception: JunOS uses preference 10 (intra/inter-area) and 150 (external) rather than 110.
 
 ## Key RFCs
 

@@ -68,6 +68,7 @@ If devices in the NSSA area have no default route and no full routing table, the
 - **Juniper JunOS**: `area <id> nssa default-lsa default-metric <metric>` under `protocols ospf`
 - **Aruba AOS-CX**: `area <id> nssa default-information-originate` under `router ospf`
 - **MikroTik RouterOS**: `default-originate=always` on the OSPF instance or area
+- **VyOS**: `set protocols ospf area <id> area-type nssa default-information-originate`
 
 ## NSSA + Totally Stubby (NSSA No-Summary)
 
