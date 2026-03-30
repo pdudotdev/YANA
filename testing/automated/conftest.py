@@ -1,4 +1,4 @@
-"""Conftest for automated tests — stubs transport, vault, netbox to prevent live connections."""
+"""Conftest for automated tests — stubs transport to prevent live connections."""
 import sys
 from pathlib import Path
 
@@ -37,7 +37,7 @@ def mock_inventory(monkeypatch):
     import transport
 
     monkeypatch.setattr(core.inventory, "devices", MOCK_DEVICES)
-    monkeypatch.setattr(core.inventory, "source", "netbox")
+    monkeypatch.setattr(core.inventory, "source", "network_json")
     monkeypatch.setattr(core.inventory, "get_device", _mock_get_device)
     monkeypatch.setattr(tools.ospf, "get_device", _mock_get_device)
     monkeypatch.setattr(tools.operational, "get_device", _mock_get_device)

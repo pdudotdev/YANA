@@ -70,11 +70,14 @@ class TracerouteInput(BaseParamsModel):
 
 
 class KBQuery(BaseParamsModel):
-    query: str = Field(..., description="Search question for the OSPF knowledge base", max_length=500)
+    query: str = Field(..., description="Search question for the network knowledge base", max_length=500)
     vendor: Literal["cisco_ios", "arista_eos", "juniper_junos", "aruba_aoscx", "mikrotik_ros"] | None = Field(
         None, description="Filter by vendor: cisco_ios | arista_eos | juniper_junos | aruba_aoscx | mikrotik_ros"
     )
     topic: Literal["rfc", "vendor_guide"] | None = Field(
         None, description="Filter by topic: rfc | vendor_guide"
+    )
+    protocol: Literal["ospf", "bgp", "eigrp"] | None = Field(
+        None, description="Filter by protocol: ospf | bgp | eigrp"
     )
     top_k: int = Field(5, description="Number of results to return (1-10)", ge=1, le=10)

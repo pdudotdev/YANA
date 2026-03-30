@@ -6,20 +6,21 @@ As the YANA document corpus grows (adding BGP, EIGRP, STP, and other protocols),
 
 This is not a latency problem. It is a **relevance quality** problem in the retrieval step that feeds the LLM context window.
 
-## Current Architecture (v1.0.0)
+## Current Architecture (v1.2)
 
 | Component | Value |
 |-----------|-------|
-| Chunks | ~75 |
-| Collection | Single `ospf_kb` (all content mixed) |
+| Chunks | ~170 |
+| Collection | `network_kb` (renamed from `ospf_kb` — generic, multi-protocol ready) |
 | Embedding model | `all-MiniLM-L6-v2` (384 dimensions) |
 | Chunk size | 800 characters, 100 overlap |
 | Splitter | `RecursiveCharacterTextSplitter` (header-aware) |
 | Similarity | Cosine distance via ChromaDB HNSW index |
-| Metadata filters | `vendor`, `topic`, `source` |
+| Metadata filters | `vendor`, `topic`, `source`, `protocol` |
+| Contextual headers | Enabled — `[Source: filename | Protocol: protocol]` prepended to each chunk |
 | Default top-k | 5 (range 1-10) |
 
-At this scale, retrieval works well. The vector space is sparse — 75 points in 384 dimensions means queries land near relevant chunks with high confidence.
+At this scale, retrieval works well. The vector space is sparse enough that queries land near relevant chunks with high confidence. The `protocol` metadata field and contextual headers are already in place to maintain precision as the corpus grows.
 
 ## Why Precision Degrades With Scale
 
@@ -39,12 +40,12 @@ Current `vendor` and `topic` filters narrow the search space, but there is no `p
 
 ### Tier 1: Low Effort, High Impact
 
-#### 1. Add a `protocol` Metadata Field
-Tag every chunk with its protocol (`ospf`, `bgp`, `eigrp`, `stp`, etc.) during ingestion. Filter on it at query time:
+#### 1. Add a `protocol` Metadata Field — Implemented (v1.2)
+Every chunk is tagged with its protocol (`ospf`, `bgp`, `eigrp`, etc.) during ingestion. Filter on it at query time:
 ```python
 where = {"$and": [{"protocol": "ospf"}, {"vendor": "cisco_ios"}]}
 ```
-The CLAUDE.md routing table (protocol -> skill file) already identifies the protocol — pass it through to the search. This is the single most effective change.
+Protocol is detected from filenames: RFCs via `_RFC_PROTOCOL_MAP`, vendor docs via the third filename segment (e.g., `vendor_cisco_ios_bgp.md` → `bgp`). This eliminates cross-protocol noise immediately.
 
 #### 2. Per-Protocol Collections
 Instead of one monolithic collection, create `ospf_kb`, `bgp_kb`, `eigrp_kb`, etc. ChromaDB supports multiple collections natively. This provides **hard isolation** — a BGP query literally cannot return OSPF chunks. Trade-off: slightly more complex ingestion and collection management, but retrieval precision is guaranteed at the collection boundary.
@@ -68,13 +69,13 @@ Higher dimensionality encodes finer-grained semantic distinctions (e.g., "OSPF n
 
 Cross-encoders see query and chunk *together*, making them far more precise than bi-encoders. Too slow for full-corpus search — hence the two-stage pipeline.
 
-#### 5. Contextual Chunk Headers
-Currently, a chunk like `"The stub flag prevents external LSAs..."` loses context about its source section. Prepend a context header during ingestion:
+#### 5. Contextual Chunk Headers — Implemented (v1.2)
+Each chunk has a context header prepended during ingestion:
 ```
-[RFC 2328 - OSPF Version 2 > Section 3.6 - Stub Areas]
+[Source: rfc2328_summary.md | Protocol: ospf]
 The stub flag prevents external LSAs...
 ```
-This gives the embedding model more signal for vector placement without changing the model itself.
+This gives the embedding model more signal for vector placement without changing the model itself. Source and protocol metadata are prepended to every chunk in `ingest.py`.
 
 #### 6. Hybrid Search (Vector + Keyword)
 Network terminology is precise (LSA Type 7, NSSA, eBGP multihop). Keyword matching can outperform semantic similarity for exact terms.
@@ -123,14 +124,14 @@ One-size-fits-all (800 chars) becomes suboptimal as document diversity grows:
 
 ## Recommended Implementation Order
 
-| Priority | Optimization | Rationale |
-|----------|-------------|-----------|
-| 1 | `protocol` metadata field | Minutes to implement, eliminates cross-protocol noise immediately |
-| 2 | Contextual chunk headers | Small ingest change, measurably improves embedding quality |
-| 3 | Per-protocol collections | Clean architectural boundary, simple to reason about |
-| 4 | Hybrid search (BM25 + vector) | Network terminology is precise; keyword matching helps |
-| 5 | Cross-encoder re-ranking | Biggest precision gain for ambiguous queries |
-| 6 | Larger embedding model | When corpus exceeds ~500 chunks |
-| 7 | Dynamic chunk sizing | When adding non-prose document types |
-| 8 | Query decomposition | When multi-hop questions become common |
-| 9 | Fine-tuned embeddings | When general-purpose models plateau on domain-specific queries |
+| Priority | Optimization | Status |
+|----------|-------------|--------|
+| 1 | `protocol` metadata field | **Implemented** (v1.2) |
+| 2 | Contextual chunk headers | **Implemented** (v1.2) |
+| 3 | Per-protocol collections | Planned — clean architectural boundary, simple to reason about |
+| 4 | Hybrid search (BM25 + vector) | Planned — network terminology is precise; keyword matching helps |
+| 5 | Cross-encoder re-ranking | Planned — biggest precision gain for ambiguous queries |
+| 6 | Larger embedding model | Planned — when corpus exceeds ~500 chunks |
+| 7 | Dynamic chunk sizing | Planned — when adding non-prose document types |
+| 8 | Query decomposition | Planned — when multi-hop questions become common |
+| 9 | Fine-tuned embeddings | Planned — when general-purpose models plateau on domain-specific queries |

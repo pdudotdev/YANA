@@ -21,12 +21,10 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import pynetbox
 from dotenv import load_dotenv
 
-from core.vault import get_secret
-
 load_dotenv()
 
-NETWORK_JSON = os.path.join(os.path.dirname(os.path.dirname(__file__)), "core", "legacy", "NETWORK.json")
-INTENT_JSON  = os.path.join(os.path.dirname(os.path.dirname(__file__)), "core", "legacy", "INTENT.json")
+NETWORK_JSON = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "NETWORK.json")
+INTENT_JSON  = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "INTENT.json")
 
 MANUFACTURER_MAP = {
     "cisco_iosxe":      "Cisco",
@@ -57,9 +55,9 @@ def log(msg: str):
 
 def main():
     url = os.getenv("NETBOX_URL", "").strip()
-    token = (get_secret("yana/netbox", "token", fallback_env="NETBOX_TOKEN") or "").strip()
+    token = os.getenv("NETBOX_TOKEN", "").strip()
     if not url or not token:
-        print("ERROR: NETBOX_URL must be set in .env; NETBOX_TOKEN must be in Vault (yana/netbox) or .env")
+        print("ERROR: NETBOX_URL and NETBOX_TOKEN must be set in .env")
         sys.exit(1)
 
     nb = pynetbox.api(url, token=token)

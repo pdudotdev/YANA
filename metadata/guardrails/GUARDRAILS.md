@@ -88,6 +88,6 @@ No MCP tool in YANA issues write commands:
 - `get_ospf` — runs read-only OSPF show commands via static platform_map
 - `get_interfaces` — runs read-only interface status commands via static platform_map
 - `get_routing` — runs read-only routing table and policy show commands via static platform_map
-- `query_intent` — reads network design intent from NetBox or local JSON (no network writes)
+- `query_intent` — reads network design intent from local JSON (no network writes)
 - `get_status` — probes data source availability (read-only health check)
 - `list_devices` — returns device inventory from memory (no network access)

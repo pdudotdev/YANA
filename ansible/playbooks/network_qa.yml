@@ -5,7 +5,7 @@
 #   ansible-playbook playbooks/network_qa.yml
 #   ansible-playbook playbooks/network_qa.yml -e scenario_filter=route_to_a2a
 #
-# Results are written to ansible/results/results_<timestamp>.json.
+# Results are written to results/results_<timestamp>.xml (JUnit XML).
 # On failures, run /qa in Claude to investigate.
 
 - name: Network QA — NETCONF health checks
@@ -15,7 +15,7 @@
 
   vars:
     scenario_filter: ""
-    results_dir: "{{ playbook_dir }}/../results"
+    results_dir: "{{ playbook_dir }}/../../results"
     test_cases_dir: "{{ playbook_dir }}/../test_cases"
 
   tasks:
@@ -50,10 +50,10 @@
         state: directory
         mode: "0755"
 
-    - name: Write results JSON
-      ansible.builtin.copy:
-        content: "{{ qa_results | to_nice_json }}"
-        dest: "{{ results_dir }}/results_{{ lookup('pipe', 'date +%Y%m%dT%H%M%S') }}.json"
+    - name: Write JUnit XML results
+      ansible.builtin.template:
+        src: "{{ playbook_dir }}/../templates/junit_results.xml.j2"
+        dest: "{{ results_dir }}/results_{{ lookup('pipe', 'date +%Y%m%dT%H%M%S') }}.xml"
         mode: "0644"
 
     - name: Print summary

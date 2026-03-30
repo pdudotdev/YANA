@@ -1,5 +1,55 @@
 # Changelog
 
+## v1.2.0 — 2026-03-30
+
+Removed Vault and NetBox, implemented RAG optimizations, standardized on JUnit XML for test results, added Makefile for setup.
+
+### Vault and NetBox Removal
+
+- **Deleted** `core/vault.py` and `core/netbox.py` — Vault and NetBox are production concerns, unnecessary for QA/lab networks.
+- **Deleted** `testing/automated/test_vault.py` and `testing/automated/test_netbox.py`.
+- **Moved** `core/legacy/NETWORK.json` → `data/NETWORK.json` and `core/legacy/INTENT.json` → `data/INTENT.json` — JSON is the primary (and only) data source, not a "legacy" fallback.
+- **Simplified `core/settings.py`** — credentials read directly from `ROUTER_USERNAME` / `ROUTER_PASSWORD` env vars.
+- **Simplified `core/inventory.py`** — JSON-only loading from `data/NETWORK.json`, no NetBox fallback.
+- **Simplified `tools/intent.py`** — JSON-only loading from `data/INTENT.json`, no NetBox fallback.
+- **Simplified `tools/status.py`** — reports 3 fields: inventory, intent, chromadb (removed vault).
+- **Simplified `transport/ssh.py`** — global credentials only (no per-vendor Vault lookup).
+- **Removed dependencies** from `requirements.txt`: `hvac`, `pynetbox`, `ncclient`, `ansible-core`.
+
+### RAG Optimizations
+
+- **Protocol metadata field** — every chunk tagged with `protocol` (ospf, bgp, eigrp, general) during ingestion. Filterable at query time via `search_knowledge_base(protocol="ospf")`. Eliminates cross-protocol noise as the corpus grows.
+- **Contextual chunk headers** — `[Source: filename | Protocol: protocol]` prepended to each chunk during ingestion, improving embedding quality and vector placement.
+- **Collection renamed** — `ospf_kb` → `network_kb` (generic, multi-protocol ready).
+- **`KBQuery` model** — added `protocol` field (`Literal["ospf", "bgp", "eigrp"] | None`).
+- See [OPTIMIZATIONS.md](metadata/scalability/OPTIMIZATIONS.md) for the full optimization roadmap.
+
+### JUnit XML for Test Results
+
+- **`results/` directory** — test results now live at project root (was `ansible/results/`). Any test framework that outputs JUnit XML is supported.
+- **Ansible JUnit template** — `ansible/templates/junit_results.xml.j2` renders qa_results as JUnit XML with `<properties>` for device, rfc_ref, description, rfc_citation.
+- **Ansible playbook updated** — `network_qa.yml` writes JUnit XML to `results/results_<timestamp>.xml`.
+- **Ansible inventory** — switched from Vault lookups to env var lookups (`ROUTER_USERNAME`, `ROUTER_PASSWORD`, `ROUTER_PASSWORD_JUNOS`). Removed `community.hashi_vault` from collection requirements.
+
+### `/qa` Skill Rewrite
+
+- Rewritten for JUnit XML parsing (was JSON). Loads `.xml` files from `results/`, parses `<testcase>` elements with `<properties>` and `<failure>` children.
+- Framework-agnostic — works with results from pytest, pyATS, Robot Framework, Ansible, or any JUnit XML producer.
+
+### Makefile
+
+- Four targets: `make install` (venv + deps), `make ingest` (rebuild ChromaDB), `make clean` (reset), `make setup` (both).
+
+### Documentation
+
+- **README.md** — complete rewrite as "Network QA Investigation Tool." Removed all Vault/NetBox references. Added Customization, QA Workflow, and Knowledge Base sections.
+- **CLAUDE.md** — reframed as investigation tool. Removed vault from status table, added protocol filter to KB search, updated tool descriptions.
+- **WORKFLOW.md** — complete rewrite. Removed Vault/NetBox references. Documents JSON-only data sources, env var credentials, protocol metadata, JUnit XML results.
+- **OPTIMIZATIONS.md** — updated current architecture table (collection name, chunk count, protocol metadata, contextual headers). Marked items 1 and 5 as implemented.
+- **`.env.example`** — new file with `ROUTER_USERNAME`, `ROUTER_PASSWORD`, `SSH_STRICT_HOST_KEY`.
+
+---
+
 ## v1.0.0 — 2026-03-24
 
 Initial release. RAG-powered OSPF knowledge base assistant for multi-vendor networks.

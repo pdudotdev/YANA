@@ -1,10 +1,8 @@
 """Backend status tool."""
-import asyncio
+import json
 import logging
 
 import core.inventory
-import core.vault
-from core.netbox import load_intent
 from tools import CHROMA_DIR as _CHROMA_DIR, INTENT_JSON as _INTENT_JSON
 
 log = logging.getLogger("yana.status")
@@ -13,7 +11,7 @@ log = logging.getLogger("yana.status")
 async def get_status() -> dict:
     """Report which backend each subsystem is using.
 
-    Probes inventory, credentials, intent, and the ChromaDB vector store
+    Probes inventory, intent, and the ChromaDB vector store
     and returns their current source/availability.
     """
     # Inventory
@@ -23,20 +21,16 @@ async def get_status() -> dict:
         "device_count": device_count,
     }
 
-    # Vault / credentials
-    # Trigger secret resolution so _sources is populated (no-op if already cached)
-    core.vault.get_secret("yana/router", "username", fallback_env="ROUTER_USERNAME", quiet=True)
-    vault_status = {"source": core.vault.get_source("yana/router")}
-
     # Intent
-    intent = await asyncio.to_thread(load_intent)
-    if intent:
-        intent_status = {
-            "source": "netbox",
-            "router_count": len(intent.get("routers", {})),
-        }
-    elif _INTENT_JSON.exists():
-        intent_status = {"source": "intent_json"}
+    if _INTENT_JSON.exists():
+        try:
+            data = json.loads(_INTENT_JSON.read_text())
+            intent_status = {
+                "source": "intent_json",
+                "router_count": len(data.get("routers", {})),
+            }
+        except Exception:
+            intent_status = {"source": "unavailable"}
     else:
         intent_status = {"source": "unavailable"}
 
@@ -46,7 +40,6 @@ async def get_status() -> dict:
 
     return {
         "inventory": inventory_status,
-        "vault": vault_status,
         "intent": intent_status,
         "chromadb": chroma_status,
     }

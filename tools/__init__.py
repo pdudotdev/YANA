@@ -2,7 +2,7 @@
 from pathlib import Path
 
 _PROJECT_ROOT = Path(__file__).resolve().parent.parent
-INTENT_JSON = _PROJECT_ROOT / "core" / "legacy" / "INTENT.json"
+INTENT_JSON = _PROJECT_ROOT / "data" / "INTENT.json"
 CHROMA_DIR = _PROJECT_ROOT / "data" / "chroma"
 
 

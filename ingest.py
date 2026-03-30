@@ -1,4 +1,4 @@
-"""Ingest OSPF knowledge base docs into ChromaDB via LangChain."""
+"""Ingest network knowledge base docs into ChromaDB via LangChain."""
 import shutil
 import sys
 from pathlib import Path
@@ -19,16 +19,28 @@ COLLECTION_NAME = _COLLECTION
 CHUNK_SIZE = 800
 CHUNK_OVERLAP = 100
 
+_RFC_PROTOCOL_MAP = {
+    "rfc2328": "ospf",
+    "rfc3101": "ospf",
+    # Future: "rfc4271": "bgp", "rfc7868": "eigrp"
+}
+
 
 def extract_metadata(file_path: Path) -> dict:
-    """Derive vendor and topic metadata from filename."""
+    """Derive vendor, topic, and protocol metadata from filename."""
     name = file_path.stem
     if name.startswith("vendor_"):
-        vendor = name[len("vendor_"):]
-        return {"vendor": vendor, "topic": "vendor_guide", "source": file_path.name}
+        parts = name[len("vendor_"):].split("_")
+        # Convention: vendor_<vendor>_<protocol>.md (e.g. vendor_cisco_ios_bgp.md)
+        # Current files: vendor_<vendor>.md (all OSPF)
+        vendor = "_".join(parts[:2]) if len(parts) >= 2 else parts[0]
+        protocol = parts[2] if len(parts) > 2 else "ospf"
+        return {"vendor": vendor, "topic": "vendor_guide", "source": file_path.name, "protocol": protocol}
     elif name.startswith("rfc"):
-        return {"vendor": "all", "topic": "rfc", "source": file_path.name}
-    return {"vendor": "all", "topic": "general", "source": file_path.name}
+        rfc_id = name.split("_")[0]
+        protocol = _RFC_PROTOCOL_MAP.get(rfc_id, "general")
+        return {"vendor": "all", "topic": "rfc", "source": file_path.name, "protocol": protocol}
+    return {"vendor": "all", "topic": "general", "source": file_path.name, "protocol": "general"}
 
 
 def ingest():
@@ -56,6 +68,13 @@ def ingest():
         for chunk in splits:
             chunk.metadata = doc.metadata.copy()
         chunks.extend(splits)
+
+    # Prepend contextual headers for better embedding quality
+    for chunk in chunks:
+        src = chunk.metadata.get("source", "unknown")
+        proto = chunk.metadata.get("protocol", "general")
+        chunk.page_content = f"[Source: {src} | Protocol: {proto}]\n{chunk.page_content}"
+
     print(f"Split into {len(chunks)} chunk(s)")
 
     embeddings = HuggingFaceEmbeddings(model_name=_EMBEDDING_MODEL)

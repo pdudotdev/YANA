@@ -1,10 +1,8 @@
 """Runtime configuration — credentials and SSH constants."""
 import os
 
-from core.vault import get_secret
-
-USERNAME = get_secret("yana/router", "username", fallback_env="ROUTER_USERNAME")
-PASSWORD = get_secret("yana/router", "password", fallback_env="ROUTER_PASSWORD")
+USERNAME = os.getenv("ROUTER_USERNAME", "")
+PASSWORD = os.getenv("ROUTER_PASSWORD", "")
 
 SSH_TIMEOUT_OPS = 30
 SSH_TIMEOUT_OPS_LONG = 90

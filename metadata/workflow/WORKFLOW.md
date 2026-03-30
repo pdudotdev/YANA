@@ -1,8 +1,6 @@
 # YANA — How It Works
 
-YANA is an MCP server that gives Claude real-time access to a multi-vendor network. It has two modes of operation: **interactive troubleshooting** (user asks questions, agent investigates) and **automated QA** (Ansible runs health checks, agent investigates failures).
-
-Both modes use the same 8 MCP tools and the same diagnostic workflow — the difference is how the investigation starts.
+YANA is framework that gives Claude real-time access to a multi-vendor network. It investigates network QA test failures and ad-hoc issues using live device queries, design intent, and protocol documentation.
 
 ---
 
@@ -12,10 +10,10 @@ YANA exposes 8 tools registered in `server/MCPServer.py`:
 
 | Tool | Purpose | Backend |
 |------|---------|---------|
-| `get_status` | Report active data sources (inventory, credentials, intent, KB) | Local checks |
-| `list_devices` | List inventory devices, optionally filtered by vendor | `core/inventory.py` |
+| `get_status` | Report active data sources (inventory, intent, KB) | Local checks |
+| `list_devices` | List inventory devices, optionally filtered by CLI style | `core/inventory.py` |
 | `search_knowledge_base` | Semantic search over RFCs and vendor docs | ChromaDB + MiniLM embeddings |
-| `query_intent` | Network design intent (roles, OSPF areas, links) | NetBox or `core/legacy/INTENT.json` |
+| `query_intent` | Network design intent (roles, OSPF areas, links) | `data/INTENT.json` |
 | `get_ospf` | Live OSPF queries (neighbors, database, borders, config, interfaces, details) | SSH via Scrapli |
 | `get_interfaces` | Live interface status | SSH via Scrapli |
 | `get_routing` | Live routing table and policy data (ip_route, route_maps, prefix_lists, PBR, ACLs) | SSH via Scrapli |
@@ -28,27 +26,29 @@ All live device tools (`get_ospf`, `get_interfaces`, `get_routing`, `traceroute`
 ```
 User query
   → Pydantic validation (VRF regex: ^[a-zA-Z0-9_-]{1,32}$)
-  → Device lookup (core/inventory.py — loaded from NetBox or NETWORK.json)
+  → Device lookup (core/inventory.py — loaded from data/NETWORK.json)
   → Command resolution (platforms/platform_map.py — 6 vendors × all query types)
   → SSH execution (transport/ssh.py — Scrapli, semaphore-limited, 1 retry)
   → Response: {device, _command, cli_style, raw}
 ```
 
-Credentials come from HashiCorp Vault (`yana/router`) with env var fallback. Six vendors are supported: Cisco IOS, Arista EOS, Juniper JunOS, Aruba AOS-CX, MikroTik RouterOS, VyOS.
+Credentials come from environment variables (`ROUTER_USERNAME`, `ROUTER_PASSWORD`). Six vendors are supported: Cisco IOS, Arista EOS, Juniper JunOS, Aruba AOS-CX, MikroTik RouterOS, VyOS.
 
 ### The Knowledge Base
 
 `search_knowledge_base` performs RAG (Retrieval-Augmented Generation):
 
-1. **Ingestion** (one-time, via `python ingest.py`): Markdown files from `docs/` are chunked, embedded with `all-MiniLM-L6-v2`, and stored in ChromaDB with metadata (vendor, topic, source).
+1. **Ingestion** (one-time, via `make ingest`): Markdown files from `docs/` are chunked, embedded with `all-MiniLM-L6-v2`, and stored in ChromaDB with metadata (vendor, topic, source, protocol). Each chunk gets a contextual header prepended (`[Source: filename | Protocol: protocol]`) for better embedding quality.
 2. **Query**: The user's question is embedded into the same vector space. ChromaDB returns the top-k most similar chunks by cosine distance.
-3. **Filters**: Optional `vendor` and `topic` filters narrow results before similarity search.
+3. **Filters**: Optional `vendor`, `topic`, and `protocol` filters narrow results before similarity search. Compound filtering is supported (e.g., `vendor=cisco_ios` + `protocol=ospf`).
 
-Device inventory and design intent are NOT in ChromaDB — they are served live by `list_devices` and `query_intent`.
+Device inventory and design intent are NOT in ChromaDB — they are served at query time by `list_devices` and `query_intent`.
+
+See [OPTIMIZATIONS.md](../scalability/OPTIMIZATIONS.md) for the full RAG optimization roadmap.
 
 ---
 
-## Mode 1: Interactive Troubleshooting
+## Interactive Investigation
 
 The user asks a question in Claude Code. The agent follows the diagnostic workflow defined in `CLAUDE.md`:
 
@@ -58,7 +58,7 @@ The user asks a question in Claude Code. The agent follows the diagnostic workfl
 get_status()
 ```
 
-Confirms which backends are active: inventory source (NetBox or JSON), credential source (Vault or env vars), intent source, and ChromaDB availability. Displayed as a table before any investigation begins.
+Confirms which backends are active: inventory (device count), intent (router count), and ChromaDB availability. Displayed as a table before any investigation begins.
 
 ### Step 1 — Load the Protocol Skill
 
@@ -73,10 +73,10 @@ The agent reads the relevant skill file before starting. Skill files contain dec
 ### Step 2 — Search the Knowledge Base
 
 ```
-search_knowledge_base(query="OSPF neighbor stuck in INIT", topic="rfc")
+search_knowledge_base(query="OSPF neighbor stuck in INIT", topic="rfc", protocol="ospf")
 ```
 
-Returns RFC text and vendor documentation relevant to the issue. The embedding model maps the question to nearby chunks even when the exact words differ.
+Returns RFC text and vendor documentation relevant to the issue. The `protocol` filter eliminates cross-protocol noise. The embedding model maps the question to nearby chunks even when the exact words differ.
 
 ### Step 3 — Query Live Devices
 
@@ -105,14 +105,14 @@ The agent combines knowledge base context with live data. When they conflict, li
 User: "Why can't E1C reach A2A's loopback?"
 
 Agent:
-  1. get_status()           → NetBox, Vault, ChromaDB all active
+  1. get_status()           → inventory, intent, ChromaDB all active
   2. Reads skills/ospf/SKILL.md
   3. get_routing("E1C", "ip_route")  → 192.168.42.1 missing from VRF1
   4. get_ospf("E1C", "database")     → No Type 3 LSA for 192.168.42.1
   5. query_intent()          → A2A should be in Area 1 (stub), connected via D1C/D2B
   6. get_ospf("D1C", "neighbors")    → D1C has no adjacency with A2A
   7. get_ospf("A2A", "interfaces")   → A2A's Area 1 is "normal", not stub
-  8. search_knowledge_base("E-bit mismatch stub area", topic="rfc")
+  8. search_knowledge_base("E-bit mismatch stub area", topic="rfc", protocol="ospf")
 
   Report: A2A is missing `area 1 stub`. RFC 2328 §10.5: E-bit mismatch
           causes Hellos to be silently discarded. Fix: add stub config to A2A.
@@ -120,85 +120,42 @@ Agent:
 
 ---
 
-## Mode 2: Automated QA
+## QA Investigation
 
-Health checks run via Ansible playbooks over NETCONF. When a check fails, the `/qa` skill triggers the same diagnostic workflow.
+Run your tests with any framework. When something fails, YANA investigates.
 
-### How the Tests Run
+### Test Results
 
-```
-cd ansible && ansible-playbook playbooks/network_qa.yml
-```
+YANA reads JUnit XML results from `results/`. JUnit XML is the de facto standard — produced by pytest (`--junitxml`), pyATS (`--xunit`), Robot Framework (`--xunit`), Ansible (junit callback), and most other test runners.
 
-**Pipeline:**
-
-```
-network_qa.yml (entry point)
-  → Discovers test cases in ansible/test_cases/*.yml
-  → Loops through each, calling _run_check.yml
-      → NETCONF GET to the target device (ietf-routing YANG model)
-      → Custom Jinja2 filter asserts the expected condition (e.g. route_exists)
-      → Records pass/fail with RFC reference and raw output
-  → Writes results to ansible/results/results_<timestamp>.json
-  → Prints summary: N passed, M failed
-```
-
-**Test case format** (example: `test_cases/route_to_a2a.yml`):
-
-```yaml
-scenario: route_to_a2a
-description: "Verify E1C has route to A2A loopback 192.168.42.1 in VRF1"
-rfc_ref: RFC 2328 §16
-device: E1C
-vrf: VRF1
-assert_route_exists: "192.168.42.1"
-```
-
-Each test case defines: which device to query, which VRF, and what to assert. The NETCONF connection uses `ietf-routing` YANG for routing table reads. Credentials come from HashiCorp Vault via the `community.hashi_vault` Ansible collection.
+Place your test results in `results/` as `.xml` files. YANA doesn't care how the tests were run — it only needs the results.
 
 ### Investigating Failures — `/qa`
 
-When tests fail, the user runs `/qa` in Claude Code. The skill (`/.claude/skills/qa/SKILL.md`) drives a structured investigation:
+When tests fail, the user runs `/qa` in Claude Code. The skill (`.claude/skills/qa/SKILL.md`) drives a structured investigation:
 
 ```
 /qa
-  1. Load latest results JSON from ansible/results/
-  2. Triage: separate passes from failures
-  3. Present numbered failure list to the user
-  4. User picks a failure to investigate
-  5. Agent reads the test case YAML to understand what was checked
-  6. Agent runs the same diagnostic workflow as Mode 1:
+  1. Load the most recently modified .xml file from results/
+  2. Parse JUnit XML — each <testcase> is one test, <failure> marks failures
+  3. Triage: count passes and failures
+  4. Present numbered failure list to the user
+  5. User picks a failure to investigate
+  6. Agent reads test context from <properties> (device, rfc_ref, description)
+  7. Agent runs the same diagnostic workflow as interactive mode:
      - query_intent() → expected state
      - get_ospf/get_routing/get_interfaces → live state
      - Follows skill decision trees to trace the root cause
      - search_knowledge_base → RFC context
-  7. Reports findings (scenario, observed, current state, root cause, RFC basis)
-  8. Re-presents remaining failures — user picks next, or stops
+  8. Reports findings (scenario, observed, current state, root cause, RFC basis)
+  9. Re-presents remaining failures — user picks next, or stops
 ```
 
 If multiple failures share a root cause, the agent says so after investigating the first one — the user can skip the rest.
 
-### Example
+### Ansible Demo
 
-```
-User: /qa
-
-Agent:
-  Network QA — 0 passed, 1 failed
-
-  Failures:
-    1. route_to_a2a   RFC 2328 §16   Verify E1C has route to A2A loopback
-
-  Which failure would you like to investigate?
-
-User: 1
-
-Agent: [runs full investigation — same tools, same skills, same report format as Mode 1]
-
-  Root cause: A2A is missing area 1 stub configuration.
-  RFC 2328 §10.5: E-bit mismatch causes Hello packets to be discarded.
-  Recovery: network is still broken — A2A remains isolated.
-```
+A reference Ansible QA implementation is included in `ansible/`. It runs NETCONF health checks and produces JUnit XML results. This is just one example — any test framework that outputs JUnit XML works.
 
 ---
 
@@ -208,8 +165,8 @@ Agent: [runs full investigation — same tools, same skills, same report format 
                     ┌─────────────────────────────────────────┐
                     │            Claude Code (UI)              │
                     │                                         │
-                    │   Mode 1: User asks a question          │
-                    │   Mode 2: User runs /qa after tests     │
+                    │   Interactive: User asks a question     │
+                    │   QA: User runs /qa after tests         │
                     └──────────────┬──────────────────────────┘
                                    │ MCP protocol
                     ┌──────────────▼──────────────────────────┐
@@ -227,14 +184,14 @@ Agent: [runs full investigation — same tools, same skills, same report format 
               │ traceroute │ │       │ │      │ │           │
               └─────┬──────┘ └───┬───┘ └──┬───┘ └───────────┘
                     │            │        │
-         ┌──────────▼──┐  ┌─────▼───┐ ┌──▼──────┐
-         │  Scrapli SSH │  │ChromaDB │ │ NetBox  │
-         │  6 vendors   │  │ + MiniLM│ │ or JSON │
-         │  Vault creds │  │         │ │         │
-         └──────────────┘  └─────────┘ └─────────┘
+         ┌──────────▼──┐  ┌─────▼───┐ ┌──▼──────────┐
+         │  Scrapli SSH │  │ChromaDB │ │ JSON files  │
+         │  6 vendors   │  │ + MiniLM│ │ data/*.json │
+         │  env creds   │  │         │ │             │
+         └──────────────┘  └─────────┘ └─────────────┘
 
-  Ansible QA (separate process, not MCP):
-    ansible-playbook network_qa.yml
-      → NETCONF GET via ncclient (ietf-routing YANG)
-      → Results JSON → consumed by /qa skill in Claude
+  Test runners (separate process, not MCP):
+    pytest, pyATS, Ansible, Robot Framework, etc.
+      → JUnit XML results in results/
+      → Consumed by /qa skill in Claude
 ```

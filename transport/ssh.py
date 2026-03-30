@@ -11,7 +11,6 @@ from scrapli.transport import Ssh2Options as TransportSsh2Options
 from core.settings import (
     PASSWORD, SSH_RETRIES, SSH_RETRY_DELAY, SSH_STRICT_HOST_KEY, SSH_TIMEOUT_OPS, USERNAME,
 )
-from core.vault import get_secret
 
 log = logging.getLogger("yana.transport.ssh")
 
@@ -27,15 +26,11 @@ def _build_cli(device: dict, timeout_ops: int | None = None) -> Cli:
     definition = _CUSTOM_DEFINITIONS.get(platform, platform)
     op_timeout = timeout_ops or SSH_TIMEOUT_OPS
 
-    cli_style = device.get("cli_style", "")
-    username = get_secret(f"yana/router{cli_style}", "username", quiet=True) or USERNAME
-    password = get_secret(f"yana/router{cli_style}", "password", quiet=True) or PASSWORD
-
     if platform == "mikrotik_routeros":
-        auth = AuthOptions(username=f"{username}+ct", password=password)
+        auth = AuthOptions(username=f"{USERNAME}+ct", password=PASSWORD)
         session = SessionOptions(operation_timeout_s=op_timeout, return_char="\r\n")
     else:
-        auth = AuthOptions(username=username, password=password)
+        auth = AuthOptions(username=USERNAME, password=PASSWORD)
         session = SessionOptions(operation_timeout_s=op_timeout)
 
     _known_hosts = os.path.expanduser("~/.ssh/known_hosts") if SSH_STRICT_HOST_KEY else None

@@ -8,4 +8,4 @@ yana/
 .ruff_cache/
 ansible_test_cases/
 ansible/collections/ansible_collections/
-ansible/results/
+results/

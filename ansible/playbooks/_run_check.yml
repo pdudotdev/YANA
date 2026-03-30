@@ -99,6 +99,7 @@
             qa_results + [{
               'scenario': scenario.scenario,
               'passed': _assertion_passed | bool,
+              'device': scenario.device,
               'rfc_ref': scenario.rfc_ref,
               'rfc_citation': scenario.rfc_citation,
               'description': scenario.description,

@@ -41,6 +41,7 @@ class TestSearchReturnsResults:
             assert "source" in r["metadata"]
             assert "vendor" in r["metadata"]
             assert "topic" in r["metadata"]
+            assert "protocol" in r["metadata"]
 
 
 class TestFiltering:
@@ -56,6 +57,12 @@ class TestFiltering:
         for r in result["results"]:
             assert r["metadata"]["topic"] == "rfc"
 
+    async def test_protocol_filter(self, run):
+        result = await run("neighbor adjacency", protocol="ospf")
+        assert len(result["results"]) > 0
+        for r in result["results"]:
+            assert r["metadata"]["protocol"] == "ospf"
+
     async def test_compound_filter(self, run):
         """Both vendor + topic should work without ChromaDB $and error."""
         result = await run("OSPF configuration", vendor="cisco_ios", topic="vendor_guide")
@@ -63,6 +70,15 @@ class TestFiltering:
         for r in result["results"]:
             assert r["metadata"]["vendor"] == "cisco_ios"
             assert r["metadata"]["topic"] == "vendor_guide"
+
+    async def test_triple_compound_filter(self, run):
+        """Vendor + topic + protocol should work with $and."""
+        result = await run("OSPF configuration", vendor="cisco_ios", topic="vendor_guide", protocol="ospf")
+        assert len(result["results"]) > 0
+        for r in result["results"]:
+            assert r["metadata"]["vendor"] == "cisco_ios"
+            assert r["metadata"]["topic"] == "vendor_guide"
+            assert r["metadata"]["protocol"] == "ospf"
 
 
 class TestSearchErrorPath:
@@ -81,4 +97,3 @@ class TestTopK:
     async def test_top_k_limits_results(self, run):
         result = await run("OSPF", top_k=2)
         assert len(result["results"]) == 2
-

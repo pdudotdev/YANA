@@ -1,4 +1,4 @@
-"""RAG tool: search the OSPF knowledge base."""
+"""RAG tool: search the network knowledge base."""
 import asyncio
 import logging
 
@@ -6,7 +6,7 @@ from input_models.models import KBQuery
 from tools import CHROMA_DIR
 
 _CHROMA_DIR = str(CHROMA_DIR)
-_COLLECTION = "ospf_kb"
+_COLLECTION = "network_kb"
 _EMBEDDING_MODEL = "all-MiniLM-L6-v2"
 
 log = logging.getLogger("yana.rag")
@@ -32,18 +32,21 @@ def _get_vectorstore():
 
 
 async def search_knowledge_base(params: KBQuery) -> dict:
-    """Search the OSPF knowledge base for relevant documentation.
+    """Search the network knowledge base for relevant documentation.
 
     Returns ranked document chunks matching the query. Use the optional
-    vendor and topic filters to narrow results:
+    filters to narrow results:
     - vendor: cisco_ios, arista_eos, juniper_junos, aruba_aoscx, mikrotik_ros
     - topic: rfc, vendor_guide
+    - protocol: ospf, bgp, eigrp
     """
     where = {}
     if params.vendor:
         where["vendor"] = params.vendor
     if params.topic:
         where["topic"] = params.topic
+    if params.protocol:
+        where["protocol"] = params.protocol
 
     # ChromaDB requires $and for compound filters
     if len(where) > 1:

@@ -33,8 +33,7 @@ def _failing_cm(exc):
 
 class TestBuildCli:
     def test_mikrotik_username_gets_ct_suffix(self):
-        with patch("transport.ssh.get_secret", return_value=None), \
-             patch("transport.ssh.USERNAME", "admin"), \
+        with patch("transport.ssh.USERNAME", "admin"), \
              patch("transport.ssh.PASSWORD", "pass"), \
              patch("transport.ssh.Cli") as mock_cli, \
              patch("transport.ssh.BinOptions"):
@@ -43,44 +42,26 @@ class TestBuildCli:
         assert auth.username == "admin+ct"
 
     def test_mikrotik_session_return_char(self):
-        with patch("transport.ssh.get_secret", return_value=None), \
-             patch("transport.ssh.Cli") as mock_cli, \
+        with patch("transport.ssh.Cli") as mock_cli, \
              patch("transport.ssh.BinOptions"):
             _build_cli(MIKROTIK_DEVICE)
         session = mock_cli.call_args.kwargs["session_options"]
         assert session.return_char == "\r\n"
 
     def test_standard_device_uses_binoptions(self):
-        with patch("transport.ssh.get_secret", return_value=None), \
-             patch("transport.ssh.BinOptions") as mock_bin, \
+        with patch("transport.ssh.BinOptions") as mock_bin, \
              patch("transport.ssh.Cli"):
             _build_cli(IOS_DEVICE)
         mock_bin.assert_called_once()
 
     def test_vyos_uses_ssh2options(self):
-        with patch("transport.ssh.get_secret", return_value=None), \
-             patch("transport.ssh.TransportSsh2Options") as mock_ssh2, \
+        with patch("transport.ssh.TransportSsh2Options") as mock_ssh2, \
              patch("transport.ssh.Cli"):
             _build_cli(VYOS_DEVICE)
         mock_ssh2.assert_called_once()
 
-    def test_vault_password_used_when_available(self):
-        def mock_get_secret(path, key, quiet=False):
-            return "vault_pass" if key == "password" else None
-
-        with patch("transport.ssh.get_secret", side_effect=mock_get_secret), \
-             patch("transport.ssh.USERNAME", "global_user"), \
-             patch("transport.ssh.PASSWORD", "global_pass"), \
-             patch("transport.ssh.BinOptions"), \
-             patch("transport.ssh.Cli") as mock_cli:
-            _build_cli(IOS_DEVICE)
-        auth = mock_cli.call_args.kwargs["auth_options"]
-        assert auth.password == "vault_pass"
-        assert auth.username == "global_user"  # Vault returned None for username → fallback
-
-    def test_global_credentials_used_when_vault_returns_none(self):
-        with patch("transport.ssh.get_secret", return_value=None), \
-             patch("transport.ssh.USERNAME", "global_user"), \
+    def test_global_credentials_used(self):
+        with patch("transport.ssh.USERNAME", "global_user"), \
              patch("transport.ssh.PASSWORD", "global_pass"), \
              patch("transport.ssh.BinOptions"), \
              patch("transport.ssh.Cli") as mock_cli:
