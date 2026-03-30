@@ -7,43 +7,24 @@
 | | |
 |---|---|
 | **Platforms** | ![Cisco IOS](https://img.shields.io/badge/Cisco_IOS-0d47a1) ![Cisco IOS-XE](https://img.shields.io/badge/Cisco_IOS--XE-0d47a1) ![Arista EOS](https://img.shields.io/badge/Arista_EOS-0d47a1) ![Juniper JunOS](https://img.shields.io/badge/Juniper_JunOS-0d47a1) ![Aruba AOS](https://img.shields.io/badge/Aruba_AOS-0d47a1) ![Vyatta VyOS](https://img.shields.io/badge/Vyatta_VyOS-0d47a1) ![MikroTik RouterOS](https://img.shields.io/badge/MikroTik_RouterOS-0d47a1) ![FRR](https://img.shields.io/badge/FRR-0d47a1) |
-| **Transport** | ![SSH](https://img.shields.io/badge/SSH%20CLI-1565c0) ![Scrapli](https://img.shields.io/badge/Scrapli-1565c0) |
-| **Integrations** | ![MCP](https://img.shields.io/badge/MCP-1e88e5) ![ChromaDB](https://img.shields.io/badge/ChromaDB-1e88e5) ![JUnit XML](https://img.shields.io/badge/JUnit_XML-1e88e5) ![CI/CD](https://img.shields.io/badge/CI/CD-1e88e5) |
-
-## Table of Contents
-
-- [Overview](#overview)
-- [What's New](#whats-new)
-- [Tech Stack](#tech-stack)
-- [Scope](#scope)
-- [Installation](#installation)
-- [MCP Tools](#mcp-tools)
-- [Customization](#customization)
-- [QA Workflow](#qa-workflow)
-- [Knowledge Base](#knowledge-base)
-- [Project Structure](#project-structure)
-- [Test Network Topology](#test-network-topology)
-- [Planned Upgrades](#planned-upgrades)
-- [Disclaimer](#disclaimer)
-- [License](#license)
-- [Collaborations](#collaborations)
+| **Transport** | ![SSH](https://img.shields.io/badge/SSH%20CLI-1565c0) ![Scrapli](https://img.shields.io/badge/Scrapli-1565c0) ![NETCONF](https://img.shields.io/badge/NETCONF-1a1a2e) |
+| **Integrations** | ![MCP](https://img.shields.io/badge/MCP-1e88e5) ![ChromaDB](https://img.shields.io/badge/ChromaDB-1e88e5) ![JUnit XML](https://img.shields.io/badge/JUnit_XML-1e88e5) |
 
 ## Overview
 
 RAG-powered network QA investigation tool for multi-vendor networks.
 
-Run your tests with any framework. When something fails, YANA investigates -- it queries live devices, searches protocol specs, follows diagnostic decision trees, and tells you why it failed and what to fix.
+Run your tests with any framework. When something fails, YANA investigates - it queries live devices, searches protocol specs, follows diagnostic decision trees, and tells you why it failed and what to fix.
 
 **Supported models:**
 - Haiku 4.5, Sonnet 4.6, Opus 4.6 (default, best reasoning)
 
 **Documentation:**
-- [WORKFLOW.md](metadata/workflow/WORKFLOW.md) -- operational flow
-- [GUARDRAILS.md](metadata/guardrails/GUARDRAILS.md) -- security controls
+- [**WORKFLOW.md**](metadata/workflow/WORKFLOW.md) - operational flow
+- [**GUARDRAILS.md**](metadata/guardrails/GUARDRAILS.md) - security controls
 
-## What's New
-
-See [CHANGELOG.md](CHANGELOG.md)
+**What's new:**
+- [**CHANGELOG.md**](CHANGELOG.md)
 
 ## Tech Stack
 
@@ -55,41 +36,40 @@ See [CHANGELOG.md](CHANGELOG.md)
 | LangChain | RAG pipeline (chunking, embedding, retrieval) |
 | ChromaDB | Vector database for knowledge base |
 | Scrapli | Multi-vendor SSH transport |
-| JUnit XML | Test results interchange format |
+| JUnit XML | Test results format |
 
 ## Scope
 
 | Protocol | What's Checked |
 |----------|---------------|
 | **OSPF** | Adjacencies, area and area types, config, LSDB |
-| **Routing** | Table, route maps, prefix lists, PBR, ACLs |
+| **Routing** | Table, route maps, prefix lists, PBR, ACLs, ECMP |
 | **Interfaces** | Up/down state, expected operational status |
 
 ## Installation
 
 **Prerequisites:** Python 3.11+
 
-**Step 1 -- Install and ingest:**
+**Step 1 - Install and ingest:**
 ```bash
-git clone https://github.com/pdudotdev/YANA
-cd YANA
-make setup
+cd ~ && git clone https://github.com/pdudotdev/YANA
+cd YANA && make setup
 ```
 
-**Step 2 -- Configure credentials:**
+**Step 2 - Configure credentials:**
 ```bash
 cp .env.example .env
-# Edit .env with your router credentials
+# Edit .env with your device credentials
 ```
 
-**Step 3 -- Authenticate with Claude:**
+**Step 3 - Authenticate with Claude:**
 ```bash
 claude auth login
 ```
 
-**Step 4 -- Register the MCP server:**
+**Step 4 - Register the MCP server:**
 ```bash
-claude mcp add yana -s user -- /path/to/yana/bin/python /path/to/YANA/server/MCPServer.py
+claude mcp add yana -s user -- /home/<user>/YANA/yana/bin/python /home/<user>/YANA/server/MCPServer.py
 ```
 
 ## MCP Tools
@@ -112,14 +92,14 @@ YANA is designed to work with your own test topology. Bring your own:
 | What | Where | Format |
 |------|-------|--------|
 | **Device inventory** | `data/NETWORK.json` | JSON dict: device name -> host, platform, cli_style |
-| **Design intent** | `data/INTENT.json` | JSON: router roles, OSPF areas, links, BGP neighbors |
-| **Protocol docs** | `docs/*.md` | Markdown files (re-ingest with `make ingest`) |
+| **Design intent** | `data/INTENT.json` | JSON: router roles, OSPF areas, links, neighbors |
+| **Protocol docs** | `docs/*.md` | Protocol data (re-ingest with `make ingest`) |
 | **Test results** | `results/*.xml` | JUnit XML from any test runner |
 | **Credentials** | `.env` | `ROUTER_USERNAME` and `ROUTER_PASSWORD` |
 
 ## QA Workflow
 
-1. **Run your tests** with any framework (pytest, pyATS, Robot Framework, Ansible, etc.)
+1. **Run your tests** with any framework (pytest, pyATS, Ansible, etc.)
 2. **Place JUnit XML results** in `results/`
 3. **Investigate failures** with the `/qa` skill:
 
@@ -128,7 +108,7 @@ claude
 > /qa
 ```
 
-The `/qa` skill loads the latest JUnit XML, lists failures, and investigates each one using live device queries, design intent, and RFC context.
+The `/qa` skill loads the latest JUnit XML, lists all failures, and investigates each one using live device queries, network intent, and RFC context.
 
 **Ansible demo:** A reference Ansible QA implementation is included in `ansible/`. It runs NETCONF health checks and produces JUnit XML results. To use it:
 ```bash
@@ -147,11 +127,11 @@ make ingest
 ```
 
 **RAG optimizations in place:**
-- `protocol` metadata field -- filters search by protocol (ospf, bgp, eigrp), eliminating cross-protocol noise
-- Contextual chunk headers -- source and protocol prepended to each chunk for better embedding quality
-- Compound filtering -- combine vendor, topic, and protocol filters in a single query
+- `protocol` metadata field - filters search by protocol (ospf, bgp, eigrp), eliminating cross-protocol noise
+- Contextual chunk headers - source and protocol prepended to each chunk for better embedding quality
+- Compound filtering - combine vendor, topic, and protocol filters in a single query
 
-See [OPTIMIZATIONS.md](metadata/scalability/OPTIMIZATIONS.md) for the full optimization roadmap.
+See [**OPTIMIZATIONS.md**](metadata/scalability/OPTIMIZATIONS.md) for the full optimization roadmap.
 
 ## Project Structure
 
@@ -219,9 +199,9 @@ YANA/
 ![topology](metadata/topology/DBL-TOPOLOGY.png)
 
 **Lab environment:**
-- 16 devices defined in [TOPOLOGY.yml](TOPOLOGY.yml)
+- 16 devices defined in [**TOPOLOGY.yml**](TOPOLOGY.yml)
 - 5 x Cisco IOS, 3 x Cisco IOS-XE, 4 x Arista cEOS, 2 x MikroTik CHR, 1 x Juniper JunOS, 1 x Aruba AOS-CX
-- OSPF multi-area, EIGRP, BGP
+- See [**lab_configs**](lab_configs/) for my test network's configuration
 
 ## Planned Upgrades
 
@@ -233,10 +213,10 @@ You are responsible for defining your own network inventory and design intent, b
 
 ## License
 
-Licensed under the [GNU General Public License v3.0](LICENSE).
+Licensed under [**GNUv3.0**](LICENSE).
 
 ## Collaborations
 
 Interested in collaborating?
-- **Email:** [hello@ainoc.dev](mailto:hello@ainoc.dev)
-- **LinkedIn:** [LinkedIn](https://www.linkedin.com/in/tmihaicatalin/)
+- **Email:** [**hello@ainoc.dev**](mailto:hello@ainoc.dev)
+- **LinkedIn:** [**LinkedIn**](https://www.linkedin.com/in/tmihaicatalin/)
