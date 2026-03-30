@@ -124,7 +124,7 @@ PLATFORM_MAP = {
         },
         "tools": {
             # count=1 limits to one probe per hop so the command terminates (default is continuous)
-            "traceroute": "/tool/traceroute count=1",
+            "traceroute": {"default": "/tool/traceroute count=1", "vrf": "/tool/traceroute count=1 routing-table={vrf}"},
         },
     },
 

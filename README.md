@@ -1,4 +1,4 @@
-# YANA - Yet Another Network Agent
+# YANA • Yet Another Network Agent
 
 [![Version](https://img.shields.io/badge/version-1.2-1a1a2e)](https://github.com/pdudotdev/YANA/releases/tag/v1.2.0)
 ![License](https://img.shields.io/badge/license-GPLv3-1a1a2e)
@@ -52,7 +52,7 @@ Run your tests with any framework. When something fails, YANA investigates - it 
 
 **Step 1 - Install and ingest:**
 ```bash
-sudo apt install git make python3.12-venv
+sudo apt install git make python3.12-venv -y
 cd ~ && git clone https://github.com/pdudotdev/YANA
 cd YANA && make setup
 ```

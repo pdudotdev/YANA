@@ -60,7 +60,9 @@ async def traceroute(params: TracerouteInput) -> dict:
         command = f"{base_cmd} {params.destination}"
         if params.source:
             command += f" source {params.source}"
-        if cli_style == "ios":
+        if cli_style in ("ios", "eos", "vyos"):
             command += " probe 1 timeout 2"
+        elif cli_style == "junos":
+            command += " wait 1"
 
     return await execute_command(params.device, command, timeout_ops=SSH_TIMEOUT_OPS_LONG)

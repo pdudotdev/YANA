@@ -8,14 +8,15 @@ import pytest
 from pydantic import ValidationError
 
 from input_models.models import (
-    DeviceListQuery, IntentQuery, InterfacesQuery, KBQuery,
-    OspfQuery, TracerouteInput,
+    DeviceListQuery, IntentQuery, KBQuery,
+    OspfQuery, RoutingQuery, TracerouteInput,
 )
-from platforms.platform_map import PLATFORM_MAP, _apply_vrf, get_action
+from platforms.platform_map import PLATFORM_MAP, _apply_vrf
 from tools.intent import query_intent
 from tools.inventory_tool import list_devices
 from tools.operational import traceroute
 from tools.ospf import get_ospf
+from tools.routing import get_routing
 from tools.status import get_status
 from transport.ssh import _build_cli, execute_ssh
 
@@ -177,6 +178,15 @@ async def test_traceroute_source_appended():
     assert "source 192.168.1.1" in result["_command"]
 
 
+async def test_routing_full_stack_ios():
+    with patch("transport.execute_ssh", new_callable=AsyncMock) as mock_ssh:
+        mock_ssh.return_value = "O    10.0.0.0/24 [110/20] via 10.0.0.1"
+        result = await get_routing(RoutingQuery(device="R1", query="ip_route"))
+    assert result["device"] == "R1"
+    assert result["cli_style"] == "ios"
+    assert result["_command"] == "show ip route vrf VRF1"
+
+
 # ── Inventory & device listing ───────────────────────────────────────────────
 
 def test_device_lookup_returns_dict(monkeypatch):
@@ -201,6 +211,10 @@ async def test_status_structure():
         mi.exists.return_value = False
         result = await get_status()
     assert set(result.keys()) == {"inventory", "intent", "chromadb"}
+    assert result["inventory"]["device_count"] == 6
+    assert result["inventory"]["source"] == "network_json"
+    assert result["intent"]["source"] == "unavailable"
+    assert result["chromadb"]["available"] is False
 
 
 async def test_intent_single_device_filter(tmp_path):
@@ -238,7 +252,22 @@ async def test_kb_basic_query():
 
 # ── Adversarial input ────────────────────────────────────────────────────────
 
-@pytest.mark.parametrize("bad_device", ["; rm -rf /", "' OR 1=1 --", "a" * 1000, ""])
-async def test_adversarial_device_name(bad_device):
-    result = await get_ospf(OspfQuery(device=bad_device, query="neighbors"))
-    assert "error" in result
+_BAD_DEVICES = [
+    "; rm -rf /", "' OR 1=1 --", "a" * 65, "",
+    "R1 extra", "R1\nshow run", "R1;cmd", "$(reboot)",
+    "R1\x00cmd", "R1&& cat /etc/shadow",
+]
+
+_VALID_DEVICES = ["R1", "my_device", "core-rtr_01", "A" * 64]
+
+
+@pytest.mark.parametrize("bad_device", _BAD_DEVICES)
+def test_adversarial_device_name_blocked(bad_device):
+    with pytest.raises(ValidationError):
+        OspfQuery(device=bad_device, query="neighbors")
+
+
+@pytest.mark.parametrize("good_device", _VALID_DEVICES)
+def test_valid_device_names_accepted(good_device):
+    q = OspfQuery(device=good_device, query="neighbors")
+    assert q.device == good_device

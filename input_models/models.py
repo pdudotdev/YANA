@@ -1,4 +1,5 @@
 """Pydantic input models for MCP tools."""
+import ipaddress
 import json
 import re
 from typing import Literal, Optional
@@ -6,10 +7,11 @@ from typing import Literal, Optional
 from pydantic import BaseModel, Field, field_validator, model_validator
 
 _VRF_RE = re.compile(r'^[a-zA-Z0-9_-]{1,32}$')
+_DEVICE_RE = re.compile(r'^[A-Za-z0-9_-]{1,64}$')
 
 
 class BaseParamsModel(BaseModel):
-    """Base class with JSON string parsing and VRF validation."""
+    """Base class with JSON string parsing, device and VRF validation."""
 
     @model_validator(mode='before')
     @classmethod
@@ -20,6 +22,15 @@ class BaseParamsModel(BaseModel):
                 return obj
             except (json.JSONDecodeError, ValueError) as e:
                 raise ValueError(f"Could not parse params as JSON: {v!r}") from e
+        return v
+
+    @field_validator('device', mode='before', check_fields=False)
+    @classmethod
+    def _validate_device(cls, v):
+        if v is None:
+            return v
+        if not _DEVICE_RE.match(str(v)):
+            raise ValueError(f"device must be alphanumeric with underscores/dashes, max 64 chars. Got: {v!r}")
         return v
 
     @field_validator('vrf', mode='before', check_fields=False)
@@ -64,9 +75,20 @@ class IntentQuery(BaseParamsModel):
 
 class TracerouteInput(BaseParamsModel):
     device: str = Field(..., description="Device name from inventory")
-    destination: str = Field(..., description="Destination IP address")
-    source: Optional[str] = Field(None, description="Source IP address (forces traceroute to use this interface)")
+    destination: str = Field(..., description="Destination IP address", max_length=45)
+    source: Optional[str] = Field(None, description="Source IP address (forces traceroute to use this interface)", max_length=45)
     vrf: str | None = Field(None, description="Optional VRF name")
+
+    @field_validator('destination', 'source', mode='before')
+    @classmethod
+    def _validate_ip(cls, v):
+        if v is None:
+            return v
+        try:
+            ipaddress.ip_address(str(v).strip())
+        except ValueError:
+            raise ValueError(f"Invalid IP address: {v!r}")
+        return str(v).strip()
 
 
 class KBQuery(BaseParamsModel):

@@ -1,6 +1,7 @@
 """RAG tool: search the network knowledge base."""
 import asyncio
 import logging
+import threading
 
 from input_models.models import KBQuery
 from tools import CHROMA_DIR
@@ -15,19 +16,22 @@ log = logging.getLogger("yana.rag")
 # the device tools (get_ospf, get_interfaces) from loading.
 _embeddings = None
 _vectorstore = None
+_init_lock = threading.Lock()
 
 
 def _get_vectorstore():
     global _embeddings, _vectorstore
     if _vectorstore is None:
-        from langchain_huggingface import HuggingFaceEmbeddings
-        from langchain_chroma import Chroma
-        _embeddings = HuggingFaceEmbeddings(model_name=_EMBEDDING_MODEL)
-        _vectorstore = Chroma(
-            persist_directory=_CHROMA_DIR,
-            embedding_function=_embeddings,
-            collection_name=_COLLECTION,
-        )
+        with _init_lock:
+            if _vectorstore is None:
+                from langchain_huggingface import HuggingFaceEmbeddings
+                from langchain_chroma import Chroma
+                _embeddings = HuggingFaceEmbeddings(model_name=_EMBEDDING_MODEL)
+                _vectorstore = Chroma(
+                    persist_directory=_CHROMA_DIR,
+                    embedding_function=_embeddings,
+                    collection_name=_COLLECTION,
+                )
     return _vectorstore
 
 
