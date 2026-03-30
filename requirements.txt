@@ -2,9 +2,10 @@
 fastmcp>=3.0,<4.0
 
 # RAG pipeline
-langchain>=0.3,<0.4
-langchain-community>=0.3,<0.4
-chromadb>=0.6,<1.0
+langchain-core>=1.0,<2.0
+langchain-huggingface>=1.0,<2.0
+langchain-chroma>=1.0,<2.0
+langchain-text-splitters>=0.3,<1.0
 sentence-transformers>=3.0,<4.0
 
 # Environment

@@ -1,5 +1,5 @@
 # Platform Coverage Results
-*Generated: 2026-03-28 19:03:34 UTC*
+*Generated: 2026-03-30 09:19:59 UTC*
 
 ## Summary
 
@@ -7,10 +7,10 @@
 |--------|----------|-----------|-------|--------|-------|--------|
 | D1C | cisco_iosxe | ios | 13 | 11 | 2 | 0 |
 | A2A | arista_eos | eos | 13 | 10 | 3 | 0 |
-| C1J | juniper_junos | junos | 13 | 11 | 2 | 0 |
+| C1J | juniper_junos | junos | 13 | 9 | 4 | 0 |
 | D2B | aruba_aoscx | aos | 13 | 11 | 2 | 0 |
 | A1M | mikrotik_routeros | routeros | 13 | 13 | 0 | 0 |
-| **Total** | | | **65** | **56** | **9** | **0** |
+| **Total** | | | **65** | **54** | **11** | **0** |
 
 ## Detailed Results
 
@@ -21,12 +21,12 @@ Command: `show ip ospf neighbor`
 ```
 Neighbor ID     Pri   State           Dead Time   Address         Interface
 22.22.22.22       1   FULL/BDR        00:00:31    10.0.0.10       Ethernet1/2
-22.22.22.11     128   FULL/BDR        00:00:39    10.0.0.6        Ethernet1/3
-11.11.11.22       1   FULL/BDR        00:00:35    10.0.0.2        Ethernet1/1
+22.22.22.11     128   FULL/BDR        00:00:34    10.0.0.6        Ethernet1/3
+11.11.11.22       1   FULL/BDR        00:00:36    10.0.0.2        Ethernet1/1
 4.4.4.4         128   FULL/BDR        00:00:33    10.1.1.25       Ethernet1/0
-3.3.3.3           1   FULL/BDR        00:00:31    10.1.1.17       Ethernet0/3
-2.2.2.2           1   FULL/BDR        00:00:30    10.1.1.9        Ethernet0/2
-1.1.1.1         128   FULL/BDR        00:00:33    10.1.1.1        Ethernet0/1
+3.3.3.3           1   FULL/BDR        00:00:32    10.1.1.17       Ethernet0/3
+2.2.2.2           1   FULL/BDR        00:00:37    10.1.1.9        Ethernet0/2
+1.1.1.1         128   FULL/BDR        00:00:34    10.1.1.1        Ethernet0/1
 ```
 
 #### 2. ospf — database — PASS
@@ -37,101 +37,101 @@ Command: `show ip ospf database`
 		Router Link States (Area 0)
 
 Link ID         ADV Router      Age         Seq#       Checksum Link count
-9.9.9.9         9.9.9.9         1166        0x8000001C 0x009D88 2         
-11.11.11.11     11.11.11.11     1019        0x80000022 0x00A47C 3         
-11.11.11.22     11.11.11.22     480         0x8000001F 0x000CF2 3         
-22.22.22.11     22.22.22.11     2276        0x80000016 0x0027F7 5         
-22.22.22.22     22.22.22.22     808         0x80000021 0x00011C 6         
-33.33.33.11     33.33.33.11     1056        0x80000020 0x001A6B 2         
-33.33.33.22     33.33.33.22     1259        0x8000001F 0x00411F 2         
+9.9.9.9         9.9.9.9         1440        0x80000005 0x00CB71 2         
+11.11.11.11     11.11.11.11     869         0x8000000B 0x00D265 3         
+11.11.11.22     11.11.11.22     1200        0x80000008 0x003ADB 3         
+22.22.22.11     22.22.22.11     1799        0x80000007 0x0045E8 5         
+22.22.22.22     22.22.22.22     1082        0x8000000A 0x002F05 6         
+33.33.33.11     33.33.33.11     987         0x8000000C 0x004257 2         
+33.33.33.22     33.33.33.22     764         0x8000000A 0x006B0A 2         
 
 		Net Link States (Area 0)
 
 Link ID         ADV Router      Age         Seq#       Checksum
-10.0.0.1        11.11.11.11     1263        0x80000018 0x00C1C9
-10.0.0.5        11.11.11.11     1019        0x80000018 0x008CE4
-10.0.0.9        11.11.11.11     1263        0x80000018 0x00FE63
-10.0.0.13       11.11.11.22     480         0x8000001B 0x00EB84
-10.0.0.18       22.22.22.22     1228        0x8000001A 0x003FE0
-10.0.0.22       22.22.22.22     808         0x8000001A 0x000AFB
-10.0.0.26       33.33.33.11     1056        0x80000018 0x00B91E
-10.0.0.30       33.33.33.22     1259        0x80000018 0x00BDFF
-10.0.0.33       22.22.22.22     1048        0x8000001A 0x0029B0
-10.0.0.37       22.22.22.22     1048        0x8000001A 0x009B2F
-10.0.0.42       22.22.22.22     1228        0x8000001A 0x004FCB
+10.0.0.1        11.11.11.11     1117        0x80000003 0x00EBB4
+10.0.0.5        11.11.11.11     869         0x80000003 0x00B6CF
+10.0.0.9        11.11.11.11     1117        0x80000003 0x00294E
+10.0.0.13       11.11.11.22     1200        0x80000003 0x001C6C
+10.0.0.18       22.22.22.22     1382        0x80000003 0x006DC9
+10.0.0.22       22.22.22.22     1082        0x80000003 0x0038E4
+10.0.0.26       33.33.33.11     987         0x80000003 0x00E309
+10.0.0.30       33.33.33.22     764         0x80000003 0x00E7EA
+10.0.0.33       22.22.22.22     1322        0x80000003 0x005799
+10.0.0.37       22.22.22.22     1322        0x80000003 0x00C918
+10.0.0.42       22.22.22.22     1442        0x80000003 0x007DB4
 
 		Summary Net Link States (Area 0)
 
 Link ID         ADV Router      Age         Seq#       Checksum
-10.1.1.0        11.11.11.11     1263        0x80000018 0x00DA09
-10.1.1.0        11.11.11.22     790         0x8000001E 0x005A34
-192.168.41.1    11.11.11.11     1263        0x80000018 0x00FD5D
-192.168.41.1    11.11.11.22     820         0x8000001B 0x001FF3
-192.168.42.1    11.11.11.11     1263        0x80000018 0x004D04
-192.168.42.1    11.11.11.22     790         0x8000001C 0x006C9B
-192.168.43.1    11.11.11.11     1263        0x80000018 0x00420E
-192.168.43.1    11.11.11.22     794         0x8000001C 0x0061A5
-192.168.44.1    11.11.11.11     1263        0x80000018 0x00DC7B
-192.168.44.1    11.11.11.22     815         0x8000001C 0x00FB13
+10.1.1.0        11.11.11.11     1117        0x80000003 0x0005F3
+10.1.1.0        11.11.11.22     1490        0x80000006 0x008A1C
+192.168.41.1    11.11.11.11     1117        0x80000003 0x002848
+192.168.41.1    11.11.11.22     1515        0x80000004 0x004DDC
+192.168.42.1    11.11.11.11     1117        0x80000003 0x0077EE
+192.168.42.1    11.11.11.22     1490        0x80000004 0x009C83
+192.168.43.1    11.11.11.11     1117        0x80000003 0x006CF8
+192.168.43.1    11.11.11.22     1494        0x80000004 0x00918D
+192.168.44.1    11.11.11.11     1117        0x80000003 0x000766
+192.168.44.1    11.11.11.22     1520        0x80000003 0x002EF9
 
 		Router Link States (Area 1)
 
 Link ID         ADV Router      Age         Seq#       Checksum Link count
-1.1.1.1         1.1.1.1         639         0x8000001F 0x0062DA 3         
-2.2.2.2         2.2.2.2         1106        0x8000001D 0x00CE0C 3         
-3.3.3.3         3.3.3.3         1107        0x8000001D 0x00A30E 3         
-4.4.4.4         4.4.4.4         837         0x8000001F 0x00A71A 3         
-11.11.11.11     11.11.11.11     1263        0x80000023 0x00068E 4         
-11.11.11.22     11.11.11.22     786         0x80000021 0x00E832 4         
+1.1.1.1         1.1.1.1         1513        0x80000007 0x0092C2 3         
+2.2.2.2         2.2.2.2         1381        0x80000006 0x0013DD 3         
+3.3.3.3         3.3.3.3         1378        0x80000006 0x00F3D3 3         
+4.4.4.4         4.4.4.4         1442        0x80000007 0x00D702 3         
+11.11.11.11     11.11.11.11     1117        0x8000000C 0x003477 4         
+11.11.11.22     11.11.11.22     1485        0x80000009 0x0051DF 4         
 
 		Net Link States (Area 1)
 
 Link ID         ADV Router      Age         Seq#       Checksum
-10.1.1.2        11.11.11.11     1263        0x80000018 0x002E8F
-10.1.1.5        1.1.1.1         851         0x8000001B 0x0054A0
-10.1.1.10       11.11.11.11     1263        0x80000018 0x0010A1
-10.1.1.13       2.2.2.2         1106        0x8000001A 0x00289D
-10.1.1.18       11.11.11.11     1263        0x80000018 0x00F1B3
-10.1.1.21       3.3.3.3         1107        0x8000001A 0x00DBD9
-10.1.1.26       11.11.11.11     1263        0x80000018 0x00D3C5
-10.1.1.29       4.4.4.4         649         0x8000001B 0x006F55
+10.1.1.2        11.11.11.11     1117        0x80000003 0x00587A
+10.1.1.5        1.1.1.1         1470        0x80000003 0x008488
+10.1.1.10       11.11.11.11     1117        0x80000003 0x003A8C
+10.1.1.14       11.11.11.22     1495        0x80000003 0x00DCEF
+10.1.1.18       11.11.11.11     1117        0x80000003 0x001C9E
+10.1.1.22       11.11.11.22     1495        0x80000003 0x00AE12
+10.1.1.26       11.11.11.11     1117        0x80000003 0x00FDB0
+10.1.1.29       4.4.4.4         1470        0x80000003 0x009F3D
 
 		Summary Net Link States (Area 1)
 
 Link ID         ADV Router      Age         Seq#       Checksum
-0.0.0.0         11.11.11.11     1263        0x80000018 0x0038C2
-0.0.0.0         11.11.11.22     831         0x8000001B 0x00D13B
-10.0.0.0        11.11.11.11     1263        0x80000018 0x00FDEC
-10.0.0.0        11.11.11.22     835         0x8000001B 0x001F83
-10.0.0.4        11.11.11.11     1263        0x80000018 0x00D511
-10.0.0.4        11.11.11.22     474         0x8000001C 0x00FE9D
-10.0.0.8        11.11.11.11     1263        0x80000018 0x00AD35
-10.0.0.8        11.11.11.22     826         0x8000001B 0x00335D
-10.0.0.12       11.11.11.11     1019        0x8000001A 0x008B50
-10.0.0.12       11.11.11.22     835         0x8000001B 0x00A6EF
-10.0.0.16       11.11.11.11     1263        0x80000018 0x00C10F
-10.0.0.16       11.11.11.22     836         0x8000001B 0x007E14
-10.0.0.20       11.11.11.11     1019        0x80000019 0x003D97
-10.0.0.20       11.11.11.22     474         0x8000001D 0x005C2F
-10.0.0.24       11.11.11.11     1019        0x80000019 0x0015BB
-10.0.0.24       11.11.11.22     474         0x8000001C 0x003652
-10.0.0.28       11.11.11.11     1019        0x80000019 0x00ECDF
-10.0.0.28       11.11.11.22     474         0x8000001C 0x000E76
-10.0.0.32       11.11.11.11     1019        0x80000019 0x00CEF8
-10.0.0.32       11.11.11.22     474         0x8000001D 0x00ED90
-10.0.0.36       11.11.11.11     1019        0x80000019 0x00A61D
-10.0.0.36       11.11.11.22     474         0x8000001D 0x00C5B4
-10.0.0.40       11.11.11.11     1263        0x80000018 0x00D0E7
-10.0.0.40       11.11.11.22     816         0x8000001C 0x00EF7F
-10.9.9.1        11.11.11.11     1263        0x80000018 0x00FEC1
-10.9.9.1        11.11.11.22     816         0x8000001B 0x002058
+0.0.0.0         11.11.11.11     1117        0x80000003 0x0062AD
+0.0.0.0         11.11.11.22     1534        0x80000003 0x000223
+10.0.0.0        11.11.11.11     1117        0x80000003 0x0028D7
+10.0.0.0        11.11.11.22     1534        0x80000003 0x004F6B
+10.0.0.4        11.11.11.11     1117        0x80000003 0x00FFFB
+10.0.0.4        11.11.11.22     1195        0x80000004 0x002F85
+10.0.0.8        11.11.11.11     1117        0x80000003 0x00D720
+10.0.0.8        11.11.11.22     1529        0x80000003 0x006345
+10.0.0.12       11.11.11.11     869         0x80000005 0x00B53B
+10.0.0.12       11.11.11.22     1535        0x80000003 0x00D6D7
+10.0.0.16       11.11.11.11     1117        0x80000003 0x00EBF9
+10.0.0.16       11.11.11.22     1535        0x80000003 0x00AEFB
+10.0.0.20       11.11.11.11     869         0x80000004 0x006782
+10.0.0.20       11.11.11.22     1195        0x80000005 0x008C17
+10.0.0.24       11.11.11.11     869         0x80000004 0x003FA6
+10.0.0.24       11.11.11.22     1195        0x80000004 0x00663A
+10.0.0.28       11.11.11.11     869         0x80000004 0x0017CA
+10.0.0.28       11.11.11.22     1195        0x80000004 0x003E5E
+10.0.0.32       11.11.11.11     869         0x80000004 0x00F8E3
+10.0.0.32       11.11.11.22     1195        0x80000005 0x001E78
+10.0.0.36       11.11.11.11     869         0x80000004 0x00D008
+10.0.0.36       11.11.11.22     1195        0x80000005 0x00F59C
+10.0.0.40       11.11.11.11     1117        0x80000003 0x00FAD2
+10.0.0.40       11.11.11.22     1490        0x80000004 0x002067
+10.9.9.1        11.11.11.11     1117        0x80000003 0x0029AC
+10.9.9.1        11.11.11.22     1490        0x80000004 0x004E41
 
 		Type-5 AS External Link States
 
 Link ID         ADV Router      Age         Seq#       Checksum Tag
-0.0.0.0         33.33.33.11     1306        0x80000018 0x002C81 1         
-0.0.0.0         33.33.33.22     1259        0x80000018 0x00E9B8 1         
-10.10.10.0      11.11.11.11     1263        0x80000018 0x006F53 0         
+0.0.0.0         33.33.33.11     987         0x80000003 0x00566C 1         
+0.0.0.0         33.33.33.22     1023        0x80000003 0x0014A3 1         
+10.10.10.0      11.11.11.11     1117        0x80000003 0x00993E 0         
 ... (4 more lines truncated)
 ```
 
@@ -146,13 +146,13 @@ Command: `show ip ospf border-routers`
 Internal Router Routing Table
 Codes: i - Intra-area route, I - Inter-area route
 
-i 9.9.9.9 [20] via 10.0.0.10, Ethernet1/2, ASBR, Area 0, SPF 32
-i 33.33.33.11 [11] via 10.0.0.6, Ethernet1/3, ASBR, Area 0, SPF 32
-i 33.33.33.22 [11] via 10.0.0.6, Ethernet1/3, ASBR, Area 0, SPF 32
-i 22.22.22.22 [10] via 10.0.0.10, Ethernet1/2, ASBR, Area 0, SPF 32
-i 11.11.11.22 [11] via 10.1.1.25, Ethernet1/0, ABR, Area 1, SPF 20
-i 11.11.11.22 [10] via 10.0.0.2, Ethernet1/1, ABR, Area 0, SPF 32
-i 11.11.11.22 [11] via 10.1.1.1, Ethernet0/1, ABR, Area 1, SPF 20
+i 9.9.9.9 [20] via 10.0.0.10, Ethernet1/2, ASBR, Area 0, SPF 29
+i 33.33.33.11 [11] via 10.0.0.6, Ethernet1/3, ASBR, Area 0, SPF 29
+i 33.33.33.22 [11] via 10.0.0.6, Ethernet1/3, ASBR, Area 0, SPF 29
+i 22.22.22.22 [10] via 10.0.0.10, Ethernet1/2, ASBR, Area 0, SPF 29
+i 11.11.11.22 [11] via 10.1.1.1, Ethernet0/1, ABR, Area 1, SPF 19
+i 11.11.11.22 [11] via 10.1.1.25, Ethernet1/0, ABR, Area 1, SPF 19
+i 11.11.11.22 [10] via 10.0.0.2, Ethernet1/1, ABR, Area 0, SPF 29
 ```
 
 #### 4. ospf — config — PASS
@@ -187,7 +187,7 @@ Ethernet1/2 is up, line protocol is up
   Backup Designated router (ID) 22.22.22.22, Interface address 10.0.0.10
   Timer intervals configured, Hello 10, Dead 40, Wait 40, Retransmit 5
     oob-resync timeout 40
-    Hello due in 00:00:08
+    Hello due in 00:00:05
   Supports Link-local Signaling (LLS)
   Cisco NSF helper support enabled
   IETF NSF helper support enabled
@@ -196,8 +196,8 @@ Ethernet1/2 is up, line protocol is up
   Not Protected by per-prefix TI-LFA
   Index 1/3/3, flood queue length 0
   Next 0x0(0)/0x0(0)/0x0(0)
-  Last flood scan length is 2, maximum is 12
-  Last flood scan time is 0 msec, maximum is 1 msec
+  Last flood scan length is 0, maximum is 12
+  Last flood scan time is 0 msec, maximum is 0 msec
   Neighbor Count is 1, Adjacent neighbor count is 1 
     Adjacent with neighbor 22.22.22.22  (Backup Designated Router)
   Suppress hello for 0 neighbor(s)
@@ -212,7 +212,7 @@ Ethernet1/3 is up, line protocol is up
   Backup Designated router (ID) 22.22.22.11, Interface address 10.0.0.6
   Timer intervals configured, Hello 10, Dead 40, Wait 40, Retransmit 5
     oob-resync timeout 40
-    Hello due in 00:00:01
+    Hello due in 00:00:02
   Supports Link-local Signaling (LLS)
   Cisco NSF helper support enabled
   IETF NSF helper support enabled
@@ -237,7 +237,7 @@ Ethernet1/1 is up, line protocol is up
   Backup Designated router (ID) 11.11.11.22, Interface address 10.0.0.2
   Timer intervals configured, Hello 10, Dead 40, Wait 40, Retransmit 5
     oob-resync timeout 40
-    Hello due in 00:00:08
+    Hello due in 00:00:09
   Supports Link-local Signaling (LLS)
   Cisco NSF helper support enabled
   IETF NSF helper support enabled
@@ -246,8 +246,8 @@ Ethernet1/1 is up, line protocol is up
   Not Protected by per-prefix TI-LFA
   Index 1/1/1, flood queue length 0
   Next 0x0(0)/0x0(0)/0x0(0)
-  Last flood scan length is 0, maximum is 12
-  Last flood scan time is 0 msec, maximum is 1 msec
+  Last flood scan length is 2, maximum is 12
+  Last flood scan time is 0 msec, maximum is 0 msec
   Neighbor Count is 1, Adjacent neighbor count is 1 
     Adjacent with neighbor 11.11.11.22  (Backup Designated Router)
   Suppress hello for 0 neighbor(s)
@@ -262,7 +262,7 @@ Ethernet1/0 is up, line protocol is up
   Backup Designated router (ID) 4.4.4.4, Interface address 10.1.1.25
   Timer intervals configured, Hello 10, Dead 40, Wait 40, Retransmit 5
     oob-resync timeout 40
-    Hello due in 00:00:02
+    Hello due in 00:00:06
   Supports Link-local Signaling (LLS)
   Cisco NSF helper support enabled
   IETF NSF helper support enabled
@@ -272,7 +272,7 @@ Ethernet1/0 is up, line protocol is up
   Index 1/4/7, flood queue length 0
   Next 0x0(0)/0x0(0)/0x0(0)
   Last flood scan length is 6, maximum is 12
-  Last flood scan time is 0 msec, maximum is 3 msec
+  Last flood scan time is 1 msec, maximum is 1 msec
   Neighbor Count is 1, Adjacent neighbor count is 1 
     Adjacent with neighbor 4.4.4.4  (Backup Designated Router)
   Suppress hello for 0 neighbor(s)
@@ -284,7 +284,7 @@ Command: `show ip ospf`
 ```
  Routing Process "ospf 1" with ID 11.11.11.11
    Domain ID type 0x0005, value 0.0.0.1
- Start time: 00:00:02.388, Time elapsed: 13:15:55.301
+ Start time: 00:00:03.243, Time elapsed: 01:27:23.770
  Supports only single TOS(TOS0) routes
  Supports opaque LSA
  Supports Link-local Signaling (LLS)
@@ -317,7 +317,7 @@ Command: `show ip ospf`
  Interface flood pacing timer 33 msecs
  Retransmission pacing timer 66 msecs
  EXCHANGE/LOADING adjacency limit: initial 300, process maximum 300
- Number of external LSA 7. Checksum Sum 0x02D4B4
+ Number of external LSA 7. Checksum Sum 0x02FD1F
  Number of opaque AS LSA 0. Checksum Sum 0x000000
  Number of DCbitless external and opaque AS LSA 0
  Number of DoNotAge external and opaque AS LSA 0
@@ -330,10 +330,10 @@ Command: `show ip ospf`
     Area BACKBONE(0)
         Number of interfaces in this area is 3
 	Area has no authentication
-	SPF algorithm last executed 13:08:22.027 ago
-	SPF algorithm executed 32 times
+	SPF algorithm last executed 01:20:24.389 ago
+	SPF algorithm executed 29 times
 	Area ranges are
-	Number of LSA 28. Checksum Sum 0x0D6936
+	Number of LSA 28. Checksum Sum 0x0C42C9
 	Number of opaque link LSA 0. Checksum Sum 0x000000
 	Number of DCbitless LSA 7
 	Number of indication LSA 0
@@ -344,25 +344,26 @@ Command: `show ip ospf`
         It is a stub area
         Generates stub default route with cost 1
 	Area has no authentication
-	SPF algorithm last executed 13:13:39.723 ago
-	SPF algorithm executed 20 times
+	SPF algorithm last executed 01:25:18.659 ago
+	SPF algorithm executed 19 times
 	Area ranges are
 	   10.1.1.0/24 Active(10) Advertise 
-	Number of LSA 40. Checksum Sum 0x166CEF
+	Number of LSA 40. Checksum Sum 0x1421A7
 	Number of opaque link LSA 0. Checksum Sum 0x000000
-	Number of DCbitless LSA 18
+	Number of DCbitless LSA 20
 	Number of indication LSA 0
 	Number of DoNotAge LSA 0
 	Flood list length 0
- Maintenance Mode ID:     128920110258832
+ Maintenance Mode ID:     133796033419920
  Maintenance Mode:        disabled
  Maintenance Mode Timer:  stopped (0)
   Graceful Reload FSU Global status : None (global: None)
 ```
 
 #### 7. routing_table — ip_route — PASS
-Command: `show ip route`
+Command: `show ip route vrf VRF1`
 ```
+Routing Table: VRF1
 Codes: L - local, C - connected, S - static, R - RIP, M - mobile, B - BGP
        D - EIGRP, EX - EIGRP external, O - OSPF, IA - OSPF inter area 
        N1 - OSPF NSSA external type 1, N2 - OSPF NSSA external type 2
@@ -376,7 +377,55 @@ Codes: L - local, C - connected, S - static, R - RIP, M - mobile, B - BGP
        + - replicated route, % - next hop override, p - overrides from PfR
        & - replicated local route overrides by connected
 
-Gateway of last resort is not set
+Gateway of last resort is 10.0.0.6 to network 0.0.0.0
+
+O*E1  0.0.0.0/0 [110/12] via 10.0.0.6, 01:20:38, Ethernet1/3
+      10.0.0.0/8 is variably subnetted, 33 subnets, 3 masks
+C        10.0.0.0/30 is directly connected, Ethernet1/1
+L        10.0.0.1/32 is directly connected, Ethernet1/1
+C        10.0.0.4/30 is directly connected, Ethernet1/3
+L        10.0.0.5/32 is directly connected, Ethernet1/3
+C        10.0.0.8/30 is directly connected, Ethernet1/2
+L        10.0.0.9/32 is directly connected, Ethernet1/2
+O        10.0.0.12/30 [110/11] via 10.0.0.6, 01:20:32, Ethernet1/3
+O        10.0.0.16/30 [110/20] via 10.0.0.10, 01:26:34, Ethernet1/2
+O        10.0.0.20/30 [110/11] via 10.0.0.6, 01:20:32, Ethernet1/3
+O        10.0.0.24/30 [110/11] via 10.0.0.6, 01:20:38, Ethernet1/3
+O        10.0.0.28/30 [110/11] via 10.0.0.6, 01:20:38, Ethernet1/3
+O        10.0.0.32/30 [110/12] via 10.0.0.6, 01:20:38, Ethernet1/3
+O        10.0.0.36/30 [110/12] via 10.0.0.6, 01:20:38, Ethernet1/3
+O        10.0.0.40/30 [110/20] via 10.0.0.10, 01:26:34, Ethernet1/2
+O        10.1.1.0/24 is a summary, 01:26:44, Null0
+C        10.1.1.0/30 is directly connected, Ethernet0/1
+L        10.1.1.2/32 is directly connected, Ethernet0/1
+O        10.1.1.4/30 [110/11] via 10.1.1.1, 01:26:41, Ethernet0/1
+C        10.1.1.8/30 is directly connected, Ethernet0/2
+L        10.1.1.10/32 is directly connected, Ethernet0/2
+O        10.1.1.12/30 [110/20] via 10.1.1.9, 01:25:26, Ethernet0/2
+C        10.1.1.16/30 is directly connected, Ethernet0/3
+L        10.1.1.18/32 is directly connected, Ethernet0/3
+O        10.1.1.20/30 [110/20] via 10.1.1.17, 01:25:31, Ethernet0/3
+C        10.1.1.24/30 is directly connected, Ethernet1/0
+L        10.1.1.26/32 is directly connected, Ethernet1/0
+O        10.1.1.28/30 [110/11] via 10.1.1.25, 01:26:42, Ethernet1/0
+O        10.9.9.1/32 [110/30] via 10.0.0.10, 01:25:49, Ethernet1/2
+C        10.10.10.0/30 is directly connected, Ethernet2/0
+L        10.10.10.2/32 is directly connected, Ethernet2/0
+C        10.10.10.4/30 is directly connected, Ethernet2/1
+L        10.10.10.6/32 is directly connected, Ethernet2/1
+D        10.10.10.8/30 [90/307200] via 10.10.10.5, 01:27:24, Ethernet2/1
+                       [90/307200] via 10.10.10.1, 01:27:24, Ethernet2/0
+      172.16.0.0/32 is subnetted, 2 subnets
+D        172.16.110.1 [90/409600] via 10.10.10.1, 01:27:24, Ethernet2/0
+D        172.16.210.1 [90/409600] via 10.10.10.5, 01:27:24, Ethernet2/1
+      192.168.41.0/32 is subnetted, 1 subnets
+O        192.168.41.1 [110/11] via 10.1.1.1, 01:26:41, Ethernet0/1
+      192.168.42.0/32 is subnetted, 1 subnets
+O        192.168.42.1 [110/20] via 10.1.1.9, 01:26:23, Ethernet0/2
+      192.168.43.0/32 is subnetted, 1 subnets
+O        192.168.43.1 [110/20] via 10.1.1.17, 01:26:26, Ethernet0/3
+      192.168.44.0/32 is subnetted, 1 subnets
+O        192.168.44.1 [110/11] via 10.1.1.25, 01:26:42, Ethernet1/0
 ```
 
 #### 8. routing_table — route_maps — PASS
@@ -435,8 +484,8 @@ Command: `traceroute vrf VRF1 172.20.20.207 probe 1 timeout 2`
 Type escape sequence to abort.
 Tracing the route to 172.20.20.207
 VRF info: (vrf in name/id, vrf out name/id)
-  1 10.0.0.6 2 msec
-  2 10.0.0.26 1 msec
+  1 10.0.0.6 3 msec
+  2 10.0.0.30 1 msec
   3  * 
   4  * 
   5  * 
@@ -473,7 +522,7 @@ VRF info: (vrf in name/id, vrf out name/id)
 Command: `show ip ospf neighbor vrf VRF1`
 ```
 Neighbor ID     Instance VRF      Pri State                  Dead Time   Address         Interface
-11.11.11.22     1        VRF1     1   FULL/BDR               00:00:32    10.1.1.14       Ethernet2
+11.11.11.22     1        VRF1     1   FULL/DR                00:00:32    10.1.1.14       Ethernet2
 11.11.11.11     1        VRF1     1   FULL/DR                00:00:31    10.1.1.10       Ethernet1
 ```
 
@@ -486,54 +535,54 @@ Command: `show ip ospf database vrf VRF1`
                  Router Link States (Area 0.0.0.1)
 
 Link ID         ADV Router      Age         Seq#         Checksum Link count
-3.3.3.3         3.3.3.3         1111        0x8000001d   0xa30e   3
-4.4.4.4         4.4.4.4         841         0x8000001f   0xa71a   3
-2.2.2.2         2.2.2.2         1108        0x8000001d   0xce0c   3
-1.1.1.1         1.1.1.1         643         0x8000001f   0x62da   3
-11.11.11.11     11.11.11.11     1267        0x80000023   0x68e    4
-11.11.11.22     11.11.11.22     788         0x80000021   0xe832   4
+3.3.3.3         3.3.3.3         1382        0x80000006   0xf3d3   3
+4.4.4.4         4.4.4.4         1445        0x80000007   0xd702   3
+2.2.2.2         2.2.2.2         1382        0x80000006   0x13dd   3
+1.1.1.1         1.1.1.1         1516        0x80000007   0x92c2   3
+11.11.11.11     11.11.11.11     1121        0x8000000c   0x3477   4
+11.11.11.22     11.11.11.22     1486        0x80000009   0x51df   4
 
                  Network Link States (Area 0.0.0.1)
 
 Link ID         ADV Router      Age         Seq#         Checksum
-10.1.1.5        1.1.1.1         855         0x8000001b   0x54a0  
-10.1.1.26       11.11.11.11     1267        0x80000018   0xd3c5  
-10.1.1.2        11.11.11.11     1267        0x80000018   0x2e8f  
-10.1.1.18       11.11.11.11     1267        0x80000018   0xf1b3  
-10.1.1.10       11.11.11.11     1267        0x80000018   0x10a1  
-10.1.1.29       4.4.4.4         653         0x8000001b   0x6f55  
-10.1.1.21       3.3.3.3         1111        0x8000001a   0xdbd9  
-10.1.1.13       2.2.2.2         1108        0x8000001a   0x289d  
+10.1.1.29       4.4.4.4         1473        0x80000003   0x9f3d  
+10.1.1.22       11.11.11.22     1498        0x80000003   0xae12  
+10.1.1.26       11.11.11.11     1121        0x80000003   0xfdb0  
+10.1.1.2        11.11.11.11     1121        0x80000003   0x587a  
+10.1.1.18       11.11.11.11     1121        0x80000003   0x1c9e  
+10.1.1.10       11.11.11.11     1121        0x80000003   0x3a8c  
+10.1.1.14       11.11.11.22     1498        0x80000003   0xdcef  
+10.1.1.5        1.1.1.1         1473        0x80000003   0x8488  
 
                  Summary Link States (Area 0.0.0.1)
 
 Link ID         ADV Router      Age         Seq#         Checksum
-10.0.0.4        11.11.11.11     1267        0x80000018   0xd511  
-0.0.0.0         11.11.11.22     833         0x8000001b   0xd13b  
-0.0.0.0         11.11.11.11     1267        0x80000018   0x38c2  
-10.9.9.1        11.11.11.11     1267        0x80000018   0xfec1  
-10.0.0.8        11.11.11.11     1267        0x80000018   0xad35  
-10.0.0.16       11.11.11.11     1267        0x80000018   0xc10f  
-10.0.0.32       11.11.11.11     1022        0x80000019   0xcef8  
-10.0.0.0        11.11.11.11     1267        0x80000018   0xfdec  
-10.0.0.0        11.11.11.22     837         0x8000001b   0x1f83  
-10.0.0.32       11.11.11.22     475         0x8000001d   0xed90  
-10.0.0.16       11.11.11.22     838         0x8000001b   0x7e14  
-10.0.0.24       11.11.11.11     1022        0x80000019   0x15bb  
-10.0.0.40       11.11.11.11     1267        0x80000018   0xd0e7  
-10.0.0.8        11.11.11.22     828         0x8000001b   0x335d  
-10.0.0.40       11.11.11.22     820         0x8000001c   0xef7f  
-10.0.0.24       11.11.11.22     475         0x8000001c   0x3652  
-10.0.0.12       11.11.11.22     837         0x8000001b   0xa6ef  
-10.0.0.20       11.11.11.11     1022        0x80000019   0x3d97  
-10.0.0.36       11.11.11.11     1022        0x80000019   0xa61d  
-10.0.0.4        11.11.11.22     475         0x8000001c   0xfe9d  
-10.0.0.36       11.11.11.22     475         0x8000001d   0xc5b4  
-10.0.0.20       11.11.11.22     475         0x8000001d   0x5c2f  
-10.0.0.28       11.11.11.11     1022        0x80000019   0xecdf  
-10.0.0.12       11.11.11.11     1022        0x8000001a   0x8b50  
-10.0.0.28       11.11.11.22     475         0x8000001c   0xe76   
-10.9.9.1        11.11.11.22     820         0x8000001b   0x2058  
+10.0.0.4        11.11.11.11     1121        0x80000003   0xfffb  
+0.0.0.0         11.11.11.22     1535        0x80000003   0x223   
+0.0.0.0         11.11.11.11     1121        0x80000003   0x62ad  
+10.9.9.1        11.11.11.11     1121        0x80000003   0x29ac  
+10.0.0.8        11.11.11.11     1121        0x80000003   0xd720  
+10.0.0.16       11.11.11.11     1121        0x80000003   0xebf9  
+10.0.0.32       11.11.11.11     873         0x80000004   0xf8e3  
+10.0.0.0        11.11.11.11     1121        0x80000003   0x28d7  
+10.0.0.0        11.11.11.22     1535        0x80000003   0x4f6b  
+10.0.0.32       11.11.11.22     1197        0x80000005   0x1e78  
+10.0.0.16       11.11.11.22     1536        0x80000003   0xaefb  
+10.0.0.24       11.11.11.11     873         0x80000004   0x3fa6  
+10.0.0.40       11.11.11.11     1121        0x80000003   0xfad2  
+10.0.0.8        11.11.11.22     1530        0x80000003   0x6345  
+10.0.0.40       11.11.11.22     1491        0x80000004   0x2067  
+10.0.0.24       11.11.11.22     1197        0x80000004   0x663a  
+10.0.0.12       11.11.11.11     873         0x80000005   0xb53b  
+10.0.0.20       11.11.11.11     873         0x80000004   0x6782  
+10.0.0.36       11.11.11.11     873         0x80000004   0xd008  
+10.0.0.4        11.11.11.22     1197        0x80000004   0x2f85  
+10.0.0.36       11.11.11.22     1197        0x80000005   0xf59c  
+10.0.0.20       11.11.11.22     1197        0x80000005   0x8c17  
+10.0.0.28       11.11.11.11     873         0x80000004   0x17ca  
+10.0.0.12       11.11.11.22     1536        0x80000003   0xd6d7  
+10.0.0.28       11.11.11.22     1197        0x80000004   0x3e5e  
+10.9.9.1        11.11.11.22     1491        0x80000004   0x4e41  
 ```
 
 #### 3. ospf — borders — PASS
@@ -573,10 +622,10 @@ Loopback0 is up
 Ethernet2 is up
   Interface Address 10.1.1.13/30, instance 1, VRF VRF1, Area 0.0.0.1
   Network Type Broadcast, Cost: 10
-  Transmit Delay is 1 sec, State DR, Priority 1
+  Transmit Delay is 1 sec, State Backup DR, Priority 1
   Interface Speed: 1000 mbps
-  Designated Router is 2.2.2.2
-  Backup Designated Router is 11.11.11.22
+  Designated Router is 11.11.11.22
+  Backup Designated Router is 2.2.2.2
   Timer intervals configured, Hello 10, Dead 40, Retransmit 5
   Neighbor Count is 1
   No authentication
@@ -618,7 +667,7 @@ Maximum number of LSA allowed 12000
  Number of opaque AS LSA 0, Checksum sum 0
  Number of areas in this router is 1. 0 normal, 1 stub, 0 nssa
  Number of LSA 40
- Time since last SPF 47304 secs
+ Time since last SPF 4826 secs
  No Scheduled SPF
  Adjacency exchange-start threshold is 20
  Maximum number of next-hops supported in ECMP is 128
@@ -632,12 +681,12 @@ Maximum number of LSA allowed 12000
    It is a stub area
    Traffic engineering is disabled
    Area has None authentication 
-   SPF algorithm executed 17 times
-   Number of LSA 40. Checksum Sum 1469679
+   SPF algorithm executed 18 times
+   Number of LSA 40. Checksum Sum 1319335
    Number of opaque link LSA 0. Checksum Sum 0
    Number of opaque area LSA 0. Checksum Sum 0
    Number of indication LSA 0
-   Number of DC-clear LSA 18
+   Number of DC-clear LSA 20
 ```
 
 #### 7. routing_table — ip_route — PASS
@@ -742,14 +791,14 @@ Phone ACL bypass: disabled
 IP Access List default-control-plane-acl [readonly]
 Warning: displaying stale counters
         counters per-entry
-        10 permit icmp any any [match 235032 bytes in 2807 packets, 0:20:16 ago]
-        20 permit ip any any tracked [match 674480 bytes in 5029 packets, 0:00:00 ago]
+        10 permit icmp any any [match 87826 bytes in 1041 packets, 0:00:10 ago]
+        20 permit ip any any tracked [match 160616 bytes in 1172 packets, 0:00:10 ago]
         30 permit udp any any eq bfd ttl eq 255
         40 permit udp any any eq bfd-echo ttl eq 254
         50 permit udp any any eq multihop-bfd micro-bfd sbfd
         60 permit udp any eq sbfd any eq sbfd-initiator
-        70 permit ospf any any [match 951216 bytes in 10808 packets, 0:00:00 ago]
-        80 permit tcp any any eq ssh telnet www snmp bgp https msdp ldp netconf-ssh gnmi [match 7800 bytes in 130 packets, 0:00:10 ago]
+        70 permit ospf any any [match 105304 bytes in 1180 packets, 0:00:00 ago]
+        80 permit tcp any any eq ssh telnet www snmp bgp https msdp ldp netconf-ssh gnmi [match 1920 bytes in 32 packets, 0:00:10 ago]
         90 permit udp any any eq bootps bootpc snmp rip ntp ldp ptp-event ptp-general
         100 permit tcp any any eq mlag ttl eq 255
         110 permit udp any any eq mlag ttl eq 255
@@ -794,9 +843,9 @@ Management0       172.20.20.202/24       up           up                 1500
 Command: `traceroute vrf VRF1 172.20.20.207`
 ```
 traceroute to 172.20.20.207 (172.20.20.207), 30 hops max, 60 byte packets
- 1  _gateway (10.1.1.10)  0.476 ms  0.487 ms  0.470 ms
- 2  10.0.0.6 (10.0.0.6)  3.300 ms  4.752 ms  5.096 ms
- 3  10.0.0.26 (10.0.0.26)  3.289 ms  3.470 ms 10.0.0.30 (10.0.0.30)  3.329 ms
+ 1  _gateway (10.1.1.10)  0.806 ms  0.622 ms  0.606 ms
+ 2  10.0.0.6 (10.0.0.6)  4.419 ms  8.834 ms  9.033 ms
+ 3  10.0.0.26 (10.0.0.26)  4.826 ms 10.0.0.30 (10.0.0.30)  8.986 ms 10.0.0.26 (10.0.0.26)  8.419 ms
  4  * * *
  5  * * *
  6  * * *
@@ -836,11 +885,11 @@ Command: `show ospf neighbor instance VRF1`
 Warning: License key missing; requires 'OSPF' license
 
 Address          Interface              State           ID               Pri  Dead
-10.0.0.26        et-0/0/0.0             Full            33.33.33.11        1    31
-10.0.0.30        et-0/0/1.0             Full            33.33.33.22        1    32
-10.0.0.22        et-0/0/2.0             Full            22.22.22.22        1    33
+10.0.0.26        et-0/0/0.0             Full            33.33.33.11        1    36
+10.0.0.30        et-0/0/1.0             Full            33.33.33.22        1    37
+10.0.0.22        et-0/0/2.0             Full            22.22.22.22        1    39
 10.0.0.13        et-0/0/3.0             Full            11.11.11.22        1    32
-10.0.0.5         et-0/0/4.0             Full            11.11.11.11        1    39
+10.0.0.5         et-0/0/4.0             Full            11.11.11.11        1    32
 ```
 
 #### 2. ospf — database — PASS
@@ -853,43 +902,43 @@ Warning: License key missing; requires 'OSPF' license
 
     OSPF database, Area 0.0.0.0
  Type       ID               Adv Rtr           Seq      Age  Opt  Cksum  Len 
-Router   9.9.9.9          9.9.9.9          0x8000001c  1169  0x22 0x9d88  48
-Router   11.11.11.11      11.11.11.11      0x80000022  1023  0x22 0xa47c  60
-Router   11.11.11.22      11.11.11.22      0x8000001f   483  0x2  0xcf2   60
-Router  *22.22.22.11      22.22.22.11      0x80000016  2276  0x22 0x27f7  84
-Router   22.22.22.22      22.22.22.22      0x80000021   811  0x22 0x11c   96
-Router   33.33.33.11      33.33.33.11      0x80000020  1058  0x22 0x1a6b  48
-Router   33.33.33.22      33.33.33.22      0x8000001f  1261  0x22 0x411f  48
-Network  10.0.0.1         11.11.11.11      0x80000018  1267  0x22 0xc1c9  32
-Network  10.0.0.5         11.11.11.11      0x80000018  1023  0x22 0x8ce4  32
-Network  10.0.0.9         11.11.11.11      0x80000018  1267  0x22 0xfe63  32
-Network  10.0.0.13        11.11.11.22      0x8000001b   483  0x2  0xeb84  32
-Network  10.0.0.18        22.22.22.22      0x8000001a  1231  0x22 0x3fe0  32
-Network  10.0.0.22        22.22.22.22      0x8000001a   811  0x22 0xafb   32
-Network  10.0.0.26        33.33.33.11      0x80000018  1058  0x22 0xb91e  32
-Network  10.0.0.30        33.33.33.22      0x80000018  1261  0x22 0xbdff  32
-Network  10.0.0.33        22.22.22.22      0x8000001a  1051  0x22 0x29b0  32
-Network  10.0.0.37        22.22.22.22      0x8000001a  1051  0x22 0x9b2f  32
-Network  10.0.0.42        22.22.22.22      0x8000001a  1231  0x22 0x4fcb  32
-Summary  10.1.1.0         11.11.11.11      0x80000018  1267  0x22 0xda09  28
-Summary  10.1.1.0         11.11.11.22      0x8000001e   795  0x2  0x5a34  28
-Summary  192.168.41.1     11.11.11.11      0x80000018  1267  0x22 0xfd5d  28
-Summary  192.168.41.1     11.11.11.22      0x8000001b   823  0x2  0x1ff3  28
-Summary  192.168.42.1     11.11.11.11      0x80000018  1267  0x22 0x4d04  28
-Summary  192.168.42.1     11.11.11.22      0x8000001c   795  0x2  0x6c9b  28
-Summary  192.168.43.1     11.11.11.11      0x80000018  1267  0x22 0x420e  28
-Summary  192.168.43.1     11.11.11.22      0x8000001c   798  0x2  0x61a5  28
-Summary  192.168.44.1     11.11.11.11      0x80000018  1267  0x22 0xdc7b  28
-Summary  192.168.44.1     11.11.11.22      0x8000001c   819  0x2  0xfb13  28
+Router   9.9.9.9          9.9.9.9          0x80000005  1443  0x22 0xcb71  48
+Router   11.11.11.11      11.11.11.11      0x8000000b   874  0x22 0xd265  60
+Router   11.11.11.22      11.11.11.22      0x80000008  1203  0x2  0x3adb  60
+Router  *22.22.22.11      22.22.22.11      0x80000007  1799  0x22 0x45e8  84
+Router   22.22.22.22      22.22.22.22      0x8000000a  1085  0x22 0x2f05  96
+Router   33.33.33.11      33.33.33.11      0x8000000c   989  0x22 0x4257  48
+Router   33.33.33.22      33.33.33.22      0x8000000a   766  0x22 0x6b0a  48
+Network  10.0.0.1         11.11.11.11      0x80000003  1121  0x22 0xebb4  32
+Network  10.0.0.5         11.11.11.11      0x80000003   874  0x22 0xb6cf  32
+Network  10.0.0.9         11.11.11.11      0x80000003  1121  0x22 0x294e  32
+Network  10.0.0.13        11.11.11.22      0x80000003  1203  0x2  0x1c6c  32
+Network  10.0.0.18        22.22.22.22      0x80000003  1385  0x22 0x6dc9  32
+Network  10.0.0.22        22.22.22.22      0x80000003  1085  0x22 0x38e4  32
+Network  10.0.0.26        33.33.33.11      0x80000003   989  0x22 0xe309  32
+Network  10.0.0.30        33.33.33.22      0x80000003   766  0x22 0xe7ea  32
+Network  10.0.0.33        22.22.22.22      0x80000003  1325  0x22 0x5799  32
+Network  10.0.0.37        22.22.22.22      0x80000003  1325  0x22 0xc918  32
+Network  10.0.0.42        22.22.22.22      0x80000003  1445  0x22 0x7db4  32
+Summary  10.1.1.0         11.11.11.11      0x80000003  1121  0x22 0x5f3   28
+Summary  10.1.1.0         11.11.11.22      0x80000006  1493  0x2  0x8a1c  28
+Summary  192.168.41.1     11.11.11.11      0x80000003  1121  0x22 0x2848  28
+Summary  192.168.41.1     11.11.11.22      0x80000004  1519  0x2  0x4ddc  28
+Summary  192.168.42.1     11.11.11.11      0x80000003  1121  0x22 0x77ee  28
+Summary  192.168.42.1     11.11.11.22      0x80000004  1493  0x2  0x9c83  28
+Summary  192.168.43.1     11.11.11.11      0x80000003  1121  0x22 0x6cf8  28
+Summary  192.168.43.1     11.11.11.22      0x80000004  1498  0x2  0x918d  28
+Summary  192.168.44.1     11.11.11.11      0x80000003  1121  0x22 0x766   28
+Summary  192.168.44.1     11.11.11.22      0x80000003  1524  0x2  0x2ef9  28
     OSPF AS SCOPE link state database
  Type       ID               Adv Rtr           Seq      Age  Opt  Cksum  Len 
-Extern   0.0.0.0          33.33.33.11      0x80000018  1308  0x20 0x2c81  36
-Extern   0.0.0.0          33.33.33.22      0x80000018  1261  0x20 0xe9b8  36
-Extern   10.10.10.0       11.11.11.11      0x80000018  1267  0x20 0x6f53  36
-Extern   10.10.10.4       11.11.11.11      0x80000018  1267  0x20 0x4777  36
-Extern   10.10.10.8       11.11.11.11      0x80000018  1267  0x20 0x1f9b  36
-Extern   172.16.110.1     11.11.11.11      0x80000018  1267  0x20 0x9c15  36
-Extern   172.16.210.1     11.11.11.11      0x80000018  1267  0x20 0x4c01  36
+Extern   0.0.0.0          33.33.33.11      0x80000003   989  0x20 0x566c  36
+Extern   0.0.0.0          33.33.33.22      0x80000003  1025  0x20 0x14a3  36
+Extern   10.10.10.0       11.11.11.11      0x80000003  1121  0x20 0x993e  36
+Extern   10.10.10.4       11.11.11.11      0x80000003  1121  0x20 0x7162  36
+Extern   10.10.10.8       11.11.11.11      0x80000003  1121  0x20 0x4986  36
+Extern   172.16.110.1     11.11.11.11      0x80000003  1121  0x20 0xc6ff  36
+Extern   172.16.210.1     11.11.11.11      0x80000003  1121  0x20 0x76eb  36
 ```
 
 #### 3. ospf — borders — PASS
@@ -931,7 +980,7 @@ Instance: VRF1
       Area scope LSAs received with no DC bit: 7
   Topology: default (ID 0)
     Prefix export count: 0
-    Full SPF runs: 10
+    Full SPF runs: 9
     SPF delay: 0.200000 sec, SPF holddown: 5 sec, SPF rapid runs: 3
     Backup SPF: Not Needed
 ```
@@ -975,19 +1024,79 @@ Instance: VRF1
       Area scope LSAs received with no DC bit: 7
   Topology: default (ID 0)
     Prefix export count: 0
-    Full SPF runs: 10
+    Full SPF runs: 9
     SPF delay: 0.200000 sec, SPF holddown: 5 sec, SPF rapid runs: 3
     Backup SPF: Not Needed
 ```
 
 #### 7. routing_table — ip_route — PASS
-Command: `show route instance VRF1`
+Command: `show route table VRF1.inet.0`
 ```
  
-Instance             Type
-         Primary RIB                                     Active/holddown/hidden
-VRF1                 virtual-router 
-         VRF1.inet.0                                     29/0/0
+
+VRF1.inet.0: 29 destinations, 29 routes (29 active, 0 holddown, 0 hidden)
++ = Active Route, - = Last Active, * = Both
+
+0.0.0.0/0          *[OSPF/150] 01:21:04, metric 2, tag 1
+                    >  to 10.0.0.26 via et-0/0/0.0
+                       to 10.0.0.30 via et-0/0/1.0
+10.0.0.0/30        *[OSPF/10] 01:20:41, metric 11
+                    >  to 10.0.0.5 via et-0/0/4.0
+10.0.0.4/30        *[Direct/0] 01:21:21
+                    >  via et-0/0/4.0
+10.0.0.6/32        *[Local/0] 01:21:21
+                       Local via et-0/0/4.0
+10.0.0.8/30        *[OSPF/10] 01:20:31, metric 11
+                    >  to 10.0.0.5 via et-0/0/4.0
+                       to 10.0.0.22 via et-0/0/2.0
+10.0.0.12/30       *[Direct/0] 01:21:20
+                    >  via et-0/0/3.0
+10.0.0.14/32       *[Local/0] 01:21:20
+                       Local via et-0/0/3.0
+10.0.0.16/30       *[OSPF/10] 01:20:31, metric 11
+                    >  to 10.0.0.22 via et-0/0/2.0
+10.0.0.20/30       *[Direct/0] 01:21:20
+                    >  via et-0/0/2.0
+10.0.0.21/32       *[Local/0] 01:21:20
+                       Local via et-0/0/2.0
+10.0.0.24/30       *[Direct/0] 01:21:20
+                    >  via et-0/0/0.0
+10.0.0.25/32       *[Local/0] 01:21:20
+                       Local via et-0/0/0.0
+10.0.0.28/30       *[Direct/0] 01:21:20
+                    >  via et-0/0/1.0
+10.0.0.29/32       *[Local/0] 01:21:20
+                       Local via et-0/0/1.0
+10.0.0.32/30       *[OSPF/10] 01:21:10, metric 2
+                    >  to 10.0.0.26 via et-0/0/0.0
+10.0.0.36/30       *[OSPF/10] 01:21:04, metric 2
+                    >  to 10.0.0.30 via et-0/0/1.0
+10.0.0.40/30       *[OSPF/10] 01:20:31, metric 11
+                    >  to 10.0.0.22 via et-0/0/2.0
+10.1.1.0/24        *[OSPF/10] 01:20:41, metric 11
+                    >  to 10.0.0.5 via et-0/0/4.0
+10.9.9.1/32        *[OSPF/10] 01:20:31, metric 21
+                    >  to 10.0.0.22 via et-0/0/2.0
+10.10.10.0/30      *[OSPF/150] 01:20:41, metric 21, tag 0
+                    >  to 10.0.0.5 via et-0/0/4.0
+10.10.10.4/30      *[OSPF/150] 01:20:41, metric 21, tag 0
+                    >  to 10.0.0.5 via et-0/0/4.0
+10.10.10.8/30      *[OSPF/150] 01:20:41, metric 21, tag 0
+                    >  to 10.0.0.5 via et-0/0/4.0
+172.16.110.1/32    *[OSPF/150] 01:20:41, metric 21, tag 0
+                    >  to 10.0.0.5 via et-0/0/4.0
+172.16.210.1/32    *[OSPF/150] 01:20:41, metric 21, tag 0
+                    >  to 10.0.0.5 via et-0/0/4.0
+192.168.41.1/32    *[OSPF/10] 01:20:41, metric 12
+                    >  to 10.0.0.5 via et-0/0/4.0
+192.168.42.1/32    *[OSPF/10] 01:20:41, metric 21
+                    >  to 10.0.0.5 via et-0/0/4.0
+192.168.43.1/32    *[OSPF/10] 01:20:41, metric 21
+                    >  to 10.0.0.5 via et-0/0/4.0
+192.168.44.1/32    *[OSPF/10] 01:20:41, metric 12
+                    >  to 10.0.0.5 via et-0/0/4.0
+224.0.0.5/32       *[OSPF/10] 01:22:46, metric 1
+                       MultiRecv
 ```
 
 #### 8. routing_table — route_maps — EMPTY
@@ -1002,18 +1111,16 @@ Command: `show configuration policy-options`
  
 ```
 
-#### 10. routing_table — policy_based_routing — PASS
-Command: `show firewall filter`
+#### 10. routing_table — policy_based_routing — EMPTY
+Command: `show configuration firewall`
 ```
  
-missing mandatory argument: filtername.
 ```
 
-#### 11. routing_table — access_lists — PASS
-Command: `show firewall filter`
+#### 11. routing_table — access_lists — EMPTY
+Command: `show configuration firewall`
 ```
  
-missing mandatory argument: filtername.
 ```
 
 #### 12. interfaces — interface_status — PASS
@@ -1071,7 +1178,7 @@ lbi.0                   up    up   inet
                                    mpls    
 lo0                     up    up
 lo0.0                   up    up   inet    
-                                   inet6    fe80::a29:79f0:3b:374d-->  
+                                   inet6    fe80::aab6:1ef0:d4:c481-->  
 lsi                     up    up
 pip0                    up    up
 vtep                    up    up
@@ -1082,7 +1189,7 @@ Command: `traceroute routing-instance VRF1 172.20.20.207`
 ```
  
 traceroute to 172.20.20.207 (172.20.20.207), 30 hops max, 60 byte packets
- 1  10.0.0.30 (10.0.0.30)  2.764 ms  2.222 ms 10.0.0.26 (10.0.0.26)  1.733 ms
+ 1  10.0.0.26 (10.0.0.26)  1.772 ms 10.0.0.30 (10.0.0.30)  1.535 ms  1.346 ms
  2  * * *
  3  * * *
  4  * * *
@@ -1134,9 +1241,9 @@ Neighbor ID      Priority  State             Nbr Address       Interface
 
 1.1.1.1          128       FULL/DR           10.1.1.5           1/1/2          
 
-2.2.2.2          1         FULL/DR           10.1.1.13          1/1/3          
+2.2.2.2          1         FULL/BDR          10.1.1.13          1/1/3          
 
-3.3.3.3          1         FULL/DR           10.1.1.21          1/1/4          
+3.3.3.3          1         FULL/BDR          10.1.1.21          1/1/4          
 
 4.4.4.4          128       FULL/DR           10.1.1.29          1/1/5          
 ```
@@ -1152,98 +1259,98 @@ Router Link State Advertisements (Area 0.0.0.0)
 
 LSID            ADV Router      Age       Seq#       Checksum       Link Count
 -------------------------------------------------------------------------------
-9.9.9.9         9.9.9.9         1171      0x8000001c 0x00009d88     2
-11.11.11.11     11.11.11.11     1024      0x80000022 0x0000a47c     3
-11.11.11.22     11.11.11.22     483       0x8000001f 0x00000cf2     3
-22.22.22.11     22.22.22.11     2281      0x80000016 0x000027f7     5
-22.22.22.22     22.22.22.22     813       0x80000021 0x0000011c     6
-33.33.33.11     33.33.33.11     1060      0x80000020 0x00001a6b     2
-33.33.33.22     33.33.33.22     1264      0x8000001f 0x0000411f     2
+9.9.9.9         9.9.9.9         1446      0x80000005 0x0000cb71     2
+11.11.11.11     11.11.11.11     876       0x8000000b 0x0000d265     3
+11.11.11.22     11.11.11.22     1204      0x80000008 0x00003adb     3
+22.22.22.11     22.22.22.11     1804      0x80000007 0x000045e8     5
+22.22.22.22     22.22.22.22     1086      0x8000000a 0x00002f05     6
+33.33.33.11     33.33.33.11     991       0x8000000c 0x00004257     2
+33.33.33.22     33.33.33.22     768       0x8000000a 0x00006b0a     2
 
 Network Link State Advertisements (Area 0.0.0.0)
 -------------------------------------------------
 
 LSID            ADV Router      Age       Seq#       Checksum
 --------------------------------------------------------------
-10.0.0.1        11.11.11.11     1270      0x80000018 0x0000c1c9
-10.0.0.5        11.11.11.11     1024      0x80000018 0x00008ce4
-10.0.0.9        11.11.11.11     1270      0x80000018 0x0000fe63
-10.0.0.13       11.11.11.22     483       0x8000001b 0x0000eb84
-10.0.0.18       22.22.22.22     1233      0x8000001a 0x00003fe0
-10.0.0.22       22.22.22.22     813       0x8000001a 0x00000afb
-10.0.0.26       33.33.33.11     1060      0x80000018 0x0000b91e
-10.0.0.30       33.33.33.22     1264      0x80000018 0x0000bdff
-10.0.0.33       22.22.22.22     1052      0x8000001a 0x000029b0
-10.0.0.37       22.22.22.22     1052      0x8000001a 0x00009b2f
-10.0.0.42       22.22.22.22     1233      0x8000001a 0x00004fcb
+10.0.0.1        11.11.11.11     1123      0x80000003 0x0000ebb4
+10.0.0.5        11.11.11.11     876       0x80000003 0x0000b6cf
+10.0.0.9        11.11.11.11     1123      0x80000003 0x0000294e
+10.0.0.13       11.11.11.22     1204      0x80000003 0x00001c6c
+10.0.0.18       22.22.22.22     1387      0x80000003 0x00006dc9
+10.0.0.22       22.22.22.22     1086      0x80000003 0x000038e4
+10.0.0.26       33.33.33.11     991       0x80000003 0x0000e309
+10.0.0.30       33.33.33.22     768       0x80000003 0x0000e7ea
+10.0.0.33       22.22.22.22     1327      0x80000003 0x00005799
+10.0.0.37       22.22.22.22     1327      0x80000003 0x0000c918
+10.0.0.42       22.22.22.22     1447      0x80000003 0x00007db4
 
 Inter-area Summary Link State Advertisements (Area 0.0.0.0)
 ------------------------------------------------------------
 
 LSID            ADV Router      Age       Seq#       Checksum
 --------------------------------------------------------------
-10.1.1.0        11.11.11.11     1270      0x80000018 0x0000da09
-10.1.1.0        11.11.11.22     793       0x8000001e 0x00005a34
-192.168.41.1    11.11.11.11     1270      0x80000018 0x0000fd5d
-192.168.41.1    11.11.11.22     823       0x8000001b 0x00001ff3
-192.168.42.1    11.11.11.11     1270      0x80000018 0x00004d04
-192.168.42.1    11.11.11.22     793       0x8000001c 0x00006c9b
-192.168.43.1    11.11.11.11     1270      0x80000018 0x0000420e
-192.168.43.1    11.11.11.22     797       0x8000001c 0x000061a5
-192.168.44.1    11.11.11.11     1270      0x80000018 0x0000dc7b
-192.168.44.1    11.11.11.22     818       0x8000001c 0x0000fb13
+10.1.1.0        11.11.11.11     1123      0x80000003 0x000005f3
+10.1.1.0        11.11.11.22     1492      0x80000006 0x00008a1c
+192.168.41.1    11.11.11.11     1123      0x80000003 0x00002848
+192.168.41.1    11.11.11.22     1518      0x80000004 0x00004ddc
+192.168.42.1    11.11.11.11     1123      0x80000003 0x000077ee
+192.168.42.1    11.11.11.22     1492      0x80000004 0x00009c83
+192.168.43.1    11.11.11.11     1123      0x80000003 0x00006cf8
+192.168.43.1    11.11.11.22     1497      0x80000004 0x0000918d
+192.168.44.1    11.11.11.11     1123      0x80000003 0x00000766
+192.168.44.1    11.11.11.22     1523      0x80000003 0x00002ef9
 
 Router Link State Advertisements (Area 0.0.0.1)
 ------------------------------------------------
 
 LSID            ADV Router      Age       Seq#       Checksum       Link Count
 -------------------------------------------------------------------------------
-1.1.1.1         1.1.1.1         644       0x8000001f 0x000062da     3
-2.2.2.2         2.2.2.2         1111      0x8000001d 0x0000ce0c     3
-3.3.3.3         3.3.3.3         1112      0x8000001d 0x0000a30e     3
-4.4.4.4         4.4.4.4         842       0x8000001f 0x0000a71a     3
-11.11.11.11     11.11.11.11     1270      0x80000023 0x0000068e     4
-11.11.11.22     11.11.11.22     788       0x80000021 0x0000e832     4
+1.1.1.1         1.1.1.1         1517      0x80000007 0x000092c2     3
+2.2.2.2         2.2.2.2         1385      0x80000006 0x000013dd     3
+3.3.3.3         3.3.3.3         1383      0x80000006 0x0000f3d3     3
+4.4.4.4         4.4.4.4         1446      0x80000007 0x0000d702     3
+11.11.11.11     11.11.11.11     1123      0x8000000c 0x00003477     4
+11.11.11.22     11.11.11.22     1487      0x80000009 0x000051df     4
 
 Network Link State Advertisements (Area 0.0.0.1)
 -------------------------------------------------
 
 LSID            ADV Router      Age       Seq#       Checksum
 --------------------------------------------------------------
-10.1.1.2        11.11.11.11     1270      0x80000018 0x00002e8f
-10.1.1.5        1.1.1.1         856       0x8000001b 0x000054a0
-10.1.1.10       11.11.11.11     1270      0x80000018 0x000010a1
-10.1.1.13       2.2.2.2         1111      0x8000001a 0x0000289d
-10.1.1.18       11.11.11.11     1270      0x80000018 0x0000f1b3
-10.1.1.21       3.3.3.3         1112      0x8000001a 0x0000dbd9
-10.1.1.26       11.11.11.11     1270      0x80000018 0x0000d3c5
-10.1.1.29       4.4.4.4         654       0x8000001b 0x00006f55
+10.1.1.2        11.11.11.11     1123      0x80000003 0x0000587a
+10.1.1.5        1.1.1.1         1475      0x80000003 0x00008488
+10.1.1.10       11.11.11.11     1123      0x80000003 0x00003a8c
+10.1.1.14       11.11.11.22     1497      0x80000003 0x0000dcef
+10.1.1.18       11.11.11.11     1123      0x80000003 0x00001c9e
+10.1.1.22       11.11.11.22     1497      0x80000003 0x0000ae12
+10.1.1.26       11.11.11.11     1123      0x80000003 0x0000fdb0
+10.1.1.29       4.4.4.4         1474      0x80000003 0x00009f3d
 
 Inter-area Summary Link State Advertisements (Area 0.0.0.1)
 ------------------------------------------------------------
 
 LSID            ADV Router      Age       Seq#       Checksum
 --------------------------------------------------------------
-0.0.0.0         11.11.11.11     1270      0x80000018 0x000038c2
-0.0.0.0         11.11.11.22     833       0x8000001b 0x0000d13b
-10.0.0.0        11.11.11.11     1270      0x80000018 0x0000fdec
-10.0.0.0        11.11.11.22     837       0x8000001b 0x00001f83
-10.0.0.4        11.11.11.11     1270      0x80000018 0x0000d511
-10.0.0.4        11.11.11.22     476       0x8000001c 0x0000fe9d
-10.0.0.8        11.11.11.11     1270      0x80000018 0x0000ad35
-10.0.0.8        11.11.11.22     828       0x8000001b 0x0000335d
-10.0.0.12       11.11.11.11     1025      0x8000001a 0x00008b50
-10.0.0.12       11.11.11.22     837       0x8000001b 0x0000a6ef
-10.0.0.16       11.11.11.11     1270      0x80000018 0x0000c10f
-10.0.0.16       11.11.11.22     838       0x8000001b 0x00007e14
-10.0.0.20       11.11.11.11     1025      0x80000019 0x00003d97
-10.0.0.20       11.11.11.22     476       0x8000001d 0x00005c2f
-10.0.0.24       11.11.11.11     1025      0x80000019 0x000015bb
-10.0.0.24       11.11.11.22     476       0x8000001c 0x00003652
-10.0.0.28       11.11.11.11     1025      0x80000019 0x0000ecdf
-10.0.0.28       11.11.11.22     476       0x8000001c 0x00000e76
-10.0.0.32       11.11.11.11     1025      0x80000019 0x0000cef8
-10.0.0.32       11.11.11.22     476       0x8000001d 0x0000ed90
+0.0.0.0         11.11.11.11     1123      0x80000003 0x000062ad
+0.0.0.0         11.11.11.22     1536      0x80000003 0x00000223
+10.0.0.0        11.11.11.11     1123      0x80000003 0x000028d7
+10.0.0.0        11.11.11.22     1536      0x80000003 0x00004f6b
+10.0.0.4        11.11.11.11     1123      0x80000003 0x0000fffb
+10.0.0.4        11.11.11.22     1198      0x80000004 0x00002f85
+10.0.0.8        11.11.11.11     1123      0x80000003 0x0000d720
+10.0.0.8        11.11.11.22     1531      0x80000003 0x00006345
+10.0.0.12       11.11.11.11     876       0x80000005 0x0000b53b
+10.0.0.12       11.11.11.22     1537      0x80000003 0x0000d6d7
+10.0.0.16       11.11.11.11     1123      0x80000003 0x0000ebf9
+10.0.0.16       11.11.11.22     1537      0x80000003 0x0000aefb
+10.0.0.20       11.11.11.11     876       0x80000004 0x00006782
+10.0.0.20       11.11.11.22     1198      0x80000005 0x00008c17
+10.0.0.24       11.11.11.11     876       0x80000004 0x00003fa6
+10.0.0.24       11.11.11.22     1198      0x80000004 0x0000663a
+10.0.0.28       11.11.11.11     876       0x80000004 0x000017ca
+10.0.0.28       11.11.11.22     1198      0x80000004 0x00003e5e
+10.0.0.32       11.11.11.11     876       0x80000004 0x0000f8e3
+10.0.0.32       11.11.11.22     1198      0x80000005 0x00001e78
 ... (19 more lines truncated)
 ```
 
@@ -1257,13 +1364,13 @@ Internal Routing Table
 Codes: i - Intra-area route, I - Inter-area route
 
            Router-ID   Cost  Type              Area     SPF           Nexthop                Interface
- i       11.11.11.11    101   ABR           0.0.0.1      38          10.1.1.5                    1/1/2
- i       11.11.11.11    101   ABR           0.0.0.1      38         10.1.1.29                    1/1/5
- i       11.11.11.11    100  BOTH           0.0.0.0      38          10.0.0.1                    1/1/8
- i           9.9.9.9    110  ASBR           0.0.0.0      38         10.0.0.18                    1/1/6
- i       22.22.22.22    100  ASBR           0.0.0.0      38         10.0.0.18                    1/1/6
- i       33.33.33.11    101  ASBR           0.0.0.0      38         10.0.0.14                    1/1/7
- i       33.33.33.22    101  ASBR           0.0.0.0      38         10.0.0.14                    1/1/7
+ i       11.11.11.11    101   ABR           0.0.0.1      43          10.1.1.5                    1/1/2
+ i       11.11.11.11    101   ABR           0.0.0.1      43         10.1.1.29                    1/1/5
+ i       11.11.11.11    100  BOTH           0.0.0.0      43          10.0.0.1                    1/1/8
+ i           9.9.9.9    110  ASBR           0.0.0.0      43         10.0.0.18                    1/1/6
+ i       22.22.22.22    100  ASBR           0.0.0.0      43         10.0.0.18                    1/1/6
+ i       33.33.33.11    101  ASBR           0.0.0.0      43         10.0.0.14                    1/1/7
+ i       33.33.33.22    101  ASBR           0.0.0.0      43         10.0.0.14                    1/1/7
 ```
 
 #### 4. ospf — config — PASS
@@ -1277,7 +1384,7 @@ BFD                : Disabled            SPF Start Interval     : 200   ms
 SPF Hold Interval  : 1000  ms            SPF Max Wait Interval  : 5000  ms
 LSA Start Time     : 5000  ms            LSA Hold Time          : 0     ms
 LSA Max Wait Time  : 0     ms            LSA Arrival            : 1000  ms
-External LSAs      : 7                   Checksum Sum           : 185524              
+External LSAs      : 7                   Checksum Sum           : 195871              
 ECMP               : 4                   Reference Bandwidth    : 100000 Mbps
 Area Border        : true                AS Border              : false
 GR Status          : Enabled             GR Interval            : 120
@@ -1297,19 +1404,19 @@ Area  : 0.0.0.0
 Area Type              : Normal         Status               : Active         
 Total Interfaces       : 3              Active Interfaces    : 3              
 Passive Interfaces     : 0              Loopback Interfaces  : 0
-SPF Calculation Count  : 38             
+SPF Calculation Count  : 43             
 Area ranges     : 
-Number of LSAs         : 28             Checksum Sum         : 878902
+Number of LSAs         : 28             Checksum Sum         : 803529
 Area  : 0.0.0.1
 ----------------
 Area Type              : Stub           Status               : Active         
 Total Interfaces       : 4              Active Interfaces    : 4              
 Passive Interfaces     : 0              Loopback Interfaces  : 0
-SPF Calculation Count  : 38             
+SPF Calculation Count  : 43             
 Default Route Cost     : 1    
 Area ranges     : 
     ip-prefix 10.1.1.0/24, inter-area, advertise
-Number of LSAs         : 40             Checksum Sum         : 1469679
+Number of LSAs         : 40             Checksum Sum         : 1319335
 ```
 
 #### 5. ospf — interfaces — PASS
@@ -1395,8 +1502,8 @@ Hello Interval  : 10  sec                         Dead Interval       : 40  sec
 Transit Delay   : 1   sec                         Retransmit Interval : 5   sec
 Authentication  : No                              Link Speed          : 1000Mbps
 Cost Configured : NA                              Cost Calculated     : 100
-State/Type      : BDR                             Router Priority     : 1
-DR              : 10.1.1.13                       BDR                 : 10.1.1.14
+State/Type      : DR                              Router Priority     : 1
+DR              : 10.1.1.14                       BDR                 : 10.1.1.13
 Link LSAs       : 0                               Checksum Sum        : 0    
 BFD             : Disabled                        
 
@@ -1412,8 +1519,8 @@ Hello Interval  : 10  sec                         Dead Interval       : 40  sec
 Transit Delay   : 1   sec                         Retransmit Interval : 5   sec
 Authentication  : No                              Link Speed          : 1000Mbps
 Cost Configured : NA                              Cost Calculated     : 100
-State/Type      : BDR                             Router Priority     : 1
-DR              : 10.1.1.21                       BDR                 : 10.1.1.22
+State/Type      : DR                              Router Priority     : 1
+DR              : 10.1.1.22                       BDR                 : 10.1.1.21
 Link LSAs       : 0                               Checksum Sum        : 0    
 ... (18 more lines truncated)
 ```
@@ -1429,7 +1536,7 @@ BFD                : Disabled            SPF Start Interval     : 200   ms
 SPF Hold Interval  : 1000  ms            SPF Max Wait Interval  : 5000  ms
 LSA Start Time     : 5000  ms            LSA Hold Time          : 0     ms
 LSA Max Wait Time  : 0     ms            LSA Arrival            : 1000  ms
-External LSAs      : 7                   Checksum Sum           : 185524              
+External LSAs      : 7                   Checksum Sum           : 195871              
 ECMP               : 4                   Reference Bandwidth    : 100000 Mbps
 Area Border        : true                AS Border              : false
 GR Status          : Enabled             GR Interval            : 120
@@ -1449,19 +1556,19 @@ Area  : 0.0.0.0
 Area Type              : Normal         Status               : Active         
 Total Interfaces       : 3              Active Interfaces    : 3              
 Passive Interfaces     : 0              Loopback Interfaces  : 0
-SPF Calculation Count  : 38             
+SPF Calculation Count  : 43             
 Area ranges     : 
-Number of LSAs         : 28             Checksum Sum         : 878902
+Number of LSAs         : 28             Checksum Sum         : 803529
 Area  : 0.0.0.1
 ----------------
 Area Type              : Stub           Status               : Active         
 Total Interfaces       : 4              Active Interfaces    : 4              
 Passive Interfaces     : 0              Loopback Interfaces  : 0
-SPF Calculation Count  : 38             
+SPF Calculation Count  : 43             
 Default Route Cost     : 1    
 Area ranges     : 
     ip-prefix 10.1.1.0/24, inter-area, advertise
-Number of LSAs         : 40             Checksum Sum         : 1469679
+Number of LSAs         : 40             Checksum Sum         : 1319335
 ```
 
 #### 7. routing_table — ip_route — PASS
@@ -1480,50 +1587,50 @@ VRF: default
 Prefix              Nexthop          Interface     VRF(egress)       Origin/   Distance/    Age
                                                                      Type      Metric
 ---------------------------------------------------------------------------------------------------------
-0.0.0.0/0           10.0.0.14        1/1/7         -                 O/E1      [110/102]    13h:08m:34s  
+0.0.0.0/0           10.0.0.14        1/1/7         -                 O/E1      [110/102]    01h:20m:36s  
 10.0.0.0/30         -                1/1/8         -                 C         [0/0]        -            
 10.0.0.2/32         -                1/1/8         -                 L         [0/0]        -            
-10.0.0.4/30         10.0.0.14        1/1/7         -                 O         [110/101]    13h:08m:34s  
-10.0.0.8/30         10.0.0.18        1/1/6         -                 O         [110/110]    13h:14m:17s  
-                    10.0.0.1         1/1/8         -                           [110/110]    13h:14m:17s  
+10.0.0.4/30         10.0.0.14        1/1/7         -                 O         [110/101]    01h:20m:36s  
+10.0.0.8/30         10.0.0.18        1/1/6         -                 O         [110/110]    01h:25m:31s  
+                    10.0.0.1         1/1/8         -                           [110/110]    01h:25m:31s  
 10.0.0.12/30        -                1/1/7         -                 C         [0/0]        -            
 10.0.0.13/32        -                1/1/7         -                 L         [0/0]        -            
 10.0.0.16/30        -                1/1/6         -                 C         [0/0]        -            
 10.0.0.17/32        -                1/1/6         -                 L         [0/0]        -            
-10.0.0.20/30        10.0.0.14        1/1/7         -                 O         [110/101]    13h:08m:34s  
-10.0.0.24/30        10.0.0.14        1/1/7         -                 O         [110/101]    13h:08m:34s  
-10.0.0.28/30        10.0.0.14        1/1/7         -                 O         [110/101]    13h:08m:34s  
-10.0.0.32/30        10.0.0.14        1/1/7         -                 O         [110/102]    13h:08m:34s  
-10.0.0.36/30        10.0.0.14        1/1/7         -                 O         [110/102]    13h:08m:34s  
-10.0.0.40/30        10.0.0.18        1/1/6         -                 O         [110/110]    13h:14m:17s  
-10.1.1.0/24         -                reject        -                 S         [110/0]      13h:14m:19s  
-10.1.1.0/30         10.1.1.5         1/1/2         -                 O         [110/101]    13h:14m:19s  
+10.0.0.20/30        10.0.0.14        1/1/7         -                 O         [110/101]    01h:20m:36s  
+10.0.0.24/30        10.0.0.14        1/1/7         -                 O         [110/101]    01h:20m:36s  
+10.0.0.28/30        10.0.0.14        1/1/7         -                 O         [110/101]    01h:20m:36s  
+10.0.0.32/30        10.0.0.14        1/1/7         -                 O         [110/102]    01h:20m:36s  
+10.0.0.36/30        10.0.0.14        1/1/7         -                 O         [110/102]    01h:20m:36s  
+10.0.0.40/30        10.0.0.18        1/1/6         -                 O         [110/110]    01h:25m:31s  
+10.1.1.0/24         -                reject        -                 S         [110/0]      01h:25m:58s  
+10.1.1.0/30         10.1.1.5         1/1/2         -                 O         [110/101]    01h:25m:58s  
 10.1.1.4/30         -                1/1/2         -                 C         [0/0]        -            
 10.1.1.6/32         -                1/1/2         -                 L         [0/0]        -            
-10.1.1.8/30         10.1.1.13        1/1/3         -                 O         [110/110]    13h:13m:52s  
+10.1.1.8/30         10.1.1.13        1/1/3         -                 O         [110/110]    01h:25m:31s  
 10.1.1.12/30        -                1/1/3         -                 C         [0/0]        -            
 10.1.1.14/32        -                1/1/3         -                 L         [0/0]        -            
-10.1.1.16/30        10.1.1.21        1/1/4         -                 O         [110/110]    13h:13m:56s  
+10.1.1.16/30        10.1.1.21        1/1/4         -                 O         [110/110]    01h:25m:36s  
 10.1.1.20/30        -                1/1/4         -                 C         [0/0]        -            
 10.1.1.22/32        -                1/1/4         -                 L         [0/0]        -            
-10.1.1.24/30        10.1.1.29        1/1/5         -                 O         [110/101]    13h:14m:17s  
+10.1.1.24/30        10.1.1.29        1/1/5         -                 O         [110/101]    01h:25m:58s  
 10.1.1.28/30        -                1/1/5         -                 C         [0/0]        -            
 10.1.1.30/32        -                1/1/5         -                 L         [0/0]        -            
-10.9.9.1/32         10.0.0.18        1/1/6         -                 O         [110/120]    13h:14m:17s  
-10.10.10.0/30       10.1.1.5         1/1/2         -                 O/E1      [110/121]    13h:14m:17s  
-                    10.1.1.29        1/1/5         -                           [110/121]    13h:14m:17s  
-10.10.10.4/30       10.1.1.5         1/1/2         -                 O/E1      [110/121]    13h:14m:17s  
-                    10.1.1.29        1/1/5         -                           [110/121]    13h:14m:17s  
-10.10.10.8/30       10.1.1.5         1/1/2         -                 O/E1      [110/121]    13h:14m:17s  
-                    10.1.1.29        1/1/5         -                           [110/121]    13h:14m:17s  
-172.16.110.1/32     10.1.1.5         1/1/2         -                 O/E1      [110/121]    13h:14m:17s  
-                    10.1.1.29        1/1/5         -                           [110/121]    13h:14m:17s  
-172.16.210.1/32     10.1.1.5         1/1/2         -                 O/E1      [110/121]    13h:14m:17s  
-                    10.1.1.29        1/1/5         -                           [110/121]    13h:14m:17s  
-192.168.41.1/32     10.1.1.5         1/1/2         -                 O         [110/101]    13h:14m:19s  
-192.168.42.1/32     10.1.1.13        1/1/3         -                 O         [110/110]    13h:13m:52s  
-192.168.43.1/32     10.1.1.21        1/1/4         -                 O         [110/110]    13h:13m:56s  
-192.168.44.1/32     10.1.1.29        1/1/5         -                 O         [110/101]    13h:14m:17s  
+10.9.9.1/32         10.0.0.18        1/1/6         -                 O         [110/120]    01h:25m:31s  
+10.10.10.0/30       10.1.1.5         1/1/2         -                 O/E1      [110/121]    01h:25m:58s  
+                    10.1.1.29        1/1/5         -                           [110/121]    01h:25m:58s  
+10.10.10.4/30       10.1.1.5         1/1/2         -                 O/E1      [110/121]    01h:25m:58s  
+                    10.1.1.29        1/1/5         -                           [110/121]    01h:25m:58s  
+10.10.10.8/30       10.1.1.5         1/1/2         -                 O/E1      [110/121]    01h:25m:58s  
+                    10.1.1.29        1/1/5         -                           [110/121]    01h:25m:58s  
+172.16.110.1/32     10.1.1.5         1/1/2         -                 O/E1      [110/121]    01h:25m:58s  
+                    10.1.1.29        1/1/5         -                           [110/121]    01h:25m:58s  
+172.16.210.1/32     10.1.1.5         1/1/2         -                 O/E1      [110/121]    01h:25m:58s  
+                    10.1.1.29        1/1/5         -                           [110/121]    01h:25m:58s  
+192.168.41.1/32     10.1.1.5         1/1/2         -                 O         [110/101]    01h:25m:58s  
+192.168.42.1/32     10.1.1.13        1/1/3         -                 O         [110/110]    01h:25m:31s  
+192.168.43.1/32     10.1.1.21        1/1/4         -                 O         [110/110]    01h:25m:36s  
+192.168.44.1/32     10.1.1.29        1/1/5         -                 O         [110/101]    01h:25m:58s  
 
 Total Route Count : 38
 ```
@@ -1617,8 +1724,8 @@ Port      Native  Mode   Type           Enabled Status  Reason                 S
 Command: `traceroute 172.20.20.207 probes 1 timeout 2`
 ```
 traceroute to 172.20.20.207 (172.20.20.207), 1 hops min, 30 hops max, 2 sec. timeout, 1 probes
-  1   10.0.0.14  3.565ms 
-  2   10.0.0.26  3.168ms 
+  1   10.0.0.14  9.521ms 
+  2   10.0.0.30  3.399ms 
   3   * 
   4   * 
   5   * 
@@ -1654,18 +1761,13 @@ traceroute to 172.20.20.207 (172.20.20.207), 1 hops min, 30 hops max, 2 sec. tim
 #### 1. ospf — neighbors — PASS
 Command: `/routing ospf neighbor print terse without-paging`
 ```
-0 D instance=default area=area1 address=10.1.1.2 priority=1 router-id=11.11.11.11 dr=10.1.1.2 bdr=10.1.1.1 state=Full state-changes=6 adjacency=13h14m35s timeout=31s
-1 D instance=default area=area1 address=10.1.1.6 priority=1 router-id=11.11.11.22 dr=10.1.1.5 bdr=10.1.1.6 state=Full state-changes=6 adjacency=13h13m43s timeout=38s
+0 D instance=default area=area1 address=10.1.1.2 priority=1 router-id=11.11.11.11 dr=10.1.1.2 bdr=10.1.1.1 state=Full state-changes=6 adjacency=1h26m4s timeout=36s
+1 D instance=default area=area1 address=10.1.1.6 priority=1 router-id=11.11.11.22 dr=10.1.1.5 bdr=10.1.1.6 state=Full state-changes=6 adjacency=1h25m17s timeout=39s
 
 
 
 
  
-
-
-
-
-[admin@A1M] > 
 ```
 
 #### 2. ospf — database — PASS
@@ -1673,35 +1775,35 @@ Command: `/routing ospf lsa print without-paging`
 ```
 Flags: S - self-originated, F - flushing, W - wraparound; D - dynamic 
  0 SD instance=default area=area1 type="router" originator=1.1.1.1 id=1.1.1.1 
-      sequence=0x8000001F age=638 checksum=0x62DA body=
+      sequence=0x80000007 age=1511 checksum=0x92C2 body=
         options=
             type=network id=10.1.1.2 data=10.1.1.1 metric=1
             type=network id=10.1.1.5 data=10.1.1.5 metric=1
             type=stub id=192.168.41.1 data=255.255.255.255 metric=1
 
  1  D instance=default area=area1 type="router" originator=2.2.2.2 id=2.2.2.2 
-      sequence=0x8000001D age=1113 checksum=0xCE0C body=
+      sequence=0x80000006 age=1387 checksum=0x13DD body=
         options=DC
             type=stub id=192.168.42.1 data=255.255.255.255 metric=10
-            type=network id=10.1.1.13 data=10.1.1.13 metric=10
+            type=network id=10.1.1.14 data=10.1.1.13 metric=10
             type=network id=10.1.1.10 data=10.1.1.9 metric=10
 
  2  D instance=default area=area1 type="router" originator=3.3.3.3 id=3.3.3.3 
-      sequence=0x8000001D age=1114 checksum=0xA30E body=
+      sequence=0x80000006 age=1385 checksum=0xF3D3 body=
         options=DC
             type=stub id=192.168.43.1 data=255.255.255.255 metric=10
             type=network id=10.1.1.18 data=10.1.1.17 metric=10
-            type=network id=10.1.1.21 data=10.1.1.21 metric=10
+            type=network id=10.1.1.22 data=10.1.1.21 metric=10
 
  3  D instance=default area=area1 type="router" originator=4.4.4.4 id=4.4.4.4 
-      sequence=0x8000001F age=844 checksum=0xA71A body=
+      sequence=0x80000007 age=1448 checksum=0xD702 body=
         options=
             type=network id=10.1.1.26 data=10.1.1.25 metric=1
             type=network id=10.1.1.29 data=10.1.1.29 metric=1
             type=stub id=192.168.44.1 data=255.255.255.255 metric=1
 
  4  D instance=default area=area1 type="router" originator=11.11.11.11 
-      id=11.11.11.11 sequence=0x80000023 age=1270 checksum=0x68E 
+      id=11.11.11.11 sequence=0x8000000C age=1123 checksum=0x3477 
       body=
         options=DC bits=B
             type=network id=10.1.1.26 data=10.1.1.26 metric=10
@@ -1710,68 +1812,68 @@ Flags: S - self-originated, F - flushing, W - wraparound; D - dynamic
             type=network id=10.1.1.2 data=10.1.1.2 metric=10
 
  5  D instance=default area=area1 type="router" originator=11.11.11.22 
-      id=11.11.11.22 sequence=0x80000021 age=790 checksum=0xE832 
+      id=11.11.11.22 sequence=0x80000009 age=1489 checksum=0x51DF 
       body=
         options= bits=B
             type=network id=10.1.1.5 data=10.1.1.6 metric=100
-            type=network id=10.1.1.13 data=10.1.1.14 metric=100
-            type=network id=10.1.1.21 data=10.1.1.22 metric=100
+            type=network id=10.1.1.14 data=10.1.1.14 metric=100
+            type=network id=10.1.1.22 data=10.1.1.22 metric=100
             type=network id=10.1.1.29 data=10.1.1.30 metric=100
 
  6  D instance=default area=area1 type="network" originator=11.11.11.11 
-      id=10.1.1.2 sequence=0x80000018 age=1270 checksum=0x2E8F 
+      id=10.1.1.2 sequence=0x80000003 age=1123 checksum=0x587A 
       body=
         netmask=255.255.255.252
             router-id=11.11.11.11
             router-id=1.1.1.1
 
  7 SD instance=default area=area1 type="network" originator=1.1.1.1 id=10.1.1.5
-      sequence=0x8000001B age=850 checksum=0x54A0 body=
+      sequence=0x80000003 age=1468 checksum=0x8488 
+      body=
         netmask=255.255.255.252
             router-id=1.1.1.1
             router-id=11.11.11.22
 
  8  D instance=default area=area1 type="network" originator=11.11.11.11 
-      id=10.1.1.10 sequence=0x80000018 age=1270 checksum=0x10A1 
+      id=10.1.1.10 sequence=0x80000003 age=1123 checksum=0x3A8C 
       body=
         netmask=255.255.255.252
             router-id=11.11.11.11
             router-id=2.2.2.2
 
- 9  D instance=default area=area1 type="network" originator=2.2.2.2 
-      id=10.1.1.13 sequence=0x8000001A age=1113 checksum=0x289D 
+ 9  D instance=default area=area1 type="network" originator=11.11.11.22 
+      id=10.1.1.14 sequence=0x80000003 age=1499 checksum=0xDCEF 
       body=
         netmask=255.255.255.252
             router-id=2.2.2.2
             router-id=11.11.11.22
 
 10  D instance=default area=area1 type="network" originator=11.11.11.11 
-      id=10.1.1.18 sequence=0x80000018 age=1270 checksum=0xF1B3 
+      id=10.1.1.18 sequence=0x80000003 age=1123 checksum=0x1C9E 
       body=
         netmask=255.255.255.252
             router-id=11.11.11.11
             router-id=3.3.3.3
 
-11  D instance=default area=area1 type="network" originator=3.3.3.3 
-      id=10.1.1.21 sequence=0x8000001A age=1114 checksum=0xDBD9 
+11  D instance=default area=area1 type="network" originator=11.11.11.22 
+      id=10.1.1.22 sequence=0x80000003 age=1499 checksum=0xAE12 
       body=
         netmask=255.255.255.252
             router-id=3.3.3.3
             router-id=11.11.11.22
 
 12  D instance=default area=area1 type="network" originator=11.11.11.11 
-      id=10.1.1.26 sequence=0x80000018 age=1270 checksum=0xD3C5 
+      id=10.1.1.26 sequence=0x80000003 age=1123 checksum=0xFDB0 
       body=
         netmask=255.255.255.252
             router-id=11.11.11.11
             router-id=4.4.4.4
 
 13  D instance=default area=area1 type="network" originator=4.4.4.4 
-      id=10.1.1.29 sequence=0x8000001B age=656 checksum=0x6F55 
+      id=10.1.1.29 sequence=0x80000003 age=1476 checksum=0x9F3D 
       body=
         netmask=255.255.255.252
-            router-id=4.4.4.4
-... (167 more lines truncated)
+... (168 more lines truncated)
 ```
 
 #### 3. ospf — borders — PASS
@@ -1851,8 +1953,8 @@ Columns: DST-ADDRESS, GATEWAY, ROUTING-TABLE, DISTANCE
 #      DST-ADDRESS       GATEWAY               ROUTING-TABLE  DISTANCE
 0  As  172.20.20.0/24    172.31.255.29         main                  1
   DAc  172.31.255.28/30  ether1                main                  0
-  DAo+ 0.0.0.0/0         10.1.1.6%ether3@VRF1  VRF1                110
   DAo+ 0.0.0.0/0         10.1.1.2%ether2@VRF1  VRF1                110
+  DAo+ 0.0.0.0/0         10.1.1.6%ether3@VRF1  VRF1                110
   DAo  10.0.0.0/30       10.1.1.2%ether2@VRF1  VRF1                110
   DAo  10.0.0.4/30       10.1.1.2%ether2@VRF1  VRF1                110
   DAo  10.0.0.8/30       10.1.1.2%ether2@VRF1  VRF1                110
@@ -1890,9 +1992,10 @@ Columns: DST-ADDRESS, GATEWAY, ROUTING-TABLE, DISTANCE
 ```
 
 #### 8. routing_table — route_maps — PASS
-Command: `/routing filter print without-paging`
+Command: `/routing/filter/rule print detail without-paging`
 ```
-bad command name print (line 1 column 17)
+Flags: X - disabled, I - inactive 
+
 
 
 
@@ -1905,9 +2008,10 @@ bad command name print (line 1 column 17)
 ```
 
 #### 9. routing_table — prefix_lists — PASS
-Command: `/routing filter print without-paging`
+Command: `/ip/firewall/address-list print detail without-paging`
 ```
-bad command name print (line 1 column 17)
+Flags: X - disabled, D - dynamic 
+
 
 
 
@@ -1957,15 +2061,15 @@ Command: `/interface print brief without-paging`
 Flags: R - RUNNING
 Columns: NAME, TYPE, ACTUAL-MTU, L2MTU, MAC-ADDRESS
 #   NAME    TYPE      ACTUAL-MTU  L2MTU  MAC-ADDRESS      
-0 R ether1  ether           1500         0C:00:35:D6:17:00
+0 R ether1  ether           1500         0C:00:6E:34:39:00
 ;;; TO-D1C
-1 R ether2  ether           1500         AA:C1:AB:EE:89:AF
+1 R ether2  ether           1500         AA:C1:AB:74:86:8D
 ;;; TO-D2B
-2 R ether3  ether           1500         AA:C1:AB:D2:43:53
-3 R VRF1    vrf            65536         36:7A:13:01:09:45
+2 R ether3  ether           1500         AA:C1:AB:61:9F:7E
+3 R VRF1    vrf            65536         0E:7F:39:6E:7D:E4
 4 R lo      loopback       65536         00:00:00:00:00:00
 ;;; Loopback0
-5 R lo0     bridge          1500  65535  56:2C:EA:8F:80:BC
+5 R lo0     bridge          1500  65535  1A:AC:0E:0B:1D:89
 
 
 
@@ -1982,8 +2086,8 @@ Columns: NAME, TYPE, ACTUAL-MTU, L2MTU, MAC-ADDRESS
 Command: `/tool/traceroute count=1 address=172.20.20.207`
 ```
 ADDRESS                          LOSS SENT    LAST     AVG    BEST   WORST
-172.31.255.29                      0%    1   0.1ms     0.1     0.1     0.1
-172.20.20.207                      0%    1   0.5ms     0.5     0.5     0.5
+172.31.255.29                      0%    1   0.2ms     0.2     0.2     0.2
+172.20.20.207                      0%    1   1.4ms     1.4     1.4     1.4
 
 
 

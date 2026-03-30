@@ -20,8 +20,8 @@ _vectorstore = None
 def _get_vectorstore():
     global _embeddings, _vectorstore
     if _vectorstore is None:
-        from langchain_community.embeddings import HuggingFaceEmbeddings
-        from langchain_community.vectorstores import Chroma
+        from langchain_huggingface import HuggingFaceEmbeddings
+        from langchain_chroma import Chroma
         _embeddings = HuggingFaceEmbeddings(model_name=_EMBEDDING_MODEL)
         _vectorstore = Chroma(
             persist_directory=_CHROMA_DIR,

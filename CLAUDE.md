@@ -66,6 +66,10 @@ State clearly:
 - What the root cause is (or what further information is needed)
 - What the recommended fix is (configuration direction only — never push changes)
 
+### Multi-failure investigations
+
+When investigating multiple failures (e.g. via `/qa`), always loop back after each finding. Present remaining uninvestigated failures and ask the user to pick the next one. The user acknowledging a fix is not a signal to stop — only stop when the user explicitly declines or all failures are covered.
+
 ## Constraints
 
 - **Read-only.** Never suggest commands that change device configuration. Diagnosis and direction only.

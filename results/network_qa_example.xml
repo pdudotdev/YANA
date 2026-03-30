@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="network_qa"
+            tests="3"
+            failures="2"
+            timestamp="2026-03-30T06:15:42Z">
+  <testsuite name="network_qa"
+             tests="3"
+             failures="2">
+    <testcase name="route_to_a2a" classname="route_to_a2a">
+      <properties>
+        <property name="device" value="E1C"/>
+        <property name="rfc_ref" value="RFC 2328 &sect;16"/>
+        <property name="description" value="Verify E1C has route to A2A loopback 192.168.42.1 in VRF1"/>
+      </properties>
+      <failure message="Verify E1C has route to A2A loopback 192.168.42.1 in VRF1">Assertion route_exists(&quot;192.168.42.1&quot;) returned False. NETCONF response contains VRF1 routing entries but 192.168.42.1/32 is not present in the RIB.</failure>
+    </testcase>
+    <testcase name="ospf_adj_e1c_c1j" classname="ospf_adj_e1c_c1j">
+      <properties>
+        <property name="device" value="E1C"/>
+        <property name="rfc_ref" value="RFC 2328 &sect;10.3"/>
+        <property name="description" value="Verify E1C has FULL OSPF adjacency with C1J (router-id 22.22.22.11)"/>
+      </properties>
+      <failure message="Verify E1C has FULL OSPF adjacency with C1J (router-id 22.22.22.11)">Assertion ospf_neighbor_full(&quot;22.22.22.11&quot;) returned False. Neighbor 22.22.22.11 found but adjacency state is INIT, not FULL.</failure>
+    </testcase>
+    <testcase name="route_map_e1c_to_c1j" classname="route_map_e1c_to_c1j">
+      <properties>
+        <property name="device" value="C1J"/>
+        <property name="rfc_ref" value="RFC 2328 &sect;16.4"/>
+        <property name="description" value="Verify route-map on E1C redistributes static route 10.99.99.0/24 to C1J via OSPF"/>
+      </properties>
+    </testcase>
+  </testsuite>
+</testsuites>

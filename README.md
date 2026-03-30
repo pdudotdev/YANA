@@ -52,6 +52,7 @@ Run your tests with any framework. When something fails, YANA investigates - it 
 
 **Step 1 - Install and ingest:**
 ```bash
+sudo apt install git make python3.12-venv
 cd ~ && git clone https://github.com/pdudotdev/YANA
 cd YANA && make setup
 ```

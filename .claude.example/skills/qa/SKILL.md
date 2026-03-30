@@ -18,7 +18,7 @@ Then stop.
 
 Parse the XML structure:
 - Each `<testcase>` is one test scenario. The `name` attribute is the scenario name.
-- `<properties>` contain key-value pairs: `device`, `rfc_ref`, `description`, `rfc_citation`.
+- `<properties>` contain key-value pairs: `device`, `rfc_ref`, `description`.
 - A `<testcase>` with a `<failure>` child is a failed test. The `message` attribute and text content describe the failure.
 - A `<testcase>` without `<failure>` is a pass.
 
@@ -73,6 +73,6 @@ Produce a concise report for the investigated failure:
 5. **RFC basis**: the protocol rule that explains the failure
 6. **Recovery status**: is the network still broken or has it been fixed?
 
-If there are remaining uninvestigated failures, re-present the list (without the one just investigated) and ask the user to pick the next one. Repeat until all failures are investigated or the user stops.
+**IMPORTANT — always loop back.** After the report, if there are remaining uninvestigated failures, you MUST immediately re-present the remaining failure list and ask the user to pick the next one — do not wait for the user to ask. The user acknowledging a fix ("ok", "got it", "I'll do that") is NOT a signal to stop. Only stop looping if the user explicitly declines (e.g. "that's all", "no more", "skip the rest") or all failures have been investigated.
 
 After investigating a failure, if its root cause likely explains other failures still on the list, say so — the user may choose to skip those.
