@@ -46,6 +46,17 @@ Run your tests with any framework. When something fails, YANA investigates - it 
 | **Routing** | Table, route maps, prefix lists, PBR, ACLs, ECMP |
 | **Interfaces** | Up/down state, expected operational status |
 
+## Test Network Topology
+
+**Network diagram:**
+
+![topology](metadata/topology/DBL-TOPOLOGY.png)
+
+**Lab environment:**
+- 16 devices defined in [**TOPOLOGY.yml**](TOPOLOGY.yml)
+- 5 x Cisco IOS, 3 x Cisco IOS-XE, 4 x Arista cEOS, 2 x MikroTik CHR, 1 x Juniper JunOS, 1 x Aruba AOS-CX
+- See [**lab_configs**](lab_configs/) for my test network's configuration
+
 ## Installation
 
 **Prerequisites:** Python 3.11+
@@ -180,17 +191,6 @@ YANA/
 ├── requirements.txt
 └── README.md
 ```
-
-## Test Network Topology
-
-**Network diagram:**
-
-![topology](metadata/topology/DBL-TOPOLOGY.png)
-
-**Lab environment:**
-- 16 devices defined in [**TOPOLOGY.yml**](TOPOLOGY.yml)
-- 5 x Cisco IOS, 3 x Cisco IOS-XE, 4 x Arista cEOS, 2 x MikroTik CHR, 1 x Juniper JunOS, 1 x Aruba AOS-CX
-- See [**lab_configs**](lab_configs/) for my test network's configuration
 
 ## Planned Upgrades
 
